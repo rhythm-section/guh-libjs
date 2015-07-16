@@ -1,0 +1,40 @@
+{
+  "name": "guh-libjs",
+  "version": "0.1.0",
+  "description": "Library for mobileapp and webinterface of guh (gear up your home)",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guh/guh-libjs.git"
+  },
+  "keywords": [
+    "guh",
+    "guh-libjs",
+    "guh-mobileapp",
+    "guh-webinterface",
+    "angularjs"
+  ],
+  "author": "Lukas Mayerhofer <lukas.mayerhofer@guh.guru>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/guh/guh-libjs/issues"
+  },
+  "homepage": "https://github.com/guh/guh-libjs",
+  "devDependencies": {
+    "colors": "^1.1.2",
+    "del": "^1.2.0",
+    "gulp": "^3.9.0",
+    "gulp-angular-filesort": "^1.1.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-rename": "^1.2.2",
+    "gulp-size": "^1.2.3",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-uglify": "^1.2.0",
+    "jshint-stylish": "^2.0.1",
+    "require-dir": "^0.3.0",
+    "run-sequence": "^1.1.1",
+    "yargs": "^3.15.0"
+  }
+}
