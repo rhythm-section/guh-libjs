@@ -29,9 +29,9 @@
     .module('guh.models')
     .factory('modelsHelper', modelsHelper);
 
-  modelsHelper.$inject = ['$log', '$q', '$cordovaFile', 'DS', 'DSParamType', 'File', 'app'];
+  modelsHelper.$inject = ['$log', '$q', 'DS', 'DSParamType', 'File', 'app'];
 
-  function modelsHelper($log, $q, $cordovaFile, DS, DSParamType, File, app) {
+  function modelsHelper($log, $q, DS, DSParamType, File, app) {
 
     var modelsHelper = {
       addUiData: addUiData,
