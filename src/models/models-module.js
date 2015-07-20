@@ -38,6 +38,10 @@
     DSProvider
       .defaults
       .basePath = app.apiUrl;
+
+    DSProvider
+      .defaults
+      .debug = false;
   }
 
 }());
