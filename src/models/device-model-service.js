@@ -189,8 +189,6 @@
       device.deviceClassId = deviceClassId || '';
       device.deviceDescriptorId = deviceData.id || '';
 
-      $log.log('add deviceData', deviceData);
-
       device.deviceParams = [];
       if(deviceData.deviceParamTypes) {
         angular.forEach(deviceData.deviceParamTypes, function(deviceParamType) {
@@ -205,16 +203,12 @@
         device.deviceParams = deviceData.params;
       }
 
-      $log.log('add device.deviceParams', device.deviceParams);
-
       // Temporarly add name
       // TODO: Add name to discovery template
       device.deviceParams.push({
         name: 'name',
         value: 'Name'
       });
-
-      $log.log('add device.deviceParams', device.deviceParams);
 
       return DSDevice.create({device: device});
     }
@@ -244,12 +238,13 @@
     /*
      * Public method: executeAction()
      */
-    function executeAction(actionType) {
+    function executeAction(actionType, params) {
       /* jshint validthis: true */
       var self = this;
       var options = {};
 
-      options.params = actionType.getParams();
+      // options.params = actionType.getParams();
+      options.params = params;
 
       return DS
         .adapters
