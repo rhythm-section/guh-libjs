@@ -43,7 +43,6 @@
 
       // API configuration
       endpoint: 'event_types',
-      suffix: '.json',
 
       // Model configuration
       idAttribute: 'id',

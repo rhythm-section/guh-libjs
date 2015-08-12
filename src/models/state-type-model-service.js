@@ -43,7 +43,6 @@
 
       // API configuration
       endpoint: 'state_types',
-      suffix: '.json',
 
       // Model configuration
       idAttribute: 'id',

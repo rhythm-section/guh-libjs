@@ -43,7 +43,6 @@
 
       // API configuration
       endpoint: 'vendors',
-      suffix: '.json',
 
       // Model configuration
       idAttribute: 'id',

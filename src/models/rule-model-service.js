@@ -43,7 +43,6 @@
 
       // API configuration
       endpoint: 'rules',
-      suffix: '.json',
 
       // Model configuration
       idAttribute: 'id',

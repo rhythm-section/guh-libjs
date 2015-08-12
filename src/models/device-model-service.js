@@ -43,7 +43,6 @@
 
       // API configuration
       endpoint: 'devices',
-      suffix: '.json',
 
       // Model configuration
       idAttribute: 'id',
