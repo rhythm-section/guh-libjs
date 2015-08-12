@@ -90,19 +90,19 @@
       var paramTypes = attrs.paramTypes;
       var phrase = 'When ' + attrs.name;
 
-      // phrase
+      // Add phrase for moods
       if(angular.isArray(paramTypes) && paramTypes.length === 0) {
         attrs.phrase = phrase + ' is detected';
       } else {
         attrs.phrase = phrase + ' is detcted and parameters are';
       }
 
-      // unit
+      // Add unit
       attrs.unit = modelsHelper.getUnit(attrs.name);
 
-      // paramTypes
+      // Add templateUrl to paramTypes
       angular.forEach(paramTypes, function(paramType) {
-        paramType = modelsHelper.addUiData('input', paramType);
+        paramType = modelsHelper.addUiData(paramType);
       });
     }
 

@@ -30,9 +30,9 @@
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'DSState', 'app', 'libs', 'modelsHelper'];
+  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper'];
 
-  function DSDeviceClassFactory($log, DS, DSHttpAdapter, DSState, app, libs, modelsHelper) {
+  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper) {
     
     var staticMethods = {};
 
@@ -132,22 +132,24 @@
     function _addUiData(resource, attrs) {
       var discoveryParamTypes = attrs.discoveryParamTypes;
       var paramTypes = attrs.paramTypes;
-      var stateTypes = attrs.stateTypes;
+      // var stateTypes = attrs.stateTypes;
+
+      attrs = modelsHelper.addUiData(attrs);
 
       // discoveryParamTypes
       angular.forEach(discoveryParamTypes, function(paramType) {
-        paramType = modelsHelper.addUiData('input', paramType);
+        paramType = modelsHelper.addUiData(paramType);
       });
 
       // paramTypes
       angular.forEach(paramTypes, function(paramType) {
-        paramType = modelsHelper.addUiData('input', paramType);
+        paramType = modelsHelper.addUiData(paramType);
       });
 
       // stateTypes
-      angular.forEach(stateTypes, function(stateType) {
-        stateType = modelsHelper.addUiData('input', stateType);
-      });
+      // angular.forEach(stateTypes, function(stateType) {
+      //   stateType = modelsHelper.addUiData(stateType);
+      // });
     }
 
     /*

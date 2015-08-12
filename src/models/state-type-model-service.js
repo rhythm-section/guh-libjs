@@ -85,7 +85,7 @@
      * Private method: _addUiData(resource, attrs)
      */
     function _addUiData(resource, attrs) {
-      var paramTypes = attrs.paramTypes;
+      // var paramTypes = attrs.paramTypes;
       var regExp = /\s\[([^)]+)\]/;                 // Value inside brackets []
       var searchUnit = name.replace(regExp, '');    // Get value inside brackets
       var phrase = attrs.name;
@@ -101,10 +101,8 @@
       // unit
       attrs.unit = modelsHelper.getUnit(attrs.name);
 
-      // paramTypes
-      angular.forEach(paramTypes, function(paramType) {
-        paramType = modelsHelper.addUiData('input', paramType);
-      });
+      // Add templateUrl to stateType
+      attrs = modelsHelper.addUiData(attrs);
     }
 
   }

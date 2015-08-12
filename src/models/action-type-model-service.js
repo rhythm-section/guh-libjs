@@ -91,20 +91,20 @@
       var paramTypes = attrs.paramTypes;
       var phrase = 'Execute "' + attrs.name + '"';
 
-      // phrase
-      if(angular.isArray(paramTypes) && paramTypes.length === 0) {
-        attrs.phrase = phrase + '.';
-      } else {
+      // Add phrase for moods
+      if(angular.isArray(paramTypes) && paramTypes.length >= 0) {
         attrs.phrase = phrase + ' with parameters';
       }
 
-      function _handleParamType(paramType) {
-        paramType = modelsHelper.addUiData('action', paramType);
-        paramType.dependsOnTrigger = false;
-      }
+      // Add templateUrl to paramTypes
+      var isChildOfActionType = true;
+      angular.forEach(paramTypes, function(paramType) {
+        paramType = modelsHelper.addUiData(paramType, isChildOfActionType);
+        // paramType.dependsOnTrigger = false;
+      });
 
-      // paramTypes
-      angular.forEach(paramTypes, _handleParamType);
+      // Add templateUrl to actionType & paramTypes
+      attrs = modelsHelper.addUiData(attrs);
     }
 
 

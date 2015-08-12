@@ -29,14 +29,13 @@
     .module('guh.models')
     .factory('modelsHelper', modelsHelper);
 
-  modelsHelper.$inject = ['$log', '$q', 'DS', 'DSParamType', 'File', 'app'];
+  modelsHelper.$inject = ['$log', '$q', 'DS', 'File', 'app'];
 
-  function modelsHelper($log, $q, DS, DSParamType, File, app) {
+  function modelsHelper($log, $q, DS, File, app) {
 
     var modelsHelper = {
       addUiData: addUiData,
       checkTemplateUrl: checkTemplateUrl,
-      getTemplateUrl: getTemplateUrl,
       getUnit: getUnit,
       setBasePath: setBasePath
     };
@@ -47,88 +46,100 @@
     /*
      * Private method: _getInputPath(directiveName, filename)
      */
-    function _getInputPath(directiveName, filename) {
-      return app.basePaths.ui + directiveName + '/templates/' + filename + app.fileExtensions.html;
-    }
-
-    /*
-     * Private method: _getActionTemplate(guhType)
-     */
-    function _getActionTemplate(guhType) {
-      var allowedValues = (guhType.allowedValues === undefined) ? null : guhType.allowedValues;
-      var inputType = (guhType.inputType === undefined) ? null : guhType.inputType;
-      // var name = (guhType.name === undefined) ? null : guhType.name;
-      var type = (guhType.type === undefined) ? null : guhType.type;
-      var directiveNameAction = 'action-param';
-      var directiveNameInput = 'input';
-      var template;
-
-      switch(type) {
-        case 'bool':
-          template = _getInputPath(directiveNameAction, directiveNameAction + '-toggle-button');
-          break;
-        case 'int':
-        case 'uint':
-          template = _getInputPath(directiveNameAction, directiveNameAction + '-slider');
-          break;
-        case 'double':
-          template = _getInputPath(directiveNameAction, directiveNameAction + '-slider');
-          break;
-        case 'QColor':
-          template = _getInputPath(directiveNameAction, directiveNameAction + '-color-picker');
-          break;
-        case 'QString':
-          if(allowedValues) {
-            template = _getInputPath(directiveNameInput, directiveNameInput + '-select');
-          } else if(inputType) {
-            template = _getInputPath(directiveNameInput, directiveNameInput + app.inputTypes[inputType]);
-          } else {
-            template = _getInputPath(directiveNameInput, directiveNameInput + '-text');
-          }
-          break;
-        default:
-          template = _getInputPath(directiveNameAction, 'template-not-available');
+    function _getInputPath(folderName, directiveName, filename) {
+      if(directiveName) {
+        return app.basePaths.ui + folderName + '/' + directiveName + '-templates/' + filename + app.fileExtensions.html;
+      } else {
+        return app.basePaths.ui + folderName + '/templates/' + filename + app.fileExtensions.html;
       }
-
-      return template;
     }
 
     /*
-     * Private method: _getInputTemplate(guhType)
+     * Private method: _getActionTemplates(actionType)
      */
-    function _getInputTemplate(guhType) {
+    function _getActionTemplate(actionType) {
+      var paramTypes = (actionType.paramTypes === undefined) ? null : actionType.paramTypes;
+      var folderName = 'action-param';
+      var directiveName = 'action-param';
+
+      if(angular.isArray(paramTypes)) {
+        if(paramTypes.length <= 0) {
+          // ActionType
+          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
+        } else if(paramTypes.length === 1) {
+          // ActionType
+          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
+
+          // ParamType
+          // paramTypes[0].templateUrl = _getInputTemplate(paramTypes[0], true);
+        } else if(paramTypes.length > 1) {
+          // ActionType
+          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-execute');
+
+          // ParamTypes
+          // angular.forEach(paramTypes, function(paramType, index) {
+          //   actionType.paramTypes[index].templateUrl = _getInputTemplate(paramType, true);
+          // });
+        }
+      } else {
+        $log.warn('guh.models.modelsHelper | The property paramTypes is not of type Array.', guhType);
+      }
+    }
+
+    /*
+     * Private method: _getInputTemplate(guhType, isChildOfActionType)
+     * guhType can be of type: ParamType, StateType
+     */
+    function _getInputTemplate(guhType, isChildOfActionType) {
       var allowedValues = (guhType.allowedValues === undefined) ? null : guhType.allowedValues;
       var inputType = (guhType.inputType === undefined) ? null : guhType.inputType;
-      // var name = (guhType.name === undefined) ? null : guhType.name;
       var type = (guhType.type === undefined) ? null : guhType.type;
-      var directiveName = 'input';
+      var folderName = 'form';
+      var directiveName = 'form-field';
       var template;
 
       switch(type) {
         case 'bool':
-          template = _getInputPath(directiveName, directiveName + '-checkbox');
+          if(isChildOfActionType) {
+            template = _getInputPath(folderName, directiveName, directiveName + '-toggle-button');
+          } else {
+            template = _getInputPath(folderName, directiveName, directiveName + '-checkbox');
+          }
           break;
         case 'int':
         case 'uint':
-          template = _getInputPath(directiveName, directiveName + '-number-integer');
+          if(isChildOfActionType) {
+            template = _getInputPath(folderName, directiveName, directiveName + '-range');
+          } else {
+            template = _getInputPath(folderName, directiveName, directiveName + '-number-integer');
+          }
           break;
         case 'double':
-          template = _getInputPath(directiveName, directiveName + '-number-decimal');
+          if(isChildOfActionType) {
+            template = _getInputPath(folderName, directiveName, directiveName + '-range');
+          } else {
+            template = _getInputPath(folderName, directiveName, directiveName + '-number-decimal');
+          }
           break;
         case 'QColor':
-          template = _getInputPath(directiveName, directiveName + '-color');
+          template = _getInputPath(folderName, directiveName, directiveName + '-color-picker');
           break;
         case 'QString':
           if(allowedValues) {
-            template = _getInputPath(directiveName, directiveName + '-select');
+            if(isChildOfActionType) {
+              template = _getInputPath(folderName, directiveName, directiveName + '-select');
+            } else {
+              template = _getInputPath(folderName, directiveName, directiveName + '-select');
+            }
           } else if(inputType) {
-            template = _getInputPath(directiveName, directiveName + app.inputTypes[inputType]);
+            template = _getInputPath(folderName, directiveName, directiveName + app.inputTypes[inputType]);
           } else {
-            template = _getInputPath(directiveName, directiveName + '-text');
+            template = _getInputPath(folderName, directiveName, directiveName + '-text');
           }
           break;
         default:
-          template = _getInputPath(directiveName, 'template-not-available');
+          template = _getInputPath(folderName, directiveName, 'template-not-available');
+          // template = null;
       }
 
       return template;
@@ -168,14 +179,31 @@
 
 
     /*
-     * Public method: addUiData(directiveName, guhType)
-     * guhType can be from type ParamType or StateType
+     * Public method: addUiData(guhType)
+     * guhType can be of type: ActionType, StateType, ParamType
      */
-    function addUiData(directiveName, guhType) {
-      guhType.operator = app.valueOperator.is.operators[0];
-      guhType.actionTemplateUrl = _getActionTemplate(guhType);
-      guhType.inputTemplateUrl = _getInputTemplate(guhType);
-      guhType.value = _getValue(guhType);
+    function addUiData(guhType, isChildOfActionType) {
+      var type;
+
+      if(DS.is('actionType', guhType)) {
+        guhType.actionTemplateUrl = _getActionTemplate(guhType);
+        type = 'actionType';
+        // _setActionTemplates(guhType);
+      } else if(DS.is('stateType', guhType)) {
+        isChildOfActionType = false;
+        guhType.inputTemplateUrl = _getInputTemplate(guhType, isChildOfActionType);
+        // guhType.operator = app.valueOperator.is.operators[0];
+        // guhType.value = _getValue(guhType);
+        type = 'stateType';
+        // guhType.templateUrl = _getInputTemplate(guhType);
+      } else {
+        guhType.inputTemplateUrl = _getInputTemplate(guhType, isChildOfActionType);
+        // guhType.value = _getValue(guhType);
+        type = 'paramType';
+        // guhType.templateUrl = _getInputTemplate(guhType);
+      }
+
+      // $log.log('Template of ' + type + ' [' + guhType.name + ' / ' + guhType.type + ']: ', guhType.templateUrl);
 
       return guhType;
     }
@@ -204,14 +232,6 @@
       } else {
         return path + 'template-not-defined.html';
       }
-    }
-
-    /*
-     * Public method: getTemplateurl(directiveName, filename)
-     */
-    function getTemplateUrl(directiveName, filename) {
-      var templateUrl = _getInputPath(directiveName, filename);
-      return checkTemplateUrl(templateUrl);
     }
 
     /*
