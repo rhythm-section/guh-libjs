@@ -42,7 +42,7 @@
     var DSDeviceClass = DS.defineResource({
 
       // API configuration
-      endpoint: 'device_classes',
+      endpoint: 'deviceclasses',
 
       // Model configuration
       idAttribute: 'id',
