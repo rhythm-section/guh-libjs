@@ -42,7 +42,7 @@
     var DSActionType = DS.defineResource({
 
       // API configuration
-      endpoint: 'action_types',
+      endpoint: 'actiontypes',
 
       // Model configuration
       idAttribute: 'id',

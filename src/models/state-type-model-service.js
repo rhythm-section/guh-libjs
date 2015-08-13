@@ -42,7 +42,7 @@
     var DSStateType = DS.defineResource({
 
       // API configuration
-      endpoint: 'state_types',
+      endpoint: 'statetypes',
 
       // Model configuration
       idAttribute: 'id',

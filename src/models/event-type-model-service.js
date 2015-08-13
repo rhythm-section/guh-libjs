@@ -42,7 +42,7 @@
     var DSEventType = DS.defineResource({
 
       // API configuration
-      endpoint: 'event_types',
+      endpoint: 'eventtypes',
 
       // Model configuration
       idAttribute: 'id',
