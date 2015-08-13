@@ -248,28 +248,13 @@
 
 
     /*
-     * Public method: discover()
+     * Public method: discover(discoveryParams)
      */
-    function discover() {
+    function discover(discoveryParams) {
       /* jshint validthis: true */
       var self = this;
-      var discoveryParams = [];
 
-      angular.forEach(self.discoveryParamTypes, function(discoveryParamType) {
-        var discoveryParam = {};
-
-        discoveryParam.name = discoveryParamType.name;
-        discoveryParam.value = discoveryParamType.value;
-
-        discoveryParams.push(discoveryParam);
-      });
-
-      return DSHttpAdapter.GET(app.apiUrl + '/device_classes/' + self.id + '/discover.json', {
-        params: {
-          'device_class_id': self.id,
-          'discovery_params': angular.toJson(discoveryParams)
-        }
-      });
+      return DSHttpAdapter.GET(app.apiUrl + '/deviceclasses/' + self.id + '/discover?params=' + angular.toJson(discoveryParams));
     }
 
     /*

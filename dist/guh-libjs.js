@@ -26,7 +26,7 @@
   'use strict';
 
   angular
-    .module('guh.models', [
+    .module('guh.utils', [
       // Datastore
       'js-data'
     ])
@@ -38,6 +38,64 @@
     DSProvider
       .defaults
       .basePath = app.apiUrl;
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.models', [
+      // Datastore
+      'js-data'
+    ])
+    .config(config);
+
+  config.$inject = ['DSHttpAdapterProvider', 'DSProvider', 'app'];
+
+  function config(DSHttpAdapterProvider, DSProvider, app) {
+    DSHttpAdapterProvider
+      .defaults
+      .log = false;
+
+    DSHttpAdapterProvider
+      .defaults
+      .deserialize = function deserialize(resourceConfig, data) {
+        return data ? ('data' in data ? data.data : data) : data;
+      }
+
+
+    DSProvider
+      .defaults
+      .basePath = app.apiUrl;
+
+    DSProvider
+      .defaults
+      .debug = false;
   }
 
 }());
@@ -86,7 +144,6 @@
 
       // API configuration
       endpoint: 'vendors',
-      suffix: '.json',
 
       // Model configuration
       idAttribute: 'id',
@@ -157,8 +214,7 @@
     var DSStateType = DS.defineResource({
 
       // API configuration
-      endpoint: 'state_types',
-      suffix: '.json',
+      endpoint: 'statetypes',
 
       // Model configuration
       idAttribute: 'id',
@@ -200,7 +256,7 @@
      * Private method: _addUiData(resource, attrs)
      */
     function _addUiData(resource, attrs) {
-      var paramTypes = attrs.paramTypes;
+      // var paramTypes = attrs.paramTypes;
       var regExp = /\s\[([^)]+)\]/;                 // Value inside brackets []
       var searchUnit = name.replace(regExp, '');    // Get value inside brackets
       var phrase = attrs.name;
@@ -216,10 +272,8 @@
       // unit
       attrs.unit = modelsHelper.getUnit(attrs.name);
 
-      // paramTypes
-      angular.forEach(paramTypes, function(paramType) {
-        paramType = modelsHelper.addUiData('input', paramType);
-      });
+      // Add templateUrl to stateType
+      attrs = modelsHelper.addUiData(attrs);
     }
 
   }
@@ -270,7 +324,6 @@
 
       // API configuration
       endpoint: 'states',
-      suffix: '.json',
 
       // Model configuration
       idAttribute: 'stateTypeId',
@@ -343,7 +396,6 @@
 
       // API configuration
       endpoint: 'rules',
-      suffix: '.json',
 
       // Model configuration
       idAttribute: 'id',
@@ -476,14 +528,13 @@
     .module('guh.models')
     .factory('modelsHelper', modelsHelper);
 
-  modelsHelper.$inject = ['$log', '$q', 'DS', 'DSParamType', 'File', 'app'];
+  modelsHelper.$inject = ['$log', '$q', 'DS', 'File', 'app'];
 
-  function modelsHelper($log, $q, DS, DSParamType, File, app) {
+  function modelsHelper($log, $q, DS, File, app) {
 
     var modelsHelper = {
       addUiData: addUiData,
       checkTemplateUrl: checkTemplateUrl,
-      getTemplateUrl: getTemplateUrl,
       getUnit: getUnit,
       setBasePath: setBasePath
     };
@@ -494,88 +545,100 @@
     /*
      * Private method: _getInputPath(directiveName, filename)
      */
-    function _getInputPath(directiveName, filename) {
-      return app.basePaths.ui + directiveName + '/templates/' + filename + app.fileExtensions.html;
-    }
-
-    /*
-     * Private method: _getActionTemplate(guhType)
-     */
-    function _getActionTemplate(guhType) {
-      var allowedValues = (guhType.allowedValues === undefined) ? null : guhType.allowedValues;
-      var inputType = (guhType.inputType === undefined) ? null : guhType.inputType;
-      // var name = (guhType.name === undefined) ? null : guhType.name;
-      var type = (guhType.type === undefined) ? null : guhType.type;
-      var directiveNameAction = 'action-param';
-      var directiveNameInput = 'input';
-      var template;
-
-      switch(type) {
-        case 'bool':
-          template = _getInputPath(directiveNameAction, directiveNameAction + '-toggle-button');
-          break;
-        case 'int':
-        case 'uint':
-          template = _getInputPath(directiveNameAction, directiveNameAction + '-slider');
-          break;
-        case 'double':
-          template = _getInputPath(directiveNameAction, directiveNameAction + '-slider');
-          break;
-        case 'QColor':
-          template = _getInputPath(directiveNameAction, directiveNameAction + '-color-picker');
-          break;
-        case 'QString':
-          if(allowedValues) {
-            template = _getInputPath(directiveNameInput, directiveNameInput + '-select');
-          } else if(inputType) {
-            template = _getInputPath(directiveNameInput, directiveNameInput + app.inputTypes[inputType]);
-          } else {
-            template = _getInputPath(directiveNameInput, directiveNameInput + '-text');
-          }
-          break;
-        default:
-          template = _getInputPath(directiveNameAction, 'template-not-available');
+    function _getInputPath(folderName, directiveName, filename) {
+      if(directiveName) {
+        return app.basePaths.ui + folderName + '/' + directiveName + '-templates/' + filename + app.fileExtensions.html;
+      } else {
+        return app.basePaths.ui + folderName + '/templates/' + filename + app.fileExtensions.html;
       }
-
-      return template;
     }
 
     /*
-     * Private method: _getInputTemplate(guhType)
+     * Private method: _getActionTemplates(actionType)
      */
-    function _getInputTemplate(guhType) {
+    function _getActionTemplate(actionType) {
+      var paramTypes = (actionType.paramTypes === undefined) ? null : actionType.paramTypes;
+      var folderName = 'action-param';
+      var directiveName = 'action-param';
+
+      if(angular.isArray(paramTypes)) {
+        if(paramTypes.length <= 0) {
+          // ActionType
+          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
+        } else if(paramTypes.length === 1) {
+          // ActionType
+          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
+
+          // ParamType
+          // paramTypes[0].templateUrl = _getInputTemplate(paramTypes[0], true);
+        } else if(paramTypes.length > 1) {
+          // ActionType
+          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-execute');
+
+          // ParamTypes
+          // angular.forEach(paramTypes, function(paramType, index) {
+          //   actionType.paramTypes[index].templateUrl = _getInputTemplate(paramType, true);
+          // });
+        }
+      } else {
+        $log.warn('guh.models.modelsHelper | The property paramTypes is not of type Array.', guhType);
+      }
+    }
+
+    /*
+     * Private method: _getInputTemplate(guhType, isChildOfActionType)
+     * guhType can be of type: ParamType, StateType
+     */
+    function _getInputTemplate(guhType, isChildOfActionType) {
       var allowedValues = (guhType.allowedValues === undefined) ? null : guhType.allowedValues;
       var inputType = (guhType.inputType === undefined) ? null : guhType.inputType;
-      // var name = (guhType.name === undefined) ? null : guhType.name;
       var type = (guhType.type === undefined) ? null : guhType.type;
-      var directiveName = 'input';
+      var folderName = 'form';
+      var directiveName = 'form-field';
       var template;
 
       switch(type) {
         case 'bool':
-          template = _getInputPath(directiveName, directiveName + '-checkbox');
+          if(isChildOfActionType) {
+            template = _getInputPath(folderName, directiveName, directiveName + '-toggle-button');
+          } else {
+            template = _getInputPath(folderName, directiveName, directiveName + '-checkbox');
+          }
           break;
         case 'int':
         case 'uint':
-          template = _getInputPath(directiveName, directiveName + '-number-integer');
+          if(isChildOfActionType) {
+            template = _getInputPath(folderName, directiveName, directiveName + '-range');
+          } else {
+            template = _getInputPath(folderName, directiveName, directiveName + '-number-integer');
+          }
           break;
         case 'double':
-          template = _getInputPath(directiveName, directiveName + '-number-decimal');
+          if(isChildOfActionType) {
+            template = _getInputPath(folderName, directiveName, directiveName + '-range');
+          } else {
+            template = _getInputPath(folderName, directiveName, directiveName + '-number-decimal');
+          }
           break;
         case 'QColor':
-          template = _getInputPath(directiveName, directiveName + '-color');
+          template = _getInputPath(folderName, directiveName, directiveName + '-color-picker');
           break;
         case 'QString':
           if(allowedValues) {
-            template = _getInputPath(directiveName, directiveName + '-select');
+            if(isChildOfActionType) {
+              template = _getInputPath(folderName, directiveName, directiveName + '-select');
+            } else {
+              template = _getInputPath(folderName, directiveName, directiveName + '-select');
+            }
           } else if(inputType) {
-            template = _getInputPath(directiveName, directiveName + app.inputTypes[inputType]);
+            template = _getInputPath(folderName, directiveName, directiveName + app.inputTypes[inputType]);
           } else {
-            template = _getInputPath(directiveName, directiveName + '-text');
+            template = _getInputPath(folderName, directiveName, directiveName + '-text');
           }
           break;
         default:
-          template = _getInputPath(directiveName, 'template-not-available');
+          template = _getInputPath(folderName, directiveName, 'template-not-available');
+          // template = null;
       }
 
       return template;
@@ -615,14 +678,31 @@
 
 
     /*
-     * Public method: addUiData(directiveName, guhType)
-     * guhType can be from type ParamType or StateType
+     * Public method: addUiData(guhType)
+     * guhType can be of type: ActionType, StateType, ParamType
      */
-    function addUiData(directiveName, guhType) {
-      guhType.operator = app.valueOperator.is.operators[0];
-      guhType.actionTemplateUrl = _getActionTemplate(guhType);
-      guhType.inputTemplateUrl = _getInputTemplate(guhType);
-      guhType.value = _getValue(guhType);
+    function addUiData(guhType, isChildOfActionType) {
+      var type;
+
+      if(DS.is('actionType', guhType)) {
+        guhType.actionTemplateUrl = _getActionTemplate(guhType);
+        type = 'actionType';
+        // _setActionTemplates(guhType);
+      } else if(DS.is('stateType', guhType)) {
+        isChildOfActionType = false;
+        guhType.inputTemplateUrl = _getInputTemplate(guhType, isChildOfActionType);
+        // guhType.operator = app.valueOperator.is.operators[0];
+        // guhType.value = _getValue(guhType);
+        type = 'stateType';
+        // guhType.templateUrl = _getInputTemplate(guhType);
+      } else {
+        guhType.inputTemplateUrl = _getInputTemplate(guhType, isChildOfActionType);
+        // guhType.value = _getValue(guhType);
+        type = 'paramType';
+        // guhType.templateUrl = _getInputTemplate(guhType);
+      }
+
+      // $log.log('Template of ' + type + ' [' + guhType.name + ' / ' + guhType.type + ']: ', guhType.templateUrl);
 
       return guhType;
     }
@@ -651,14 +731,6 @@
       } else {
         return path + 'template-not-defined.html';
       }
-    }
-
-    /*
-     * Public method: getTemplateurl(directiveName, filename)
-     */
-    function getTemplateUrl(directiveName, filename) {
-      var templateUrl = _getInputPath(directiveName, filename);
-      return checkTemplateUrl(templateUrl);
     }
 
     /*
@@ -732,8 +804,7 @@
     var DSEventType = DS.defineResource({
 
       // API configuration
-      endpoint: 'event_types',
-      suffix: '.json',
+      endpoint: 'eventtypes',
 
       // Model configuration
       idAttribute: 'id',
@@ -780,19 +851,19 @@
       var paramTypes = attrs.paramTypes;
       var phrase = 'When ' + attrs.name;
 
-      // phrase
+      // Add phrase for moods
       if(angular.isArray(paramTypes) && paramTypes.length === 0) {
         attrs.phrase = phrase + ' is detected';
       } else {
         attrs.phrase = phrase + ' is detcted and parameters are';
       }
 
-      // unit
+      // Add unit
       attrs.unit = modelsHelper.getUnit(attrs.name);
 
-      // paramTypes
+      // Add templateUrl to paramTypes
       angular.forEach(paramTypes, function(paramType) {
-        paramType = modelsHelper.addUiData('input', paramType);
+        paramType = modelsHelper.addUiData(paramType);
       });
     }
 
@@ -862,7 +933,6 @@
 
       // API configuration
       endpoint: 'devices',
-      suffix: '.json',
 
       // Model configuration
       idAttribute: 'id',
@@ -1008,8 +1078,6 @@
       device.deviceClassId = deviceClassId || '';
       device.deviceDescriptorId = deviceData.id || '';
 
-      $log.log('add deviceData', deviceData);
-
       device.deviceParams = [];
       if(deviceData.deviceParamTypes) {
         angular.forEach(deviceData.deviceParamTypes, function(deviceParamType) {
@@ -1024,16 +1092,12 @@
         device.deviceParams = deviceData.params;
       }
 
-      $log.log('add device.deviceParams', device.deviceParams);
-
       // Temporarly add name
       // TODO: Add name to discovery template
       device.deviceParams.push({
         name: 'name',
         value: 'Name'
       });
-
-      $log.log('add device.deviceParams', device.deviceParams);
 
       return DSDevice.create({device: device});
     }
@@ -1063,12 +1127,13 @@
     /*
      * Public method: executeAction()
      */
-    function executeAction(actionType) {
+    function executeAction(actionType, params) {
       /* jshint validthis: true */
       var self = this;
       var options = {};
 
-      options.params = actionType.getParams();
+      // options.params = actionType.getParams();
+      options.params = params;
 
       return DS
         .adapters
@@ -1177,9 +1242,9 @@
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'DSState', 'app', 'libs', 'modelsHelper'];
+  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper'];
 
-  function DSDeviceClassFactory($log, DS, DSHttpAdapter, DSState, app, libs, modelsHelper) {
+  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper) {
     
     var staticMethods = {};
 
@@ -1189,8 +1254,7 @@
     var DSDeviceClass = DS.defineResource({
 
       // API configuration
-      endpoint: 'device_classes',
-      suffix: '.json',
+      endpoint: 'deviceclasses',
 
       // Model configuration
       idAttribute: 'id',
@@ -1279,22 +1343,24 @@
     function _addUiData(resource, attrs) {
       var discoveryParamTypes = attrs.discoveryParamTypes;
       var paramTypes = attrs.paramTypes;
-      var stateTypes = attrs.stateTypes;
+      // var stateTypes = attrs.stateTypes;
+
+      attrs = modelsHelper.addUiData(attrs);
 
       // discoveryParamTypes
       angular.forEach(discoveryParamTypes, function(paramType) {
-        paramType = modelsHelper.addUiData('input', paramType);
+        paramType = modelsHelper.addUiData(paramType);
       });
 
       // paramTypes
       angular.forEach(paramTypes, function(paramType) {
-        paramType = modelsHelper.addUiData('input', paramType);
+        paramType = modelsHelper.addUiData(paramType);
       });
 
       // stateTypes
-      angular.forEach(stateTypes, function(stateType) {
-        stateType = modelsHelper.addUiData('input', stateType);
-      });
+      // angular.forEach(stateTypes, function(stateType) {
+      //   stateType = modelsHelper.addUiData(stateType);
+      // });
     }
 
     /*
@@ -1394,28 +1460,13 @@
 
 
     /*
-     * Public method: discover()
+     * Public method: discover(discoveryParams)
      */
-    function discover() {
+    function discover(discoveryParams) {
       /* jshint validthis: true */
       var self = this;
-      var discoveryParams = [];
 
-      angular.forEach(self.discoveryParamTypes, function(discoveryParamType) {
-        var discoveryParam = {};
-
-        discoveryParam.name = discoveryParamType.name;
-        discoveryParam.value = discoveryParamType.value;
-
-        discoveryParams.push(discoveryParam);
-      });
-
-      return DSHttpAdapter.GET(app.apiUrl + '/device_classes/' + self.id + '/discover.json', {
-        params: {
-          'device_class_id': self.id,
-          'discovery_params': angular.toJson(discoveryParams)
-        }
-      });
+      return DSHttpAdapter.GET(app.apiUrl + '/deviceclasses/' + self.id + '/discover?params=' + angular.toJson(discoveryParams));
     }
 
     /*
@@ -1548,8 +1599,7 @@
     var DSActionType = DS.defineResource({
 
       // API configuration
-      endpoint: 'action_types',
-      suffix: '.json',
+      endpoint: 'actiontypes',
 
       // Model configuration
       idAttribute: 'id',
@@ -1597,20 +1647,20 @@
       var paramTypes = attrs.paramTypes;
       var phrase = 'Execute "' + attrs.name + '"';
 
-      // phrase
-      if(angular.isArray(paramTypes) && paramTypes.length === 0) {
-        attrs.phrase = phrase + '.';
-      } else {
+      // Add phrase for moods
+      if(angular.isArray(paramTypes) && paramTypes.length >= 0) {
         attrs.phrase = phrase + ' with parameters';
       }
 
-      function _handleParamType(paramType) {
-        paramType = modelsHelper.addUiData('action', paramType);
-        paramType.dependsOnTrigger = false;
-      }
+      // Add templateUrl to paramTypes
+      var isChildOfActionType = true;
+      angular.forEach(paramTypes, function(paramType) {
+        paramType = modelsHelper.addUiData(paramType, isChildOfActionType);
+        // paramType.dependsOnTrigger = false;
+      });
 
-      // paramTypes
-      angular.forEach(paramTypes, _handleParamType);
+      // Add templateUrl to actionType & paramTypes
+      attrs = modelsHelper.addUiData(attrs);
     }
 
 
@@ -1667,49 +1717,6 @@
       return ruleActionParams;
     }
 
-  }
-
-}());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
-    .module('guh.utils', [
-      // Datastore
-      'js-data'
-    ])
-    .config(config);
-
-  config.$inject = ['DSProvider', 'app'];
-
-  function config(DSProvider, app) {
-    DSProvider
-      .defaults
-      .basePath = app.apiUrl;
   }
 
 }());
