@@ -113,9 +113,9 @@
 
 
     /*
-     * Public method: subscribe(deviceId, cb)
+     * Public method: subscribe(cb)
      */
-    function subscribe(deviceId, cb) {
+    function subscribe(cb) {
       /* jshint validthis: true */
       var self = this;
 
@@ -179,37 +179,29 @@
     }
 
     /*
-     * Public method: add(deviceClassId, deviceData)
+     * Public method: add(deviceClassId, deviceDescriptorId, deviceParams)
      */
-    function add(deviceClassId, deviceData) {
+    function add(deviceClassId, deviceDescriptorId, deviceParams) {
+      $log.log('add', deviceClassId, deviceDescriptorId, deviceParams);
       var device = {};
-      deviceData = deviceData || {};
 
-      device.deviceClassId = deviceClassId || '';
-      device.deviceDescriptorId = deviceData.id || '';
-
-      device.deviceParams = [];
-      if(deviceData.deviceParamTypes) {
-        angular.forEach(deviceData.deviceParamTypes, function(deviceParamType) {
-          var deviceParam = {};
-
-          deviceParam.name = deviceParamType.name;
-          deviceParam.value = deviceParamType.value;
-
-          device.deviceParams.push(deviceParam);
-        });
-      } else if(deviceData.params) {
-        device.deviceParams = deviceData.params;
+      // deviceClassIdl
+      if(angular.isDefined(deviceClassId) && deviceClassId  !== '') {
+        device.deviceClassId = deviceClassId;
       }
 
-      // Temporarly add name
-      // TODO: Add name to discovery template
-      device.deviceParams.push({
-        name: 'name',
-        value: 'Name'
-      });
+      // deviceDescriptorId or deviceParams
+      if(angular.isDefined(deviceDescriptorId) && deviceDescriptorId !== '') {
+        device.deviceDescriptorId = deviceDescriptorId;
+      } else if(angular.isDefined(deviceParams) && deviceParams !== []) {
+        device.deviceParams = deviceParams;
+      }
 
-      return DSDevice.create({device: device});
+      $log.log('add: create', device);
+
+      return DSDevice.create(device, {
+        cacheResponse: true
+      });
     }
 
     /*
@@ -245,10 +237,15 @@
       // options.params = actionType.getParams();
       options.params = params;
 
+      // return DS
+      //   .adapters
+      //   .http
+      //   .POST(app.apiUrl + '/devices/' + self.id + '/actions/' + actionType.id + '/execute.json', options);
+
       return DS
         .adapters
         .http
-        .POST(app.apiUrl + '/devices/' + self.id + '/actions/' + actionType.id + '/execute.json', options);
+        .POST(app.apiUrl + '/devices/' + self.id + '/execute/' + actionType.id, options);
     }
 
     /*

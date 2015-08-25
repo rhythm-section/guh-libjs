@@ -71,7 +71,7 @@
       var ws = new WebSocket(app.websocketUrl);
 
       ws.onopen = function(event) {
-        $log.log('Successfully connected with websocket.', event);
+        $log.log('Successfully connected with websocket.', ws, event);
 
         // Send broadcast event
         $rootScope.$apply(function() {
@@ -80,7 +80,7 @@
       };
 
       ws.onclose = function(event) {
-        $log.log('Closed websocket connection.', event);
+        $log.log('Closed websocket connection.', ws, event);
 
         // Send broadcast event
         $rootScope.$apply(function() {
@@ -98,10 +98,14 @@
       };
 
       ws.onmessage = function(message) {
+        $log.log('onmessage', message);
         var data = angular.fromJson(message.data);
 
         if(data.notification === app.notificationTypes.devices.stateChanged) {
           $log.log('Device state changed.', data);
+
+          $log.log('websocketService.callbacks', websocketService.callbacks);
+          $log.log('data.params.deviceId', data.params.deviceId);
 
           // Execute callback-function with right ID
           if(libs._.has(websocketService.callbacks, data.params.deviceId)) {
@@ -109,7 +113,8 @@
             cb(data);
           }
         } else {
-          $log.warn('Type of notification not handled:' + data.notification);
+          // $log.warn('Type of notification not handled:' + data.notification);
+          $log.warn('Type of notification not handled:', data);
         }
       };
 

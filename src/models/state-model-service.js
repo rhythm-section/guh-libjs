@@ -54,6 +54,12 @@
             localKey: 'deviceId',
             parent: true
           }
+        },
+        hasOne: {
+          stateType: {
+            localField: 'stateType',
+            localKey: 'stateTypeId'
+          }
         }
       },
 

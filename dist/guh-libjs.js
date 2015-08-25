@@ -26,49 +26,6 @@
   'use strict';
 
   angular
-    .module('guh.utils', [
-      // Datastore
-      'js-data'
-    ])
-    .config(config);
-
-  config.$inject = ['DSProvider', 'app'];
-
-  function config(DSProvider, app) {
-    DSProvider
-      .defaults
-      .basePath = app.apiUrl;
-  }
-
-}());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
     .module('guh.models', [
       // Datastore
       'js-data'
@@ -335,6 +292,12 @@
             localKey: 'deviceId',
             parent: true
           }
+        },
+        hasOne: {
+          stateType: {
+            localField: 'stateType',
+            localKey: 'stateTypeId'
+          }
         }
       },
 
@@ -558,28 +521,33 @@
      */
     function _getActionTemplate(actionType) {
       var paramTypes = (actionType.paramTypes === undefined) ? null : actionType.paramTypes;
-      var folderName = 'action-param';
-      var directiveName = 'action-param';
+      var folderName = 'form';
+      var directiveName = 'form-field';
 
       if(angular.isArray(paramTypes)) {
-        if(paramTypes.length <= 0) {
-          // ActionType
-          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
-        } else if(paramTypes.length === 1) {
-          // ActionType
-          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
-
-          // ParamType
-          // paramTypes[0].templateUrl = _getInputTemplate(paramTypes[0], true);
-        } else if(paramTypes.length > 1) {
-          // ActionType
-          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-execute');
-
-          // ParamTypes
-          // angular.forEach(paramTypes, function(paramType, index) {
-          //   actionType.paramTypes[index].templateUrl = _getInputTemplate(paramType, true);
-          // });
+        if(paramTypes.length === 0) {
+          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-button');
+        } else {
+          actionType.templateUrl = undefined;
         }
+        // if(paramTypes.length <= 0) {
+        //   // ActionType
+        //   actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
+        // } else if(paramTypes.length === 1) {
+        //   // ActionType
+        //   actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
+
+        //   // ParamType
+        //   // paramTypes[0].templateUrl = _getInputTemplate(paramTypes[0], true);
+        // } else if(paramTypes.length > 1) {
+        //   // ActionType
+        //   actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-execute');
+
+        //   // ParamTypes
+        //   // angular.forEach(paramTypes, function(paramType, index) {
+        //   //   actionType.paramTypes[index].templateUrl = _getInputTemplate(paramType, true);
+        //   // });
+        // }
       } else {
         $log.warn('guh.models.modelsHelper | The property paramTypes is not of type Array.', guhType);
       }
@@ -599,11 +567,11 @@
 
       switch(type) {
         case 'bool':
-          if(isChildOfActionType) {
-            template = _getInputPath(folderName, directiveName, directiveName + '-toggle-button');
-          } else {
+          // if(isChildOfActionType) {
+          //   template = _getInputPath(folderName, directiveName, directiveName + '-toggle-button');
+          // } else {
             template = _getInputPath(folderName, directiveName, directiveName + '-checkbox');
-          }
+          // }
           break;
         case 'int':
         case 'uint':
@@ -1003,9 +971,9 @@
 
 
     /*
-     * Public method: subscribe(deviceId, cb)
+     * Public method: subscribe(cb)
      */
-    function subscribe(deviceId, cb) {
+    function subscribe(cb) {
       /* jshint validthis: true */
       var self = this;
 
@@ -1069,37 +1037,29 @@
     }
 
     /*
-     * Public method: add(deviceClassId, deviceData)
+     * Public method: add(deviceClassId, deviceDescriptorId, deviceParams)
      */
-    function add(deviceClassId, deviceData) {
+    function add(deviceClassId, deviceDescriptorId, deviceParams) {
+      $log.log('add', deviceClassId, deviceDescriptorId, deviceParams);
       var device = {};
-      deviceData = deviceData || {};
 
-      device.deviceClassId = deviceClassId || '';
-      device.deviceDescriptorId = deviceData.id || '';
-
-      device.deviceParams = [];
-      if(deviceData.deviceParamTypes) {
-        angular.forEach(deviceData.deviceParamTypes, function(deviceParamType) {
-          var deviceParam = {};
-
-          deviceParam.name = deviceParamType.name;
-          deviceParam.value = deviceParamType.value;
-
-          device.deviceParams.push(deviceParam);
-        });
-      } else if(deviceData.params) {
-        device.deviceParams = deviceData.params;
+      // deviceClassIdl
+      if(angular.isDefined(deviceClassId) && deviceClassId  !== '') {
+        device.deviceClassId = deviceClassId;
       }
 
-      // Temporarly add name
-      // TODO: Add name to discovery template
-      device.deviceParams.push({
-        name: 'name',
-        value: 'Name'
-      });
+      // deviceDescriptorId or deviceParams
+      if(angular.isDefined(deviceDescriptorId) && deviceDescriptorId !== '') {
+        device.deviceDescriptorId = deviceDescriptorId;
+      } else if(angular.isDefined(deviceParams) && deviceParams !== []) {
+        device.deviceParams = deviceParams;
+      }
 
-      return DSDevice.create({device: device});
+      $log.log('add: create', device);
+
+      return DSDevice.create(device, {
+        cacheResponse: true
+      });
     }
 
     /*
@@ -1135,10 +1095,15 @@
       // options.params = actionType.getParams();
       options.params = params;
 
+      // return DS
+      //   .adapters
+      //   .http
+      //   .POST(app.apiUrl + '/devices/' + self.id + '/actions/' + actionType.id + '/execute.json', options);
+
       return DS
         .adapters
         .http
-        .POST(app.apiUrl + '/devices/' + self.id + '/actions/' + actionType.id + '/execute.json', options);
+        .POST(app.apiUrl + '/devices/' + self.id + '/execute/' + actionType.id, options);
     }
 
     /*
@@ -1645,11 +1610,12 @@
      */
     function _addUiData(resource, attrs) {
       var paramTypes = attrs.paramTypes;
-      var phrase = 'Execute "' + attrs.name + '"';
+      
+      attrs.phrase = 'Execute "' + attrs.name + '"';
 
       // Add phrase for moods
-      if(angular.isArray(paramTypes) && paramTypes.length >= 0) {
-        attrs.phrase = phrase + ' with parameters';
+      if(angular.isArray(paramTypes) && paramTypes.length > 0) {
+        attrs.phrase = attrs.phrase + ' with parameters';
       }
 
       // Add templateUrl to paramTypes
@@ -1717,6 +1683,49 @@
       return ruleActionParams;
     }
 
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.utils', [
+      // Datastore
+      'js-data'
+    ])
+    .config(config);
+
+  config.$inject = ['DSProvider', 'app'];
+
+  function config(DSProvider, app) {
+    DSProvider
+      .defaults
+      .basePath = app.apiUrl;
   }
 
 }());
@@ -1829,7 +1838,7 @@
       var ws = new WebSocket(app.websocketUrl);
 
       ws.onopen = function(event) {
-        $log.log('Successfully connected with websocket.', event);
+        $log.log('Successfully connected with websocket.', ws, event);
 
         // Send broadcast event
         $rootScope.$apply(function() {
@@ -1838,7 +1847,7 @@
       };
 
       ws.onclose = function(event) {
-        $log.log('Closed websocket connection.', event);
+        $log.log('Closed websocket connection.', ws, event);
 
         // Send broadcast event
         $rootScope.$apply(function() {
@@ -1856,10 +1865,14 @@
       };
 
       ws.onmessage = function(message) {
+        $log.log('onmessage', message);
         var data = angular.fromJson(message.data);
 
         if(data.notification === app.notificationTypes.devices.stateChanged) {
           $log.log('Device state changed.', data);
+
+          $log.log('websocketService.callbacks', websocketService.callbacks);
+          $log.log('data.params.deviceId', data.params.deviceId);
 
           // Execute callback-function with right ID
           if(libs._.has(websocketService.callbacks, data.params.deviceId)) {
@@ -1867,7 +1880,8 @@
             cb(data);
           }
         } else {
-          $log.warn('Type of notification not handled:' + data.notification);
+          // $log.warn('Type of notification not handled:' + data.notification);
+          $log.warn('Type of notification not handled:', data);
         }
       };
 

@@ -59,28 +59,33 @@
      */
     function _getActionTemplate(actionType) {
       var paramTypes = (actionType.paramTypes === undefined) ? null : actionType.paramTypes;
-      var folderName = 'action-param';
-      var directiveName = 'action-param';
+      var folderName = 'form';
+      var directiveName = 'form-field';
 
       if(angular.isArray(paramTypes)) {
-        if(paramTypes.length <= 0) {
-          // ActionType
-          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
-        } else if(paramTypes.length === 1) {
-          // ActionType
-          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
-
-          // ParamType
-          // paramTypes[0].templateUrl = _getInputTemplate(paramTypes[0], true);
-        } else if(paramTypes.length > 1) {
-          // ActionType
-          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-execute');
-
-          // ParamTypes
-          // angular.forEach(paramTypes, function(paramType, index) {
-          //   actionType.paramTypes[index].templateUrl = _getInputTemplate(paramType, true);
-          // });
+        if(paramTypes.length === 0) {
+          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-button');
+        } else {
+          actionType.templateUrl = undefined;
         }
+        // if(paramTypes.length <= 0) {
+        //   // ActionType
+        //   actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
+        // } else if(paramTypes.length === 1) {
+        //   // ActionType
+        //   actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
+
+        //   // ParamType
+        //   // paramTypes[0].templateUrl = _getInputTemplate(paramTypes[0], true);
+        // } else if(paramTypes.length > 1) {
+        //   // ActionType
+        //   actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-execute');
+
+        //   // ParamTypes
+        //   // angular.forEach(paramTypes, function(paramType, index) {
+        //   //   actionType.paramTypes[index].templateUrl = _getInputTemplate(paramType, true);
+        //   // });
+        // }
       } else {
         $log.warn('guh.models.modelsHelper | The property paramTypes is not of type Array.', guhType);
       }
@@ -100,11 +105,11 @@
 
       switch(type) {
         case 'bool':
-          if(isChildOfActionType) {
-            template = _getInputPath(folderName, directiveName, directiveName + '-toggle-button');
-          } else {
+          // if(isChildOfActionType) {
+          //   template = _getInputPath(folderName, directiveName, directiveName + '-toggle-button');
+          // } else {
             template = _getInputPath(folderName, directiveName, directiveName + '-checkbox');
-          }
+          // }
           break;
         case 'int':
         case 'uint':

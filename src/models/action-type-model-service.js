@@ -88,11 +88,12 @@
      */
     function _addUiData(resource, attrs) {
       var paramTypes = attrs.paramTypes;
-      var phrase = 'Execute "' + attrs.name + '"';
+      
+      attrs.phrase = 'Execute "' + attrs.name + '"';
 
       // Add phrase for moods
-      if(angular.isArray(paramTypes) && paramTypes.length >= 0) {
-        attrs.phrase = phrase + ' with parameters';
+      if(angular.isArray(paramTypes) && paramTypes.length > 0) {
+        attrs.phrase = attrs.phrase + ' with parameters';
       }
 
       // Add templateUrl to paramTypes
