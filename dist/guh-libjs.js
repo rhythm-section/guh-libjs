@@ -224,7 +224,7 @@
       }
 
       // phrase
-      attrs.phrase = 'When value of ' + phrase + ' is';
+      attrs.phrase = 'When value of ' + phrase;
 
       // unit
       attrs.unit = modelsHelper.getUnit(attrs.name);
@@ -589,7 +589,7 @@
           }
           break;
         case 'QColor':
-          template = _getInputPath(folderName, directiveName, directiveName + '-color-picker');
+          template = _getInputPath(folderName, directiveName, directiveName + '-color');
           break;
         case 'QString':
           if(allowedValues) {
@@ -792,7 +792,7 @@
 
       // Instance methods
       methods: {
-        getParamDescriptors: getParamDescriptors
+        getParamDescriptor: getParamDescriptor
       },
 
       // Lifecycle hooks
@@ -823,7 +823,7 @@
       if(angular.isArray(paramTypes) && paramTypes.length === 0) {
         attrs.phrase = phrase + ' is detected';
       } else {
-        attrs.phrase = phrase + ' is detcted and parameters are';
+        attrs.phrase = phrase + ' is detected and parameters are';
       }
 
       // Add unit
@@ -837,20 +837,18 @@
 
 
     /*
-     * Public method: getParamDescriptors(paramTypes)
+     * Public method: getParamDescriptors(paramType, value, operator)
      */
-    function getParamDescriptors(paramTypes) {
-      var paramDescriptors = [];
+    function getParamDescriptor(paramType, value, operator) {
+      var paramDescriptor = {};
 
-      angular.forEach(paramTypes, function(paramType) {
-        paramDescriptors.push({
-          name: paramType.name,
-          operator: paramType.operator,
-          value: paramType.value
-        });
-      });
+      paramDescriptor = {
+        name: paramType.name,
+        operator: operator,
+        value: value
+      };
 
-      return paramDescriptors;
+      return paramDescriptor;
     }
 
   }
@@ -1117,19 +1115,17 @@
     }
 
     /*
-     * Public method: getEventDescriptor(eventType)
+     * Public method: getEventDescriptor(eventType, paramDescriptors)
      */
-    function getEventDescriptor(eventType) {
+    function getEventDescriptor(eventType, paramDescriptors) {
       /* jshint validthis: true */
       var self = this;
       var eventDescriptor = {};
-      var paramDescriptors = [];
 
       eventDescriptor.deviceId = self.id;
       eventDescriptor.eventTypeId = eventType.id;
 
-      paramDescriptors = eventType.getParamDescriptors(eventType.paramTypes);
-      if(paramDescriptors.length > 0) {
+      if(angular.isDefined(paramDescriptors) && paramDescriptors.length > 0) {
         eventDescriptor.paramDescriptors = paramDescriptors;
       }
 
@@ -1137,17 +1133,17 @@
     }
 
     /*
-     * Public method: getStateDescriptor(stateType)
+     * Public method: getStateDescriptor(stateType, value, operator)
      */
-    function getStateDescriptor(stateType) {
+    function getStateDescriptor(stateType, value, operator) {
       /* jshint validthis: true */
       var self = this;
       var stateDescriptor = {};
 
       stateDescriptor.deviceId = self.id;
-      stateDescriptor.operator = stateType.operator;
+      stateDescriptor.operator = operator;
       stateDescriptor.stateTypeId = stateType.id;
-      stateDescriptor.value = stateType.value;
+      stateDescriptor.value = value;
 
       return stateDescriptor;
     }
@@ -1683,49 +1679,6 @@
       return ruleActionParams;
     }
 
-  }
-
-}());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
-    .module('guh.utils', [
-      // Datastore
-      'js-data'
-    ])
-    .config(config);
-
-  config.$inject = ['DSProvider', 'app'];
-
-  function config(DSProvider, app) {
-    DSProvider
-      .defaults
-      .basePath = app.apiUrl;
   }
 
 }());
