@@ -105,11 +105,11 @@
 
       switch(type) {
         case 'bool':
-          // if(isChildOfActionType) {
-          //   template = _getInputPath(folderName, directiveName, directiveName + '-toggle-button');
-          // } else {
+          if(isChildOfActionType) {
+            template = _getInputPath(folderName, directiveName, directiveName + '-toggle-button');
+          } else {
             template = _getInputPath(folderName, directiveName, directiveName + '-checkbox');
-          // }
+          }
           break;
         case 'int':
         case 'uint':
