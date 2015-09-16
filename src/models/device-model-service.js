@@ -259,19 +259,17 @@
     }
 
     /*
-     * Public method: getEventDescriptor(eventType)
+     * Public method: getEventDescriptor(eventType, paramDescriptors)
      */
-    function getEventDescriptor(eventType) {
+    function getEventDescriptor(eventType, paramDescriptors) {
       /* jshint validthis: true */
       var self = this;
       var eventDescriptor = {};
-      var paramDescriptors = [];
 
       eventDescriptor.deviceId = self.id;
       eventDescriptor.eventTypeId = eventType.id;
 
-      paramDescriptors = eventType.getParamDescriptors(eventType.paramTypes);
-      if(paramDescriptors.length > 0) {
+      if(angular.isDefined(paramDescriptors) && paramDescriptors.length > 0) {
         eventDescriptor.paramDescriptors = paramDescriptors;
       }
 
@@ -279,17 +277,17 @@
     }
 
     /*
-     * Public method: getStateDescriptor(stateType)
+     * Public method: getStateDescriptor(stateType, value, operator)
      */
-    function getStateDescriptor(stateType) {
+    function getStateDescriptor(stateType, value, operator) {
       /* jshint validthis: true */
       var self = this;
       var stateDescriptor = {};
 
       stateDescriptor.deviceId = self.id;
-      stateDescriptor.operator = stateType.operator;
+      stateDescriptor.operator = operator;
       stateDescriptor.stateTypeId = stateType.id;
-      stateDescriptor.value = stateType.value;
+      stateDescriptor.value = value;
 
       return stateDescriptor;
     }

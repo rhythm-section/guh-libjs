@@ -62,7 +62,7 @@
 
       // Instance methods
       methods: {
-        getParamDescriptors: getParamDescriptors
+        getParamDescriptor: getParamDescriptor
       },
 
       // Lifecycle hooks
@@ -93,7 +93,7 @@
       if(angular.isArray(paramTypes) && paramTypes.length === 0) {
         attrs.phrase = phrase + ' is detected';
       } else {
-        attrs.phrase = phrase + ' is detcted and parameters are';
+        attrs.phrase = phrase + ' is detected and parameters are';
       }
 
       // Add unit
@@ -107,20 +107,18 @@
 
 
     /*
-     * Public method: getParamDescriptors(paramTypes)
+     * Public method: getParamDescriptors(paramType, value, operator)
      */
-    function getParamDescriptors(paramTypes) {
-      var paramDescriptors = [];
+    function getParamDescriptor(paramType, value, operator) {
+      var paramDescriptor = {};
 
-      angular.forEach(paramTypes, function(paramType) {
-        paramDescriptors.push({
-          name: paramType.name,
-          operator: paramType.operator,
-          value: paramType.value
-        });
-      });
+      paramDescriptor = {
+        name: paramType.name,
+        operator: operator,
+        value: value
+      };
 
-      return paramDescriptors;
+      return paramDescriptor;
     }
 
   }

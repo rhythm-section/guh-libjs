@@ -95,7 +95,7 @@
       }
 
       // phrase
-      attrs.phrase = 'When value of ' + phrase + ' is';
+      attrs.phrase = 'When value of ' + phrase;
 
       // unit
       attrs.unit = modelsHelper.getUnit(attrs.name);
