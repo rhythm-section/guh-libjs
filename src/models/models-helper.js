@@ -127,7 +127,7 @@
           }
           break;
         case 'QColor':
-          template = _getInputPath(folderName, directiveName, directiveName + '-color-picker');
+          template = _getInputPath(folderName, directiveName, directiveName + '-color');
           break;
         case 'QString':
           if(allowedValues) {
