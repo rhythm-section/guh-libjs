@@ -133,32 +133,23 @@
     }
 
     /*
-     * Public method: pair(deviceClassId, deviceData)
+     * Public method: pair(deviceClassId, deviceDescriptorId, deviceParams)
      */
-    function pair(deviceClassId, deviceData) {
-      var device = {};
+    function pair(deviceClassId, deviceDescriptorId, deviceParams) {
       var options = {};
-      deviceData = deviceData || {};
 
-      device.deviceClassId = deviceClassId || '';
-      device.deviceDescriptorId = deviceData.id || '';
+      options.deviceClassId = deviceClassId || '';
 
-      device.deviceParams = [];
-      angular.forEach(deviceData.deviceParamTypes, function(deviceParamType) {
-        var deviceParam = {};
-
-        deviceParam.name = deviceParamType.name;
-        deviceParam.value = deviceParamType.value;
-
-        device.deviceParams.push(deviceParam);
-      });
-
-      options.device = device;
+      if(angular.isDefined(deviceDescriptorId) && deviceDescriptorId !== '') {
+        options.deviceDescriptorId = deviceDescriptorId;
+      } else {
+        options.deviceParams = deviceParams || [];
+      }
 
       return DS
         .adapters
         .http
-        .POST(app.apiUrl + '/devices.json', options);
+        .POST(app.apiUrl + '/devices/pair', options);
     }
 
     /*
@@ -166,23 +157,19 @@
      */
     function confirmPairing(pairingTransactionId) {
       var options = {};
-      var params = {};
       
-      params.pairingTransactionId = pairingTransactionId;
-
-      options.params = params;
+      options.pairingTransactionId = pairingTransactionId;
 
       return DS
         .adapters
         .http
-        .POST(app.apiUrl + '/devices/confirm_pairing.json', options);      
+        .POST(app.apiUrl + '/devices/confirmpairing', options);      
     }
 
     /*
      * Public method: add(deviceClassId, deviceDescriptorId, deviceParams)
      */
     function add(deviceClassId, deviceDescriptorId, deviceParams) {
-      $log.log('add', deviceClassId, deviceDescriptorId, deviceParams);
       var device = {};
 
       // deviceClassIdl
@@ -196,8 +183,6 @@
       } else if(angular.isDefined(deviceParams) && deviceParams !== []) {
         device.deviceParams = deviceParams;
       }
-
-      $log.log('add: create', device);
 
       return DSDevice.create(device, {
         cacheResponse: true
