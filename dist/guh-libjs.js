@@ -1263,10 +1263,18 @@
 
 
     /*
-     * Private method: _getInputPath(filename)
+     * Private method: _getInputPath(name, filename)
      */
-    function _getInputPath(filename) {
-      return app.basePaths.devices + 'detail/device-class-templates/' + filename + app.fileExtensions.html;
+    function _getInputPath(name, filename) {
+      var classType = _getClassType(name);
+
+      if(classType === 'device' || classType === 'gateway') {
+        return app.basePaths.devices + 'detail/device-class-templates/' + filename + app.fileExtensions.html;
+      } else if(classType === 'service' || classType === 'dev-service') {
+        return app.basePaths.services + 'detail/device-class-templates/' + filename + app.fileExtensions.html;
+      } else {
+        return '';
+      }
     }
 
     /*
@@ -1278,7 +1286,7 @@
         .toLowerCase()
         .replace(/\s/g, '-')
         .replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '');
-      var templateUrl = _getInputPath('device-class-' + templateName);
+      var templateUrl = _getInputPath(name, 'device-class-' + templateName);
 
       return modelsHelper.checkTemplateUrl(templateUrl);
     }
@@ -1310,9 +1318,9 @@
     }
 
     /*
-     * Private method: _mapClassType(resource, attrs)
+     * Private method: _getClassType(name)
      */
-    function _mapClassType(resource, attrs) {
+    function _getClassType(name) {
       var devServices = [
         'Mock Device',
         'Mock Device (Auto created)'
@@ -1360,18 +1368,26 @@
         'Weather from OpenWeatherMap',
         'Yahoo mail'
       ];
+      var classType = 'device';
 
-      attrs.classType = 'device';
-
-      if(libs._.contains(devServices, attrs.name)) {
-        attrs.classType = 'dev-service';
-      } else if(libs._.contains(moods, attrs.name)) {
-        attrs.classType = 'mood';
-      } else if(libs._.contains(gateways, attrs.name)) {
-        attrs.classType = 'gateway';
-      } else if(libs._.contains(services, attrs.name)) {
-        attrs.classType = 'service';
+      if(libs._.contains(devServices, name)) {
+        classType = 'dev-service';
+      } else if(libs._.contains(moods, name)) {
+        classType = 'mood';
+      } else if(libs._.contains(gateways, name)) {
+        classType = 'gateway';
+      } else if(libs._.contains(services, name)) {
+        classType = 'service';
       }
+
+      return classType;
+    }
+
+    /*
+     * Private method: _mapClassType(resource, attrs)
+     */
+    function _mapClassType(resource, attrs) {
+      attrs.classType = _getClassType(attrs.name);
     }
 
 
