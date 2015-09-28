@@ -48,12 +48,18 @@
       idAttribute: 'id',
       name: 'stateType',
       relations: {
-        belongsTo: {
-          deviceClass: {
-            localField: 'deviceClass',
-            localKey: 'deviceClassId',
-            parent: true
-          }
+        // belongsTo: {
+        //   deviceClass: {
+        //     localField: 'deviceClass',
+        //     localKey: 'deviceClassId',
+        //     parent: true
+        //   }
+        // }
+        hasMany: {
+          deviceClassStateType: {
+            localField: 'deviceClassStateTypes',
+            foreignKey: 'stateTypeId'
+          },
         }
       },
 

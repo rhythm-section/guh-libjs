@@ -30,11 +30,13 @@
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper'];
+  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassStateType'];
 
-  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper) {
+  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper, DSDeviceClassActionType, DSDeviceClassStateType) {
     
     var staticMethods = {};
+    var deviceClassActionTypesId = 0;
+    var deviceClassStateTypesId = 0;
 
     /*
      * DataStore configuration
@@ -56,16 +58,16 @@
           }
         },
         hasMany: {
-          actionType: {
-            localField: 'actionTypes',
+          deviceClassActionType: {
+            localField: 'deviceClassActionTypes',
             foreignKey: 'deviceClassId'
           },
           eventType: {
             localField: 'eventTypes',
             foreignKey: 'deviceClassId'
           },
-          stateType: {
-            localField: 'stateTypes',
+          deviceClassStateType: {
+            localField: 'deviceClassStateTypes',
             foreignKey: 'deviceClassId'
           }
         }
@@ -91,15 +93,53 @@
             _addUiData(resource, attrs);
             _mapClassType(resource, attrs);
             _mapStates(resource, attrs);
+            _createDeviceClassActionsTypes(resource, attrs);
           });
         } else {
           _addUiData(resource, attrs);
           _mapClassType(resource, attrs);
           _mapStates(resource, attrs);
+          _createDeviceClassActionsTypes(resource, attrs);
         }
       }
 
     });
+
+    DSDeviceClass.getAllActionTypes = function(deviceClassId) {
+      var deviceClassActionTypes = DSDeviceClassActionType.getAll();
+      var deviceClassActionTypesFiltered = deviceClassActionTypes.filter(function(deviceClassActionType) {
+        return deviceClassActionType.deviceClassId === deviceClassId;
+      });
+      var deviceClass = DS.get('deviceClass', deviceClassId);
+      var actionTypes = [];
+
+      angular.forEach(deviceClassActionTypesFiltered, function(deviceClassActionType) {
+        if(deviceClassActionType.deviceClassId === deviceClassId) {
+          var actionType = DS.get('actionType', deviceClassActionType.actionTypeId);
+          actionTypes.push(actionType);
+        }
+      });
+
+      return actionTypes;
+    };
+
+    DSDeviceClass.getAllStateTypes = function(deviceClassId) {
+      var deviceClassStateTypes = DSDeviceClassStateType.getAll();
+      var deviceClassStateTypesFiltered = deviceClassStateTypes.filter(function(deviceClassStateType) {
+        return deviceClassStateType.deviceClassId === deviceClassId;
+      });
+      var deviceClass = DS.get('deviceClass', deviceClassId);
+      var stateTypes = [];
+
+      angular.forEach(deviceClassStateTypesFiltered, function(deviceClassStateType) {
+        if(deviceClassStateType.deviceClassId === deviceClassId) {
+          var stateType = DS.get('stateType', deviceClassStateType.stateTypeId);
+          stateTypes.push(stateType);
+        }
+      });
+
+      return stateTypes;
+    };
 
     return DSDeviceClass;
 
@@ -131,6 +171,64 @@
       var templateUrl = _getInputPath(name, 'device-class-' + templateName);
 
       return modelsHelper.checkTemplateUrl(templateUrl);
+    }
+
+    /*
+     * Private method:_createDeviceClassActionsTypes()
+     */
+    function _createDeviceClassActionsTypes(resource, attrs) {
+      var deviceClassActionTypes = DS.getAll('deviceClassActionType');
+      var actionTypes = attrs.actionTypes;
+      var stateTypes = attrs.stateTypes;
+      var deviceClassId = attrs.id;
+
+      // ActionTypes
+      angular.forEach(actionTypes, function(actionType) {
+        // Create actionType
+        var actionTypeInstance = DS.createInstance('actionType', actionType);
+        DS.inject('actionType', actionTypeInstance);
+
+        // Filtered deviceClassActionTypes
+        var deviceClassActionTypesFiltered = deviceClassActionTypes.filter(function(deviceClassActionType) {
+          return deviceClassActionType.deviceClassId === deviceClassId && deviceClassActionType.actionTypeId === actionType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(deviceClassActionTypesFiltered) && deviceClassActionTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> actionType)
+          deviceClassActionTypesId = deviceClassActionTypesId + 1;
+          var deviceClassActionTypeInstance = DS.createInstance('deviceClassActionType', {
+            id: deviceClassActionTypesId,
+            deviceClassId: deviceClassId,
+            actionTypeId: actionType.id
+          });
+          DS.inject('deviceClassActionType', deviceClassActionTypeInstance);
+        }
+      });
+
+      // StateTypes
+      angular.forEach(stateTypes, function(stateType) {
+        // Create stateType
+        var stateTypeInstance = DS.createInstance('stateType', stateType);
+        DS.inject('stateType', stateTypeInstance);
+
+        // Filtered deviceClassStateTypes
+        var deviceClassStateTypesFiltered = deviceClassActionTypes.filter(function(deviceClassStateType) {
+          return deviceClassStateType.deviceClassId === deviceClassId && deviceClassStateType.stateTypeId === stateType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(deviceClassStateTypesFiltered) && deviceClassStateTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> actionType)
+          deviceClassStateTypesId = deviceClassStateTypesId + 1;
+          var deviceClassStateTypeInstance = DS.createInstance('deviceClassStateType', {
+            id: deviceClassStateTypesId,
+            deviceClassId: deviceClassId,
+            stateTypeId: stateType.id
+          });
+          DS.inject('deviceClassStateType', deviceClassStateTypeInstance);
+        }
+      });
     }
 
     /*

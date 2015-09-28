@@ -177,12 +177,18 @@
       idAttribute: 'id',
       name: 'stateType',
       relations: {
-        belongsTo: {
-          deviceClass: {
-            localField: 'deviceClass',
-            localKey: 'deviceClassId',
-            parent: true
-          }
+        // belongsTo: {
+        //   deviceClass: {
+        //     localField: 'deviceClass',
+        //     localKey: 'deviceClassId',
+        //     parent: true
+        //   }
+        // }
+        hasMany: {
+          deviceClassStateType: {
+            localField: 'deviceClassStateTypes',
+            foreignKey: 'stateTypeId'
+          },
         }
       },
 
@@ -283,7 +289,8 @@
       endpoint: 'states',
 
       // Model configuration
-      idAttribute: 'stateTypeId',
+      // idAttribute: 'stateTypeId',
+      idAttribute: 'compoundId',
       name: 'state',
       relations: {
         belongsTo: {
@@ -302,7 +309,11 @@
       },
 
       // Computed properties
-      computed: {},
+      computed: {
+        compoundId: ['deviceId', 'stateTypeId', 'value', function (deviceId, stateTypeId, value) {
+          return '' + deviceId + '_' + stateTypeId;
+        }]
+      },
 
       // Instance methods
       methods: {}
@@ -909,13 +920,16 @@
             localField: 'deviceClass',
             localKey: 'deviceClassId'
           }
-        },
-        hasMany: {
-          state: {
-            localField: 'states',
-            foreignKey: 'deviceId'
-          }
         }
+
+        // Not working (error: "Doh! You just changed the primary key of an object!") because states are injected before the state primary keys are generated
+
+        // hasMany: {
+        //   state: {
+        //     localField: 'states',
+        //     foreignKey: 'deviceId'
+        //   }
+        // }
       },
 
       // Computed properties
@@ -941,9 +955,11 @@
           var arrayOfAttrs = attrs;
           angular.forEach(arrayOfAttrs, function(attrs) {
             _addCustomName(resource, attrs);
+            _createStates(resource, attrs);
           });
         } else {
           _addCustomName(resource, attrs);
+          _createStates(resource, attrs);
         }
       }
 
@@ -967,6 +983,25 @@
       attrs.name = (nameParameter === undefined) ? 'Name' : nameParameter.value;
     }
 
+    /*
+     * Private method: _createStates(resource, attrs);
+     */
+    function _createStates(resource, attrs) {
+      var deviceId = attrs.id;
+      var states = attrs.states;
+
+      angular.forEach(states, function(state, index) {
+        state.deviceId = deviceId;
+
+        var stateInstance = DS.createInstance('state', state);
+        DS.inject('state', stateInstance);
+
+        if(angular.isUndefined(attrs.states)) {
+          attrs.states = [];
+        }
+        attrs.states[index] = DS.get('state', '' + deviceId + '_' + state.stateTypeId);
+      });
+    }
 
     /*
      * Public method: subscribe(cb)
@@ -1185,14 +1220,81 @@
 
   angular
     .module('guh.models')
+    .factory('DSDeviceClassStateType', DSDeviceClassStateTypeFactory)
+    .run(function(DSDeviceClassStateType) {});
+
+  DSDeviceClassStateTypeFactory.$inject = ['$log', 'DS', 'modelsHelper'];
+
+  function DSDeviceClassStateTypeFactory($log, DS, modelsHelper) {
+    
+    var staticMethods = {};
+
+    /*
+     * DataStore configuration
+     */
+    var DSDeviceClassStateType = DS.defineResource({
+
+      // Model configuration
+      name: 'deviceClassStateType',
+      relations: {
+        belongsTo: {
+          deviceClass: {
+            localField: 'deviceClass',
+            localKey: 'deviceClassId'
+          },
+          stateType: {
+            localField: 'stateType',
+            localKey: 'stateTypeId'
+          }
+        }
+      }
+
+    });
+
+    return DSDeviceClassStateType;
+
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.models')
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper'];
+  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassStateType'];
 
-  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper) {
+  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper, DSDeviceClassActionType, DSDeviceClassStateType) {
     
     var staticMethods = {};
+    var deviceClassActionTypesId = 0;
+    var deviceClassStateTypesId = 0;
 
     /*
      * DataStore configuration
@@ -1214,16 +1316,16 @@
           }
         },
         hasMany: {
-          actionType: {
-            localField: 'actionTypes',
+          deviceClassActionType: {
+            localField: 'deviceClassActionTypes',
             foreignKey: 'deviceClassId'
           },
           eventType: {
             localField: 'eventTypes',
             foreignKey: 'deviceClassId'
           },
-          stateType: {
-            localField: 'stateTypes',
+          deviceClassStateType: {
+            localField: 'deviceClassStateTypes',
             foreignKey: 'deviceClassId'
           }
         }
@@ -1249,15 +1351,53 @@
             _addUiData(resource, attrs);
             _mapClassType(resource, attrs);
             _mapStates(resource, attrs);
+            _createDeviceClassActionsTypes(resource, attrs);
           });
         } else {
           _addUiData(resource, attrs);
           _mapClassType(resource, attrs);
           _mapStates(resource, attrs);
+          _createDeviceClassActionsTypes(resource, attrs);
         }
       }
 
     });
+
+    DSDeviceClass.getAllActionTypes = function(deviceClassId) {
+      var deviceClassActionTypes = DSDeviceClassActionType.getAll();
+      var deviceClassActionTypesFiltered = deviceClassActionTypes.filter(function(deviceClassActionType) {
+        return deviceClassActionType.deviceClassId === deviceClassId;
+      });
+      var deviceClass = DS.get('deviceClass', deviceClassId);
+      var actionTypes = [];
+
+      angular.forEach(deviceClassActionTypesFiltered, function(deviceClassActionType) {
+        if(deviceClassActionType.deviceClassId === deviceClassId) {
+          var actionType = DS.get('actionType', deviceClassActionType.actionTypeId);
+          actionTypes.push(actionType);
+        }
+      });
+
+      return actionTypes;
+    };
+
+    DSDeviceClass.getAllStateTypes = function(deviceClassId) {
+      var deviceClassStateTypes = DSDeviceClassStateType.getAll();
+      var deviceClassStateTypesFiltered = deviceClassStateTypes.filter(function(deviceClassStateType) {
+        return deviceClassStateType.deviceClassId === deviceClassId;
+      });
+      var deviceClass = DS.get('deviceClass', deviceClassId);
+      var stateTypes = [];
+
+      angular.forEach(deviceClassStateTypesFiltered, function(deviceClassStateType) {
+        if(deviceClassStateType.deviceClassId === deviceClassId) {
+          var stateType = DS.get('stateType', deviceClassStateType.stateTypeId);
+          stateTypes.push(stateType);
+        }
+      });
+
+      return stateTypes;
+    };
 
     return DSDeviceClass;
 
@@ -1289,6 +1429,64 @@
       var templateUrl = _getInputPath(name, 'device-class-' + templateName);
 
       return modelsHelper.checkTemplateUrl(templateUrl);
+    }
+
+    /*
+     * Private method:_createDeviceClassActionsTypes()
+     */
+    function _createDeviceClassActionsTypes(resource, attrs) {
+      var deviceClassActionTypes = DS.getAll('deviceClassActionType');
+      var actionTypes = attrs.actionTypes;
+      var stateTypes = attrs.stateTypes;
+      var deviceClassId = attrs.id;
+
+      // ActionTypes
+      angular.forEach(actionTypes, function(actionType) {
+        // Create actionType
+        var actionTypeInstance = DS.createInstance('actionType', actionType);
+        DS.inject('actionType', actionTypeInstance);
+
+        // Filtered deviceClassActionTypes
+        var deviceClassActionTypesFiltered = deviceClassActionTypes.filter(function(deviceClassActionType) {
+          return deviceClassActionType.deviceClassId === deviceClassId && deviceClassActionType.actionTypeId === actionType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(deviceClassActionTypesFiltered) && deviceClassActionTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> actionType)
+          deviceClassActionTypesId = deviceClassActionTypesId + 1;
+          var deviceClassActionTypeInstance = DS.createInstance('deviceClassActionType', {
+            id: deviceClassActionTypesId,
+            deviceClassId: deviceClassId,
+            actionTypeId: actionType.id
+          });
+          DS.inject('deviceClassActionType', deviceClassActionTypeInstance);
+        }
+      });
+
+      // StateTypes
+      angular.forEach(stateTypes, function(stateType) {
+        // Create stateType
+        var stateTypeInstance = DS.createInstance('stateType', stateType);
+        DS.inject('stateType', stateTypeInstance);
+
+        // Filtered deviceClassStateTypes
+        var deviceClassStateTypesFiltered = deviceClassActionTypes.filter(function(deviceClassStateType) {
+          return deviceClassStateType.deviceClassId === deviceClassId && deviceClassStateType.stateTypeId === stateType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(deviceClassStateTypesFiltered) && deviceClassStateTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> actionType)
+          deviceClassStateTypesId = deviceClassStateTypesId + 1;
+          var deviceClassStateTypeInstance = DS.createInstance('deviceClassStateType', {
+            id: deviceClassStateTypesId,
+            deviceClassId: deviceClassId,
+            stateTypeId: stateType.id
+          });
+          DS.inject('deviceClassStateType', deviceClassStateTypeInstance);
+        }
+      });
     }
 
     /*
@@ -1547,6 +1745,71 @@
 
   angular
     .module('guh.models')
+    .factory('DSDeviceClassActionType', DSDeviceClassActionTypeFactory)
+    .run(function(DSDeviceClassActionType) {});
+
+  DSDeviceClassActionTypeFactory.$inject = ['$log', 'DS', 'modelsHelper'];
+
+  function DSDeviceClassActionTypeFactory($log, DS, modelsHelper) {
+    
+    var staticMethods = {};
+
+    /*
+     * DataStore configuration
+     */
+    var DSDeviceClassActionType = DS.defineResource({
+
+      // Model configuration
+      name: 'deviceClassActionType',
+      relations: {
+        belongsTo: {
+          deviceClass: {
+            localField: 'deviceClass',
+            localKey: 'deviceClassId'
+          },
+          actionType: {
+            localField: 'actionType',
+            localKey: 'actionTypeId'
+          }
+        }
+      }
+
+    });
+
+    return DSDeviceClassActionType;
+
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.models')
     .factory('DSActionType', DSActionTypeFactory)
     .run(function(DSActionType) {});
 
@@ -1568,12 +1831,18 @@
       idAttribute: 'id',
       name: 'actionType',
       relations: {
-        belongsTo: {
-          deviceClass: {
-            localField: 'deviceClass',
-            localKey: 'deviceClassId',
-            parent: true
-          }
+        // belongsTo: {
+        //   deviceClass: {
+        //     localField: 'deviceClass',
+        //     localKey: 'deviceClassId',
+        //     parent: true
+        //   }
+        // },
+        hasMany: {
+          deviceClassActionType: {
+            localField: 'deviceClassActionTypes',
+            foreignKey: 'actionTypeId'
+          },
         }
       },
 

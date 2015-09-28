@@ -48,12 +48,18 @@
       idAttribute: 'id',
       name: 'actionType',
       relations: {
-        belongsTo: {
-          deviceClass: {
-            localField: 'deviceClass',
-            localKey: 'deviceClassId',
-            parent: true
-          }
+        // belongsTo: {
+        //   deviceClass: {
+        //     localField: 'deviceClass',
+        //     localKey: 'deviceClassId',
+        //     parent: true
+        //   }
+        // },
+        hasMany: {
+          deviceClassActionType: {
+            localField: 'deviceClassActionTypes',
+            foreignKey: 'actionTypeId'
+          },
         }
       },
 

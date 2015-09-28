@@ -27,56 +27,38 @@
 
   angular
     .module('guh.models')
-    .factory('DSState', DSStateFactory)
-    .run(function(DSState) {});
+    .factory('DSDeviceClassActionType', DSDeviceClassActionTypeFactory)
+    .run(function(DSDeviceClassActionType) {});
 
-  DSStateFactory.$inject = ['$log', 'DS'];
+  DSDeviceClassActionTypeFactory.$inject = ['$log', 'DS', 'modelsHelper'];
 
-  function DSStateFactory($log, DS) {
+  function DSDeviceClassActionTypeFactory($log, DS, modelsHelper) {
     
     var staticMethods = {};
 
     /*
      * DataStore configuration
      */
-    var DSState = DS.defineResource({
-
-      // API configuration
-      endpoint: 'states',
+    var DSDeviceClassActionType = DS.defineResource({
 
       // Model configuration
-      // idAttribute: 'stateTypeId',
-      idAttribute: 'compoundId',
-      name: 'state',
+      name: 'deviceClassActionType',
       relations: {
         belongsTo: {
-          device: {
-            localField: 'device',
-            localKey: 'deviceId',
-            parent: true
-          }
-        },
-        hasOne: {
-          stateType: {
-            localField: 'stateType',
-            localKey: 'stateTypeId'
+          deviceClass: {
+            localField: 'deviceClass',
+            localKey: 'deviceClassId'
+          },
+          actionType: {
+            localField: 'actionType',
+            localKey: 'actionTypeId'
           }
         }
-      },
-
-      // Computed properties
-      computed: {
-        compoundId: ['deviceId', 'stateTypeId', 'value', function (deviceId, stateTypeId, value) {
-          return '' + deviceId + '_' + stateTypeId;
-        }]
-      },
-
-      // Instance methods
-      methods: {}
+      }
 
     });
 
-    return DSState;
+    return DSDeviceClassActionType;
 
   }
 

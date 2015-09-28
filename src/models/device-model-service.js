@@ -53,13 +53,16 @@
             localField: 'deviceClass',
             localKey: 'deviceClassId'
           }
-        },
-        hasMany: {
-          state: {
-            localField: 'states',
-            foreignKey: 'deviceId'
-          }
         }
+
+        // Not working (error: "Doh! You just changed the primary key of an object!") because states are injected before the state primary keys are generated
+
+        // hasMany: {
+        //   state: {
+        //     localField: 'states',
+        //     foreignKey: 'deviceId'
+        //   }
+        // }
       },
 
       // Computed properties
@@ -85,9 +88,11 @@
           var arrayOfAttrs = attrs;
           angular.forEach(arrayOfAttrs, function(attrs) {
             _addCustomName(resource, attrs);
+            _createStates(resource, attrs);
           });
         } else {
           _addCustomName(resource, attrs);
+          _createStates(resource, attrs);
         }
       }
 
@@ -111,6 +116,25 @@
       attrs.name = (nameParameter === undefined) ? 'Name' : nameParameter.value;
     }
 
+    /*
+     * Private method: _createStates(resource, attrs);
+     */
+    function _createStates(resource, attrs) {
+      var deviceId = attrs.id;
+      var states = attrs.states;
+
+      angular.forEach(states, function(state, index) {
+        state.deviceId = deviceId;
+
+        var stateInstance = DS.createInstance('state', state);
+        DS.inject('state', stateInstance);
+
+        if(angular.isUndefined(attrs.states)) {
+          attrs.states = [];
+        }
+        attrs.states[index] = DS.get('state', '' + deviceId + '_' + state.stateTypeId);
+      });
+    }
 
     /*
      * Public method: subscribe(cb)
