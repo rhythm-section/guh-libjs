@@ -29,9 +29,9 @@
     .module('guh.api')
     .factory('websocketService', websocketService);
 
-  websocketService.$inject = ['$log', '$rootScope', 'libs', 'app'];
+  websocketService.$inject = ['$log', '$rootScope', 'libs', 'app', 'DS', 'DSHttpAdapter'];
 
-  function websocketService($log, $rootScope, libs, app) {
+  function websocketService($log, $rootScope, libs, app, DS, DSHttpAdapter) {
 
     var websocketService = {
       // Data
@@ -101,21 +101,94 @@
         $log.log('onmessage', message);
         var data = angular.fromJson(message.data);
 
-        if(data.notification === app.notificationTypes.devices.stateChanged) {
-          $log.log('Device state changed.', data);
+        switch(data.notification) {
+          // Devices.StateChanged
+          case app.notificationTypes.devices.stateChanged:
+            var deviceId = data.params.deviceId;
+            var stateTypeId = data.params.stateTypeId;
+            var value = data.params.value;
 
-          $log.log('websocketService.callbacks', websocketService.callbacks);
-          $log.log('data.params.deviceId', data.params.deviceId);
+            DS.inject('state', {
+              id: '' + deviceId + '_' + stateTypeId,
+              deviceId: deviceId,
+              stateTypeId: stateTypeId,
+              value: value
+            });
+            break;
 
-          // Execute callback-function with right ID
-          if(libs._.has(websocketService.callbacks, data.params.deviceId)) {
-            var cb = websocketService.callbacks[data.params.deviceId];
-            cb(data);
-          }
-        } else {
-          // $log.warn('Type of notification not handled:' + data.notification);
-          $log.warn('Type of notification not handled:', data);
+          // Devices.DeviceAdded
+          case app.notificationTypes.devices.deviceAdded:
+            $log.log('Device added', data);
+
+            var deviceId = data.params.device.id;
+            var device = DS.get('device', deviceId);
+
+            if(angular.isUndefined(device)) {
+              var deviceData = data.params.device;
+
+              $log.log('Insert new device.');
+              DSHttpAdapter
+                .GET(app.apiUrl + '/devices/' + deviceId + '/states')
+                .then(function(response) {
+                  var states = response.data;
+
+                  var injectedItem = DS.inject('device', {
+                    deviceClassId: deviceData.deviceClassId,
+                    id: deviceData.id,
+                    name: deviceData.name,
+                    params: deviceData.params,
+                    setupComplete: deviceData.setupComplete,
+                    states: states
+                  });
+
+                  $log.log('injectedItem', injectedItem);
+
+                  // Send broadcast event
+                  if(DS.is('device', injectedItem)) {
+                    $rootScope.$broadcast('ReloadView', injectedItem.deviceClass.name + ' was added.');
+                  }
+                });            
+            } else {
+              $log.log('Device already inserted.');
+            }
+
+            break;
+
+          // Devices.DeviceRemoved
+          case app.notificationTypes.devices.deviceRemoved:
+            $log.log('Device removed', data);
+
+            var deviceId = data.params.deviceId;
+            var ejectedItem = DS.eject('device', deviceId);
+
+            if(angular.isDefined(ejectedItem)) {
+              // Send broadcast event
+              $rootScope.$broadcast('ReloadView', 'Device was removed.');
+            } else {
+              $log.log('Device not found, removing not possible.')
+            }
+
+            break;
+
+          default:
+            $log.warn('Type of notification not handled:', data);
         }
+
+        // if(data.notification === app.notificationTypes.devices.stateChanged) {
+        //   $log.log('Device state changed.', data);
+
+        //   $log.log('websocketService.callbacks', websocketService.callbacks);
+        //   $log.log('data.params.deviceId', data.params.deviceId);
+
+        //   // Execute callback-function with right ID
+        //   if(libs._.has(websocketService.callbacks, data.params.deviceId)) {
+        //     var cb = websocketService.callbacks[data.params.deviceId];
+        //     cb(data);
+        //   }
+        // } else {
+        //   // $log.warn('Type of notification not handled:' + data.notification);
+        //   $log.warn('Type of notification not handled:', data);
+        // }
       };
 
       websocketService.ws = ws;

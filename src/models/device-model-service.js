@@ -94,6 +94,17 @@
           _addCustomName(resource, attrs);
           _createStates(resource, attrs);
         }
+      },
+
+      afterEject: function(resource, attrs) {
+        if(angular.isArray(attrs)) {
+          var arrayOfAttrs = attrs;
+          angular.forEach(arrayOfAttrs, function(attrs) {
+            _removeStates(resource, attrs);
+          });
+        } else {
+          _removeStates(resource, attrs);
+        }
       }
 
     });
@@ -133,6 +144,21 @@
           attrs.states = [];
         }
         attrs.states[index] = DS.get('state', '' + deviceId + '_' + state.stateTypeId);
+      });
+    }
+
+    /*
+     * Private method: _removeStates(resource, attrs)
+     */
+    function _removeStates(resource, attrs) {
+      $log.log('_removeStates', resource, attrs);
+
+      var deviceId = attrs.id;
+      var states = attrs.states;
+
+      angular.forEach(states, function(state, index) {
+        var ejectedItem = DS.eject('state', '' + deviceId + '_' + state.stateTypeId);
+        $log.log('ejected state', ejectedItem);
       });
     }
 
@@ -196,7 +222,7 @@
     function add(deviceClassId, deviceDescriptorId, deviceParams) {
       var device = {};
 
-      // deviceClassIdl
+      // deviceClassId
       if(angular.isDefined(deviceClassId) && deviceClassId  !== '') {
         device.deviceClassId = deviceClassId;
       }
@@ -209,7 +235,7 @@
       }
 
       return DSDevice.create(device, {
-        cacheResponse: true
+        cacheResponse: false
       });
     }
 
