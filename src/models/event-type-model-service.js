@@ -96,9 +96,6 @@
         attrs.phrase = phrase + ' is detected and parameters are';
       }
 
-      // Add unit
-      attrs.unit = modelsHelper.getUnit(attrs.name);
-
       // Add templateUrl to paramTypes
       angular.forEach(paramTypes, function(paramType) {
         paramType = modelsHelper.addUiData(paramType);

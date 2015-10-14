@@ -36,7 +36,6 @@
     var modelsHelper = {
       addUiData: addUiData,
       checkTemplateUrl: checkTemplateUrl,
-      getUnit: getUnit,
       setBasePath: setBasePath
     };
 
@@ -236,21 +235,6 @@
         return fileExists;
       } else {
         return path + 'template-not-defined.html';
-      }
-    }
-
-    /*
-     * Public method: getUnit(name)
-     */
-    function getUnit(name) {
-      // Get value inside Brackets []
-      var regExp = /\[([^)]+)\]/;
-      var searchUnit = regExp.exec(name);
-
-      if(angular.isArray(searchUnit) && searchUnit.length === 2) {
-        return searchUnit[1];
-      } else {
-        return '';
       }
     }
 

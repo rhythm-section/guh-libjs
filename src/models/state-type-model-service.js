@@ -103,9 +103,6 @@
       // phrase
       attrs.phrase = 'When value of ' + phrase;
 
-      // unit
-      attrs.unit = modelsHelper.getUnit(attrs.name);
-
       // Add templateUrl to stateType
       attrs = modelsHelper.addUiData(attrs);
     }
