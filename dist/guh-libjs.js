@@ -26,57 +26,6 @@
   'use strict';
 
   angular
-    .module('guh.logging', [])
-    .config(config);
-
-  config.$inject = ['$provide'];
-
-  function config($provide) {
-    $provide.decorator('$exceptionHandler', ['$injector', '$delegate', function($injector, $delegate) {
-      return function(exception, cause) {
-        console.log('exception', exception, cause);
-
-        var $rootScope = $injector.get('$rootScope');
-
-        $rootScope.$broadcast('HandleError', {
-          exception: exception,
-          cause: cause
-        });
-
-        $delegate(exception, cause);
-      };
-    }]);
-  }
-
-}());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
     .module('guh.models', [
       // Datastore
       'js-data'
@@ -282,9 +231,6 @@
 
       // phrase
       attrs.phrase = 'When value of ' + phrase;
-
-      // unit
-      // attrs.unit = modelsHelper.getUnit(attrs.name);
 
       // Add templateUrl to stateType
       attrs = modelsHelper.addUiData(attrs);
@@ -560,7 +506,6 @@
     var modelsHelper = {
       addUiData: addUiData,
       checkTemplateUrl: checkTemplateUrl,
-      getUnit: getUnit,
       setBasePath: setBasePath
     };
 
@@ -764,21 +709,6 @@
     }
 
     /*
-     * Public method: getUnit(name)
-     */
-    function getUnit(name) {
-      // Get value inside Brackets []
-      var regExp = /\[([^)]+)\]/;
-      var searchUnit = regExp.exec(name);
-
-      if(angular.isArray(searchUnit) && searchUnit.length === 2) {
-        return searchUnit[1];
-      } else {
-        return '';
-      }
-    }
-
-    /*
      * Public method: setBasePath()
      */
     function setBasePath() {      
@@ -951,9 +881,6 @@
       } else {
         attrs.phrase = phrase + ' is detected and parameters are';
       }
-
-      // Add unit
-      // attrs.unit = modelsHelper.getUnit(attrs.name);
 
       // Add templateUrl to paramTypes
       angular.forEach(paramTypes, function(paramType) {
@@ -1704,7 +1631,7 @@
         'Toggle Button',
         'UDP Commander',
         'Wake On Lan',
-        'Weather from OpenWeatherMap',
+        'Weather',
         'Yahoo mail'
       ];
       var classType = 'device';
@@ -2091,6 +2018,57 @@
       return ruleActionParams;
     }
 
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.logging', [])
+    .config(config);
+
+  config.$inject = ['$provide'];
+
+  function config($provide) {
+    $provide.decorator('$exceptionHandler', ['$injector', '$delegate', function($injector, $delegate) {
+      return function(exception, cause) {
+        console.log('exception', exception, cause);
+
+        var $rootScope = $injector.get('$rootScope');
+
+        $rootScope.$broadcast('HandleError', {
+          exception: exception,
+          cause: cause
+        });
+
+        $delegate(exception, cause);
+      };
+    }]);
   }
 
 }());

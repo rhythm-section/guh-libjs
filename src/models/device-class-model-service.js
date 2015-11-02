@@ -305,7 +305,7 @@
         'Toggle Button',
         'UDP Commander',
         'Wake On Lan',
-        'Weather from OpenWeatherMap',
+        'Weather',
         'Yahoo mail'
       ];
       var classType = 'device';
