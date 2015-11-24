@@ -134,32 +134,31 @@
     }
 
     /*
-     * Public method: getRuleActionParams(actionType, actionParamType, eventParamType)
+     * Public method: getRuleActionParams(params, actionParamType, eventParamType)
      */
-    function getRuleActionParams(actionType, actionParamType, eventParamType) {
+    function getRuleActionParams(params, actionParamType, eventParamType) {
       /* jshint validthis: true */
       var self = this;
       var ruleActionParams = [];
-      var paramTypes = self.paramTypes;
 
-      angular.forEach(paramTypes, function(paramType) {
+      angular.forEach(params, function(param) {
         if(actionParamType !== undefined && eventParamType !== undefined) {
-          if(paramType.name === actionParamType.name) {
+          if(param.name === actionParamType.name) {
             ruleActionParams.push({
-              name: paramType.name,
+              name: param.name,
               eventParamName: eventParamType.name,
               eventTypeId: eventParamType.eventDescriptor.eventTypeId
             });
           } else {
             ruleActionParams.push({
-              name: paramType.name,
-              value: paramType.value
+              name: param.name,
+              value: param.value
             });
           }
         } else {
           ruleActionParams.push({
-            name: paramType.name,
-            value: paramType.value
+            name: param.name,
+            value: param.value
           });
         }
       });

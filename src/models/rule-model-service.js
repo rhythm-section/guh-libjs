@@ -30,9 +30,9 @@
     .factory('DSRule', DSRuleFactory)
     .run(function(DSRule) {});
 
-  DSRuleFactory.$inject = ['$log', 'DS'];
+  DSRuleFactory.$inject = ['$log', 'app', 'DS'];
 
-  function DSRuleFactory($log, DS) {
+  function DSRuleFactory($log, app, DS) {
     
     var staticMethods = {};
 
@@ -55,6 +55,8 @@
       // Instance methods
       methods: {
         // API
+        executeActions: executeActions,
+        executeExitActions: executeExitActions,
         remove: remove
       }
 
@@ -62,6 +64,32 @@
 
     return DSRule;
 
+
+    /*
+     * Public method: executeActions()
+     */
+    function executeActions() {
+      /* jshint validthis: true */
+      var self = this;
+
+      return DS
+        .adapters
+        .http
+        .POST(app.apiUrl + '/rules/' + self.id + "/executeactions");   
+    }
+
+    /*
+     * Public method: executeExitActions()
+     */
+    function executeExitActions() {
+      /* jshint validthis: true */
+      var self = this;
+
+      return DS
+        .adapters
+        .http
+        .POST(app.apiUrl + '/rules/' + self.id + "/executeexitactions");   
+    }
 
     /*
      * Public method: remove()

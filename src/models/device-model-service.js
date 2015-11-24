@@ -312,31 +312,32 @@
     }
 
     /*
-     * Public method: getStateDescriptor(stateType, value, operator)
+     * Public method: getStateDescriptor(stateType, paramDescriptor)
      */
-    function getStateDescriptor(stateType, value, operator) {
+    function getStateDescriptor(stateType, paramDescriptor) {
       /* jshint validthis: true */
       var self = this;
       var stateDescriptor = {};
 
       stateDescriptor.deviceId = self.id;
-      stateDescriptor.operator = operator;
+      stateDescriptor.operator = paramDescriptor.operator;
       stateDescriptor.stateTypeId = stateType.id;
-      stateDescriptor.value = value;
-
+      stateDescriptor.value = paramDescriptor.value;
+      
       return stateDescriptor;
     }
 
+
     /*
-     * Public method: getAction(actionType, actionParamType, eventParamType)
+     * Public method: getAction(actionType, params)
      */
-    function getAction(actionType, actionParamType, eventParamType) {
+    function getAction(actionType, params) {
       /* jshint validthis: true */
       var self = this;
       var action = {};
       var ruleActionParams = [];
 
-      ruleActionParams = actionType.getRuleActionParams(actionType, actionParamType, eventParamType);
+      ruleActionParams = actionType.getRuleActionParams(params);
       if(ruleActionParams.length > 0) {
         action.ruleActionParams = ruleActionParams;
       }

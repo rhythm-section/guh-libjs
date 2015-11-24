@@ -354,9 +354,9 @@
     .factory('DSRule', DSRuleFactory)
     .run(function(DSRule) {});
 
-  DSRuleFactory.$inject = ['$log', 'DS'];
+  DSRuleFactory.$inject = ['$log', 'app', 'DS'];
 
-  function DSRuleFactory($log, DS) {
+  function DSRuleFactory($log, app, DS) {
     
     var staticMethods = {};
 
@@ -379,6 +379,8 @@
       // Instance methods
       methods: {
         // API
+        executeActions: executeActions,
+        executeExitActions: executeExitActions,
         remove: remove
       }
 
@@ -386,6 +388,32 @@
 
     return DSRule;
 
+
+    /*
+     * Public method: executeActions()
+     */
+    function executeActions() {
+      /* jshint validthis: true */
+      var self = this;
+
+      return DS
+        .adapters
+        .http
+        .POST(app.apiUrl + '/rules/' + self.id + "/executeactions");   
+    }
+
+    /*
+     * Public method: executeExitActions()
+     */
+    function executeExitActions() {
+      /* jshint validthis: true */
+      var self = this;
+
+      return DS
+        .adapters
+        .http
+        .POST(app.apiUrl + '/rules/' + self.id + "/executeexitactions");   
+    }
 
     /*
      * Public method: remove()
@@ -1221,31 +1249,32 @@
     }
 
     /*
-     * Public method: getStateDescriptor(stateType, value, operator)
+     * Public method: getStateDescriptor(stateType, paramDescriptor)
      */
-    function getStateDescriptor(stateType, value, operator) {
+    function getStateDescriptor(stateType, paramDescriptor) {
       /* jshint validthis: true */
       var self = this;
       var stateDescriptor = {};
 
       stateDescriptor.deviceId = self.id;
-      stateDescriptor.operator = operator;
+      stateDescriptor.operator = paramDescriptor.operator;
       stateDescriptor.stateTypeId = stateType.id;
-      stateDescriptor.value = value;
-
+      stateDescriptor.value = paramDescriptor.value;
+      
       return stateDescriptor;
     }
 
+
     /*
-     * Public method: getAction(actionType, actionParamType, eventParamType)
+     * Public method: getAction(actionType, params)
      */
-    function getAction(actionType, actionParamType, eventParamType) {
+    function getAction(actionType, params) {
       /* jshint validthis: true */
       var self = this;
       var action = {};
       var ruleActionParams = [];
 
-      ruleActionParams = actionType.getRuleActionParams(actionType, actionParamType, eventParamType);
+      ruleActionParams = actionType.getRuleActionParams(params);
       if(ruleActionParams.length > 0) {
         action.ruleActionParams = ruleActionParams;
       }
@@ -1985,32 +2014,31 @@
     }
 
     /*
-     * Public method: getRuleActionParams(actionType, actionParamType, eventParamType)
+     * Public method: getRuleActionParams(params, actionParamType, eventParamType)
      */
-    function getRuleActionParams(actionType, actionParamType, eventParamType) {
+    function getRuleActionParams(params, actionParamType, eventParamType) {
       /* jshint validthis: true */
       var self = this;
       var ruleActionParams = [];
-      var paramTypes = self.paramTypes;
 
-      angular.forEach(paramTypes, function(paramType) {
+      angular.forEach(params, function(param) {
         if(actionParamType !== undefined && eventParamType !== undefined) {
-          if(paramType.name === actionParamType.name) {
+          if(param.name === actionParamType.name) {
             ruleActionParams.push({
-              name: paramType.name,
+              name: param.name,
               eventParamName: eventParamType.name,
               eventTypeId: eventParamType.eventDescriptor.eventTypeId
             });
           } else {
             ruleActionParams.push({
-              name: paramType.name,
-              value: paramType.value
+              name: param.name,
+              value: param.value
             });
           }
         } else {
           ruleActionParams.push({
-            name: paramType.name,
-            value: paramType.value
+            name: param.name,
+            value: param.value
           });
         }
       });
