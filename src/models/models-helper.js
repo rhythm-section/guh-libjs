@@ -103,32 +103,32 @@
       var template;
 
       switch(type) {
-        case 'bool':
+        case 'Bool':
           if(isChildOfActionType) {
             template = _getInputPath(folderName, directiveName, directiveName + '-toggle-button');
           } else {
             template = _getInputPath(folderName, directiveName, directiveName + '-checkbox');
           }
           break;
-        case 'int':
-        case 'uint':
+        case 'Int':
+        case 'Uint':
           if(isChildOfActionType) {
             template = _getInputPath(folderName, directiveName, directiveName + '-range');
           } else {
             template = _getInputPath(folderName, directiveName, directiveName + '-number-integer');
           }
           break;
-        case 'double':
+        case 'Double':
           if(isChildOfActionType) {
             template = _getInputPath(folderName, directiveName, directiveName + '-range');
           } else {
             template = _getInputPath(folderName, directiveName, directiveName + '-number-decimal');
           }
           break;
-        case 'QColor':
+        case 'Color':
           template = _getInputPath(folderName, directiveName, directiveName + '-color');
           break;
-        case 'QString':
+        case 'String':
           if(allowedValues) {
             if(isChildOfActionType) {
               template = _getInputPath(folderName, directiveName, directiveName + '-select');
@@ -157,20 +157,20 @@
       var value;
 
       switch(type) {
-        case 'bool':
+        case 'Bool':
           value = guhType.defaultValue || false;
           break;
-        case 'int':
-        case 'uint':
+        case 'Int':
+        case 'Uint':
           value = guhType.defaultValue || 0;
           break;
-        case 'double':
+        case 'Double':
           value = guhType.defaultValue || 0.0;
           break;
-        case 'QColor':
+        case 'Color':
           value = guhType.defaultValue || '0,0,0';
           break;
-        case 'QString':
+        case 'String':
           value = guhType.defaultValue || '';
           break;
         default:

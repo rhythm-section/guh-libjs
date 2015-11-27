@@ -601,32 +601,32 @@
       var template;
 
       switch(type) {
-        case 'bool':
+        case 'Bool':
           if(isChildOfActionType) {
             template = _getInputPath(folderName, directiveName, directiveName + '-toggle-button');
           } else {
             template = _getInputPath(folderName, directiveName, directiveName + '-checkbox');
           }
           break;
-        case 'int':
-        case 'uint':
+        case 'Int':
+        case 'Uint':
           if(isChildOfActionType) {
             template = _getInputPath(folderName, directiveName, directiveName + '-range');
           } else {
             template = _getInputPath(folderName, directiveName, directiveName + '-number-integer');
           }
           break;
-        case 'double':
+        case 'Double':
           if(isChildOfActionType) {
             template = _getInputPath(folderName, directiveName, directiveName + '-range');
           } else {
             template = _getInputPath(folderName, directiveName, directiveName + '-number-decimal');
           }
           break;
-        case 'QColor':
+        case 'Color':
           template = _getInputPath(folderName, directiveName, directiveName + '-color');
           break;
-        case 'QString':
+        case 'String':
           if(allowedValues) {
             if(isChildOfActionType) {
               template = _getInputPath(folderName, directiveName, directiveName + '-select');
@@ -655,20 +655,20 @@
       var value;
 
       switch(type) {
-        case 'bool':
+        case 'Bool':
           value = guhType.defaultValue || false;
           break;
-        case 'int':
-        case 'uint':
+        case 'Int':
+        case 'Uint':
           value = guhType.defaultValue || 0;
           break;
-        case 'double':
+        case 'Double':
           value = guhType.defaultValue || 0.0;
           break;
-        case 'QColor':
+        case 'Color':
           value = guhType.defaultValue || '0,0,0';
           break;
-        case 'QString':
+        case 'String':
           value = guhType.defaultValue || '';
           break;
         default:
@@ -2085,7 +2085,8 @@
   function config($provide) {
     $provide.decorator('$exceptionHandler', ['$injector', '$delegate', function($injector, $delegate) {
       return function(exception, cause) {
-        console.log('exception', exception, cause);
+        console.log(exception);
+        console.log(cause);
 
         var $rootScope = $injector.get('$rootScope');
 
@@ -2096,6 +2097,30 @@
 
         $delegate(exception, cause);
       };
+    }]);
+
+    $provide.decorator('$log', ['$delegate', function($delegate) {
+      // Save original $log.log()
+      var logFn = $delegate.log;
+
+      $delegate.log = function() {
+        var args = Array.prototype.slice.call(arguments);
+        var now = new Date();
+        var year = now.getYear();
+        var month = now.getMonth();
+        var day = now.getDay();
+        var hours = now.getHours();
+        var minutes = now.getMinutes();
+        var seconds = now.getSeconds();
+
+        // Prepend timestamp
+        args[0] = day + '.' + month + '.' + year + ' ' + hours + ':' + minutes + ':' + seconds + ' - ' + args[0];
+
+        // Call original with new output (prepended with formatted timestamp)
+        logFn.apply(null, args);
+      };
+
+      return $delegate;
     }]);
   }
 
