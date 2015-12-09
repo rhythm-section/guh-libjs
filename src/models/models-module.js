@@ -43,7 +43,7 @@
       .defaults
       .deserialize = function deserialize(resourceConfig, data) {
         return data ? ('data' in data ? data.data : data) : data;
-      }
+      };
 
 
     DSProvider

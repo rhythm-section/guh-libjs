@@ -30,9 +30,9 @@
     .factory('DSDevice', DSDeviceFactory)
     .run(function(DSDevice) {});
 
-  DSDeviceFactory.$inject = ['$log', 'DS', 'libs', 'app', 'websocketService'];
+  DSDeviceFactory.$inject = ['$log', '$httpParamSerializer', 'DS', 'libs', 'app', 'websocketService'];
 
-  function DSDeviceFactory($log, DS, libs, app, websocketService) {
+  function DSDeviceFactory($log, $httpParamSerializer, DS, libs, app, websocketService) {
     
     var staticMethods = {};
 
@@ -286,11 +286,21 @@
     /*
      * Public method: remove()
      */
-    function remove() {
+    function remove(params) {
       /* jshint validthis: true */
       var self = this;
+      var options = {};
 
-      return DSDevice.destroy(self.id);
+      if(angular.isDefined(params) && params !== {}) {
+        options.params = {
+          params: params
+        };
+        options.paramSerializer = function(params) {
+          return $httpParamSerializer(params).replace(/%5B/g, '[').replace(/%5D/g, ']');
+        };
+      }
+
+      return DSDevice.destroy(self.id, options);
     }
 
     /*
