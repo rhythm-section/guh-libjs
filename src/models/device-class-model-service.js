@@ -263,7 +263,11 @@
     function _getClassType(name) {
       var devServices = [
         'Mock Device',
-        'Mock Device (Auto created)'
+        'Mock Device (Auto created)',
+        'Mock Device (Child)',
+        'Mock Device (Display Pin)',
+        'Mock Device (Parent)',
+        'Mock Device (Push Button)'
       ];
       var devices = [
         'Elro Bulb (AB440L)',
@@ -292,6 +296,7 @@
         'Mood'
       ];
       var services = [
+        'aWATTar',
         'Alarm',
         'Application launcher',
         'Bashscript launcher',
