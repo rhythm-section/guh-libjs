@@ -23,117 +23,153 @@
  *                                                                                     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// (function() {
-//   'use strict';
+(function() {
+  'use strict';
 
-//   angular
-//     .module('guh.logging.hooks')
-//     .provider('guhLoggingHttpHook', guhLoggingHttpHook);
+  angular
+    .module('guh.logging.hooks', [])
+    .config(config);
 
-//   function guhLoggingHttpHook() {
-//     // Variables
-//     var locationProtocol = location.protocol;
-//     var locationHost = location.hostname;
-//     var locationPort = location.port;
-//     var locationServer = locationProtocol + '//' + locationHost + ':' + locationPort;
+  config.$inject = [];
 
+  function config() {}
 
-//     var provider = {
-//       // Provider methods (needed)
-//       $get: ['$http', $get],
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-//       // Other methods
-//       getServer: getServer,
-//       setProtocol: setProtocol,
-//       setHostname: setHostname,
-//       setPort: setPort
-//     };
+(function() {
+  'use strict';
 
-//     return provider;
+  angular
+    .module('guh.logging.hooks')
+    .provider('guhLoggingHttpHook', guhLoggingHttpHook);
 
-
-//     function _checkParameter(parameterName, parameter) {
-//       try {
-//         if(!angular.isDefined(parameter) || parameter === null) {
-//           throw 'The parameter ' + parameterName + ' has to be defined.';
-//         } else if(!angular.isString(parameter)) {
-//           throw 'The value of ' + parameterName + ' has to be a string.';
-//         }
-//       } catch(error) {
-//         return;
-//       }
-//     }
-
-//     function _setServerAddress() {
-//       locationServer = locationProtocol + '//' + locationHost + ':' + locationPort;
-//     }
-
-
-//     function $get($http) {
-//       return function(logObject) {
-//         $http
-//           .post(locationServer, {
-//             data: logObject
-//           })
-//           .then(function(response) {
-//             console.log('Data successfully sent.', {
-//               payload: logObject,
-//               response: response
-//             });
-//           })
-//           .catch(function(error) {
-//             console.log('Data not sent.', {
-//               payload: logObject,
-//               error: error
-//             })
-//           });
-//       }
-
-//       // console.log('$get', $http);
-
-//       // var service = {
-//       //   // Variables
-//       //   protocol: locationProtocol,
-//       //   host: locationHost,
-//       //   port: locationPort,
-//       //   server: locationServer,
-
-//       //   // Methods
-//       //   addToQueue: addToQueue
-//       // };
-
-//       // return service;
+  function guhLoggingHttpHook() {
+    // Variables
+    var locationProtocol = location.protocol;
+    var locationHost = location.hostname;
+    var locationPort = location.port;
+    var locationServer = locationProtocol + '//' + locationHost + ':' + locationPort;
 
 
-//       // function addToQueue($http) {
-//       //   console.log('addToQueue', $http);
-//       // }
-//     }
+    var provider = {
+      // Provider methods (needed)
+      $get: ['$http', $get],
 
-//     function setProtocol(protocol) {
-//       _checkParameter('protocol', protocol);
-//       locationProtocol = protocol;
-//       _setServerAddress();
-//     }
+      // Other methods
+      getServer: getServer,
+      setProtocol: setProtocol,
+      setHostname: setHostname,
+      setPort: setPort
+    };
 
-//     function setHostname(hostname) {
-//       _checkParameter('hostname', hostname);
-//       locationHost = hostname;
-//       _setServerAddress();
-//     }
+    return provider;
 
-//     function setPort(port) {
-//       _checkParameter('port', port);
-//       locationPort = port;
-//       _setServerAddress();
-//     }
 
-//     function getServer() {
-//       return locationServer;
-//     }
-//   }
+    function _checkParameter(parameterName, parameter) {
+      try {
+        if(!angular.isDefined(parameter) || parameter === null) {
+          throw 'The parameter ' + parameterName + ' has to be defined.';
+        } else if(!angular.isString(parameter)) {
+          throw 'The value of ' + parameterName + ' has to be a string.';
+        }
+      } catch(error) {
+        return;
+      }
+    }
 
-// }());
+    function _setServerAddress() {
+      locationServer = locationProtocol + '//' + locationHost + ':' + locationPort;
+    }
+
+
+    function $get($http) {
+      return function(logObject) {
+        $http
+          .post(locationServer, {
+            data: logObject
+          })
+          .then(function(response) {
+            console.log('Data successfully sent.', {
+              payload: logObject,
+              response: response
+            });
+          })
+          .catch(function(error) {
+            console.log('Data not sent.', {
+              payload: logObject,
+              error: error
+            })
+          });
+      }
+
+      // console.log('$get', $http);
+
+      // var service = {
+      //   // Variables
+      //   protocol: locationProtocol,
+      //   host: locationHost,
+      //   port: locationPort,
+      //   server: locationServer,
+
+      //   // Methods
+      //   addToQueue: addToQueue
+      // };
+
+      // return service;
+
+
+      // function addToQueue($http) {
+      //   console.log('addToQueue', $http);
+      // }
+    }
+
+    function setProtocol(protocol) {
+      _checkParameter('protocol', protocol);
+      locationProtocol = protocol;
+      _setServerAddress();
+    }
+
+    function setHostname(hostname) {
+      _checkParameter('hostname', hostname);
+      locationHost = hostname;
+      _setServerAddress();
+    }
+
+    function setPort(port) {
+      _checkParameter('port', port);
+      locationPort = port;
+      _setServerAddress();
+    }
+
+    function getServer() {
+      return locationServer;
+    }
+  }
+
+}());
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                                     *
@@ -159,68 +195,54 @@
  *                                                                                     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// (function() {
-//   'use strict';
+(function() {
+  'use strict';
 
-//   angular
-//     .module('guh.logging.hooks', [])
-//     .config(config);
+  angular
+    .module('guh.logging.hooks')
+    .provider('guhLoggingBroadcastHook', guhLoggingBroadcastHook);
 
-//   config.$inject = [];
+  function guhLoggingBroadcastHook() {
 
-//   function config() {}
+    var provider = {
+      // Provider methods (needed)
+      $get: ['$rootScope', $get]
+    };
 
-// }());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-// (function() {
-//   'use strict';
-
-//   angular
-//     .module('guh.logging.hooks')
-//     .provider('guhLoggingBroadcastHook', guhLoggingBroadcastHook);
-
-//   function guhLoggingBroadcastHook() {
-
-//     var provider = {
-//       // Provider methods (needed)
-//       $get: ['$rootScope', $get]
-//     };
-
-//     return provider;
+    return provider;
 
 
-//     function $get($rootScope) {
-//       return function(logObject) {
-//         // Type: error, warn, info, debug
-//         $rootScope.$broadcast('notification', logObject);
-//       }
-//     }
-//   }
+    function $get($rootScope) {
+      return function(logObject) {
+        var type = logObject.type ? logObject.type : null;
+        var argsArray = logObject.args ? [].slice.call(logObject.args) : null;
 
-// }());
+        if(angular.isArray(argsArray)) {
+          switch(argsArray.length) {
+            case 1:
+              if(!angular.isString(argsArray[0])) {
+                $rootScope.$broadcast('notification', {
+                  type: type,
+                  args: argsArray[0]
+                });
+              }
+              break;
+            case 2:
+              $rootScope.$broadcast('notification', {
+                type: type,
+                context: argsArray[0],
+                args: argsArray[1]
+              });
+              break;
+            default:
+              console.log('Wrong number of arguments.', logObject.type, logObject.args, argsArray.length);
+          }
+        }
+      }
+    }
+  }
+
+}());
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                                     *
@@ -2312,171 +2334,94 @@
  *                                                                                     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// (function() {
-//   'use strict';
+(function() {
+  'use strict';
 
-//   angular
-//     .module('guh.logging')
-//     .provider('guhLogging', Logging);
+  angular
+    .module('guh.logging', [
+      'guh.logging.hooks'
+    ])
+    .config(config);
 
-//   Logging.$inject = ['$injector'];
+  config.$inject = ['$provide'];
 
-//   function Logging($injector) {
-//     var _logTypes = {
-//       log: {},
-//       info: {},
-//       warn: {},
-//       error: {}
-//     };
+  function config($provide) {
+    // Exceptions
+    // $provide.decorator('$exceptionHandler', ['$injector', '$delegate', 'Logging', function($injector, $delegate, Logging) {
+    //   if(!Logging.angularServiceEnhanced.$exceptionHandler) {
+    //     return $delegate;
+    //   }
 
-//     var _hooks = {
-//       http: 'guhLoggingHttpHook',
-//       broadcast: 'guhLoggingBroadcastHook',
-//       websocket: null
-//     };
+    //   return function(exception, cause) {
+    //     $delegate(exception, cause);
+    //   }
+    // }]);
 
-//     var provider = {
-//       $get: $get,
-//       enhance: enhance,
-//       before: before,
-//       after: after,
-//       decorate: decorate
-//     };
+    // Logs
+    $provide.decorator('$log', ['$injector', '$delegate', 'guhLogging', function($injector, $delegate, guhLogging) {
+      var decorator = {
+        log: log,
+        info: info,
+        warn: warn,
+        error: error
+      };
 
-//     return provider;
-
-
-//     function _getArrayFromString(string) {
-//       if(!angular.isString(string)) {
-//         return;
-//       }
-//     }
-
-//     function _addHooks(prePost, logTypes, hooks) {
-//       try {
-//         if(angular.isUndefined(logTypes) || logTypes === null || !angular.isString(logTypes)) {
-//           throw 'Wrong argument type. The argument "logTypes" should be a comma seperated String.';
-//         }
-//         if(angular.isDefined(hooks) && hooks !== null && !angular.isString(hooks)) {
-//           throw 'Wrong argument type. The argument "hooks" should be a comma seperated String.';
-//         }
-//       } catch(error) {
-//         return error;
-//       }
-
-//       var logTypesArray = logTypes.replace(/\s+/g, '').split(',');
-//       var hooksArray = hooks.replace(/\s+/g, '').split(',');
-//       var logTypeCallbacks = [];
-
-//       // Check hooks
-//       var callback;
-//       angular.forEach(hooksArray, function(hook) {
-//         if(angular.isDefined(_hooks[hook]) && _hooks[hook] !== null) {
-//           logTypeCallbacks.push(_hooks[hook]);
-//         }
-//       });
-
-//       // Initialize all log types with preCallbacks = [] / postCallbacks = []
-//       angular.forEach(_logTypes, function(_logType) {
-//         _logType[prePost + 'Callbacks'] = [];
-//       });
-
-//       // Set defined callbacks for log types
-//       angular.forEach(logTypesArray, function(logType) {
-//         if(angular.isDefined(_logTypes[logType])) {
-//           _logTypes[logType][prePost + 'Callbacks'] = logTypeCallbacks;
-//         }
-//       });
-//     }
+      return decorator;
 
 
-//     function $get() {
-//       var service = {
-//         isEnhanced: isEnhanced,
-//         log: log,
-//         info: info,
-//         warn: warn,
-//         error: error,
-//         getLogType: getLogType
-//       };
+      function _applyCallbacks(logType, args) {
+        var logTypeData = guhLogging.getLogType(logType);
 
-//       return service;
+        // Pre callbacks
+        angular.forEach(logTypeData.preCallbacks, function(preCallbackProvider) {
+          var preCallback = $injector.get(preCallbackProvider);
+          preCallback.call(preCallback, {
+            type: logType,
+            args: args
+          });
+        });
 
+        // Console
+        if(guhLogging.isEnhanced(logType)) {
+          $delegate[logType].apply($delegate, args);
+          guhLogging[logType].apply(null, args);
+        } else {
+          $delegate[logType].apply($delegate, args);
+        }
 
-//       function isEnhanced(logType) {
-//         return (angular.isDefined(_logTypes[logType]) && angular.isDefined(_logTypes[logType].enhanced)) ? _logTypes[logType].enhanced : false;
-//       }
+        // Post callbacks
+        angular.forEach(logTypeData.postCallbacks, function(postCallbackProvider) {
+          var postCallback = $injector.get(postCallbackProvider);
+          postCallback.call(postCallback, {
+            type: logType,
+            args: args
+          });
+        });
+      }
 
-//       function log() {
-//         console.log(arguments);
-//       }
+      function log() {
+        var args = arguments;
+        _applyCallbacks('log', args);
+      }
 
-//       function info() {
-//         console.info(arguments);
-//       }
+      function info() {
+        var args = arguments;
+        _applyCallbacks('info', args);
+      }
 
-//       function warn() {
-//         console.warn(arguments);
-//       }
+      function warn() {
+        var args = arguments;
+        _applyCallbacks('warn', args);
+      }
 
-//       function error() {
-//         console.error(arguments);
-//       }
+      function error() {
+        var args = arguments;
+        _applyCallbacks('error', args);
+      }
+    }]);
+  }
 
-//       function getLogType(logType) {
-//         return _logTypes[logType];
-//       }
-//     }
-
-//     function enhance(logTypes) {
-//       try {
-//         if(angular.isDefined(logTypes) && logTypes !== null && !angular.isString(logTypes)) {
-//           throw 'Wrong argument type. The argument "logTypes" should be a comma seperated String.';
-//         }
-//       } catch(error) {
-//         return error;
-//       }
-
-//       var logTypesArray = [];
-
-//       // Set enhanced
-//       if(angular.isString(logTypes)) {
-//         logTypesArray = logTypes.replace(/\s+/g, '').split(',');
-
-//         // Initialize all log types with enhanced = false
-//         angular.forEach(_logTypes, function(_logType) {
-//           _logType.enhanced = false;
-//         });
-
-//         // Set defined enhanced values for log types
-//         angular.forEach(logTypesArray, function(logType) {
-//           if(angular.isDefined(_logTypes[logType])) {
-//             _logTypes[logType].enhanced = true;
-//           }
-//         });
-//       } else {
-//         // If logTypes is undefined or null
-//         // Initialize all log types with enhanced = true
-//         angular.forEach(_logTypes, function(_logType) {
-//           _logType.enhanced = true;
-//         });
-//       }
-//     }
-
-//     function before(logTypes, hooks) {
-//       _addHooks('pre', logTypes, hooks);
-//     }
-
-//     function after(logTypes, hooks) {
-//       _addHooks('post', logTypes, hooks);
-//     }
-
-//     function decorate(message) {
-
-//     }
-//   }
-
-// }());
+}());
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                                     *
@@ -2502,93 +2447,194 @@
  *                                                                                     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// (function() {
-//   'use strict';
+(function() {
+  'use strict';
 
-//   angular
-//     .module('guh.logging', [
-//       'guh.logging.hooks'
-//     ])
-//     .config(config);
+  angular
+    .module('guh.logging')
+    .provider('guhLogging', Logging);
 
-//   config.$inject = ['$provide'];
+  Logging.$inject = ['$injector'];
 
-//   function config($provide) {
-//     // Exceptions
-//     // $provide.decorator('$exceptionHandler', ['$injector', '$delegate', 'Logging', function($injector, $delegate, Logging) {
-//     //   if(!Logging.angularServiceEnhanced.$exceptionHandler) {
-//     //     return $delegate;
-//     //   }
+  function Logging($injector) {
+    var _logTypes = {
+      log: {},
+      info: {},
+      warn: {},
+      error: {}
+    };
 
-//     //   return function(exception, cause) {
-//     //     $delegate(exception, cause);
-//     //   }
-//     // }]);
+    var _hooks = {
+      http: 'guhLoggingHttpHook',
+      broadcast: 'guhLoggingBroadcastHook',
+      websocket: null
+    };
 
-//     // Logs
-//     $provide.decorator('$log', ['$injector', '$delegate', 'guhLogging', function($injector, $delegate, guhLogging) {
-//       var decorator = {
-//         log: log,
-//         info: info,
-//         warn: warn,
-//         error: error
-//       };
+    var provider = {
+      $get: $get,
+      enhance: enhance,
+      before: before,
+      after: after,
+      decorate: decorate
+    };
 
-//       return decorator;
+    return provider;
 
 
-//       function _applyCallbacks(logType, args) {
-//         var logTypeData = guhLogging.getLogType(logType);
+    // function _getArrayFromString(string) {
+    //   if(!angular.isString(string)) {
+    //     return;
+    //   }
+    // }
 
-//         // Pre callbacks
-//         angular.forEach(logTypeData.preCallbacks, function(preCallbackProvider) {
-//           var preCallback = $injector.get(preCallbackProvider);
-//           preCallback.call(preCallback, {
-//             type: logType,
-//             args: args
-//           });
-//         });
+    function _addHooks(prePost, logTypes, hooks) {
+      try {
+        if(angular.isUndefined(logTypes) || logTypes === null || !angular.isString(logTypes)) {
+          throw 'Wrong argument type. The argument "logTypes" should be a comma seperated String.';
+        }
+        if(angular.isDefined(hooks) && hooks !== null && !angular.isString(hooks)) {
+          throw 'Wrong argument type. The argument "hooks" should be a comma seperated String.';
+        }
+      } catch(error) {
+        return error;
+      }
 
-//         // Console
-//         if(guhLogging.isEnhanced(logType)) {
-//           guhLogging[logType].apply(null, args);
-//         } else {
-//           $delegate[logType].apply($delegate, args);
-//         }
+      var logTypesArray = logTypes.replace(/\s+/g, '').split(',');
+      var hooksArray = hooks.replace(/\s+/g, '').split(',');
+      var logTypeCallbacks = [];
 
-//         // Post callbacks
-//         angular.forEach(logTypeData.postCallbacks, function(postCallbackProvider) {
-//           var postCallback = $injector.get(postCallbackProvider);
-//           postCallback.call(postCallback, {
-//             type: logType,
-//             args: args
-//           });
-//         });
-//       }
+      // Check hooks
+      var callback;
+      angular.forEach(hooksArray, function(hook) {
+        if(angular.isDefined(_hooks[hook]) && _hooks[hook] !== null) {
+          logTypeCallbacks.push(_hooks[hook]);
+        }
+      });
 
-//       function log() {
-//         var args = arguments;
-//         _applyCallbacks('log', args);
-//       }
+      // Initialize all log types with preCallbacks = [] / postCallbacks = []
+      angular.forEach(_logTypes, function(_logType) {
+        _logType[prePost + 'Callbacks'] = [];
+      });
 
-//       function info() {
-//         var args = arguments;
-//         _applyCallbacks('info', args);
-//       }
+      // Set defined callbacks for log types
+      angular.forEach(logTypesArray, function(logType) {
+        if(angular.isDefined(_logTypes[logType])) {
+          _logTypes[logType][prePost + 'Callbacks'] = logTypeCallbacks;
+        }
+      });
+    }
 
-//       function warn() {
-//         var args = arguments;
-//         _applyCallbacks('warn', args);
-//       }
+    function _getEnhancedArguments(args) {
+      // console.log('args', args, angular.isObject(args), angular.isArray(args));
 
-//       function error() {
-//         var args = arguments;
-//         _applyCallbacks('error', args);
-//       }
-//     }]);
-//   }
+      var argsArray = args ? [].slice.call(args) : args;
 
-// }());
+      // console.log('argsArray', argsArray, argsArray.length, angular.isArray(argsArray), argsArray[0]);
+
+      if(argsArray.length === 1) {
+        return argsArray[0];
+      } else {
+        return args;
+      }
+    }
+
+    function _addTimestamp() {
+
+    }
+
+
+    function $get() {
+      var service = {
+        isEnhanced: isEnhanced,
+        log: log,
+        info: info,
+        warn: warn,
+        error: error,
+        getLogType: getLogType
+      };
+
+      return service;
+
+
+      function isEnhanced(logType) {
+        return (angular.isDefined(_logTypes[logType]) && angular.isDefined(_logTypes[logType].enhanced)) ? _logTypes[logType].enhanced : false;
+      }
+
+      function log() {
+        // var args = _getEnhancedArguments(arguments);
+        // console.log(arguments);
+      }
+
+      function info() {
+        // var args = _getEnhancedArguments(arguments);
+        // console.info(arguments);
+      }
+
+      function warn() {
+        // var args = _getEnhancedArguments(arguments);
+        // console.warn(arguments);
+      }
+
+      function error() {
+        // var args = _getEnhancedArguments(arguments);
+        // console.error(arguments);
+      }
+
+      function getLogType(logType) {
+        return _logTypes[logType];
+      }
+    }
+
+    function enhance(logTypes) {
+      try {
+        if(angular.isDefined(logTypes) && logTypes !== null && !angular.isString(logTypes)) {
+          throw 'Wrong argument type. The argument "logTypes" should be a comma seperated String.';
+        }
+      } catch(error) {
+        return error;
+      }
+
+      var logTypesArray = [];
+
+      // Set enhanced
+      if(angular.isString(logTypes)) {
+        logTypesArray = logTypes.replace(/\s+/g, '').split(',');
+
+        // Initialize all log types with enhanced = false
+        angular.forEach(_logTypes, function(_logType) {
+          _logType.enhanced = false;
+        });
+
+        // Set defined enhanced values for log types
+        angular.forEach(logTypesArray, function(logType) {
+          if(angular.isDefined(_logTypes[logType])) {
+            _logTypes[logType].enhanced = true;
+          }
+        });
+      } else {
+        // If logTypes is undefined or null
+        // Initialize all log types with enhanced = true
+        angular.forEach(_logTypes, function(_logType) {
+          _logType.enhanced = true;
+        });
+      }
+    }
+
+    function before(logTypes, hooks) {
+      _addHooks('pre', logTypes, hooks);
+    }
+
+    function after(logTypes, hooks) {
+      _addHooks('post', logTypes, hooks);
+    }
+
+    function decorate(message) {
+
+    }
+  }
+
+}());
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                                     *
  * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
