@@ -30,12 +30,13 @@
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassStateType'];
+  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
 
-  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper, DSDeviceClassActionType, DSDeviceClassStateType) {
+  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
     
     var staticMethods = {};
     var deviceClassActionTypesId = 0;
+    var deviceClassEventTypesId = 0;
     var deviceClassStateTypesId = 0;
 
     /*
@@ -62,8 +63,12 @@
             localField: 'deviceClassActionTypes',
             foreignKey: 'deviceClassId'
           },
-          eventType: {
-            localField: 'eventTypes',
+          // eventType: {
+          //   localField: 'eventTypes',
+          //   foreignKey: 'deviceClassId'
+          // },
+          deviceClassEventType: {
+            localField: 'deviceClassEventTypes',
             foreignKey: 'deviceClassId'
           },
           deviceClassStateType: {
@@ -123,6 +128,24 @@
       return actionTypes;
     };
 
+    DSDeviceClass.getAllEventTypes = function(deviceClassId) {
+      var deviceClassEventTypes = DSDeviceClassEventType.getAll();
+      var deviceClassEventTypesFiltered = deviceClassEventTypes.filter(function(deviceClassEventType) {
+        return deviceClassEventType.deviceClassId === deviceClassId;
+      });
+      var deviceClass = DS.get('deviceClass', deviceClassId);
+      var eventTypes = [];
+
+      angular.forEach(deviceClassEventTypesFiltered, function(deviceClassEventType) {
+        if(deviceClassEventType.deviceClassId === deviceClassId) {
+          var eventType = DS.get('eventType', deviceClassEventType.eventTypeId);
+          eventTypes.push(eventType);
+        }
+      });
+
+      return eventTypes;
+    };
+
     DSDeviceClass.getAllStateTypes = function(deviceClassId) {
       var deviceClassStateTypes = DSDeviceClassStateType.getAll();
       var deviceClassStateTypesFiltered = deviceClassStateTypes.filter(function(deviceClassStateType) {
@@ -178,7 +201,10 @@
      */
     function _createDeviceClassActionsTypes(resource, attrs) {
       var deviceClassActionTypes = DS.getAll('deviceClassActionType');
+      var deviceClassEventTypes = DS.getAll('deviceClassEventType');
+      var deviceClassStateTypes = DS.getAll('deviceClassStateType');
       var actionTypes = attrs.actionTypes;
+      var eventTypes = attrs.eventTypes;
       var stateTypes = attrs.stateTypes;
       var deviceClassId = attrs.id;
 
@@ -206,6 +232,30 @@
         }
       });
 
+      // EventTypes
+      angular.forEach(eventTypes, function(eventType) {
+        // Create eventType
+        var eventTypeInstance = DS.createInstance('eventType', eventType);
+        DS.inject('eventType', eventTypeInstance);
+
+        // Filtered deviceClassEventTypes
+        var deviceClassEventTypesFiltered = deviceClassEventTypes.filter(function(deviceClassEventType) {
+          return deviceClassEventType.deviceClassId === deviceClassId && deviceClassEventType.eventTypeId === eventType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(deviceClassEventTypesFiltered) && deviceClassEventTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> eventType)
+          deviceClassEventTypesId = deviceClassEventTypesId + 1;
+          var deviceClassEventTypeInstance = DS.createInstance('deviceClassEventType', {
+            id: deviceClassEventTypesId,
+            deviceClassId: deviceClassId,
+            eventTypeId: eventType.id
+          });
+          DS.inject('deviceClassEventType', deviceClassEventTypeInstance);
+        }
+      });
+
       // StateTypes
       angular.forEach(stateTypes, function(stateType) {
         // Create stateType
@@ -213,7 +263,7 @@
         DS.inject('stateType', stateTypeInstance);
 
         // Filtered deviceClassStateTypes
-        var deviceClassStateTypesFiltered = deviceClassActionTypes.filter(function(deviceClassStateType) {
+        var deviceClassStateTypesFiltered = deviceClassStateTypes.filter(function(deviceClassStateType) {
           return deviceClassStateType.deviceClassId === deviceClassId && deviceClassStateType.stateTypeId === stateType.id;
         });
 

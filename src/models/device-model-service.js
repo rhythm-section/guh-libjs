@@ -77,6 +77,7 @@
         // API
         executeAction: executeAction,
         remove: remove,
+        getDescription: getDescription,
         getEventDescriptor: getEventDescriptor,
         getStateDescriptor: getStateDescriptor,
         getAction: getAction
@@ -160,6 +161,21 @@
         var ejectedItem = DS.eject('state', '' + deviceId + '_' + state.stateTypeId);
         $log.log('ejected state', ejectedItem);
       });
+    }
+
+
+    /*
+     * Public method: getDescription(delimiter)
+     */
+    function getDescription(delimiter) {
+      /* jshint validthis: true */
+      var self = this;
+      var vendorName = self.deviceClass.vendor.name;
+      var deviceClassName = self.deviceClass.name || '';
+
+      delimiter = delimiter || '-';
+
+      return (vendorName === deviceClassName) ? deviceClassName : (vendorName + delimiter + deviceClassName);
     }
 
     /*

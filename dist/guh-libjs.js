@@ -1260,6 +1260,7 @@
         // API
         executeAction: executeAction,
         remove: remove,
+        getDescription: getDescription,
         getEventDescriptor: getEventDescriptor,
         getStateDescriptor: getStateDescriptor,
         getAction: getAction
@@ -1343,6 +1344,21 @@
         var ejectedItem = DS.eject('state', '' + deviceId + '_' + state.stateTypeId);
         $log.log('ejected state', ejectedItem);
       });
+    }
+
+
+    /*
+     * Public method: getDescription(delimiter)
+     */
+    function getDescription(delimiter) {
+      /* jshint validthis: true */
+      var self = this;
+      var vendorName = self.deviceClass.vendor.name;
+      var deviceClassName = self.deviceClass.name || '';
+
+      delimiter = delimiter || '-';
+
+      return (vendorName === deviceClassName) ? deviceClassName : (vendorName + delimiter + deviceClassName);
     }
 
     /*
@@ -1641,12 +1657,13 @@
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassStateType'];
+  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
 
-  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper, DSDeviceClassActionType, DSDeviceClassStateType) {
+  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
     
     var staticMethods = {};
     var deviceClassActionTypesId = 0;
+    var deviceClassEventTypesId = 0;
     var deviceClassStateTypesId = 0;
 
     /*
@@ -1673,8 +1690,12 @@
             localField: 'deviceClassActionTypes',
             foreignKey: 'deviceClassId'
           },
-          eventType: {
-            localField: 'eventTypes',
+          // eventType: {
+          //   localField: 'eventTypes',
+          //   foreignKey: 'deviceClassId'
+          // },
+          deviceClassEventType: {
+            localField: 'deviceClassEventTypes',
             foreignKey: 'deviceClassId'
           },
           deviceClassStateType: {
@@ -1734,6 +1755,24 @@
       return actionTypes;
     };
 
+    DSDeviceClass.getAllEventTypes = function(deviceClassId) {
+      var deviceClassEventTypes = DSDeviceClassEventType.getAll();
+      var deviceClassEventTypesFiltered = deviceClassEventTypes.filter(function(deviceClassEventType) {
+        return deviceClassEventType.deviceClassId === deviceClassId;
+      });
+      var deviceClass = DS.get('deviceClass', deviceClassId);
+      var eventTypes = [];
+
+      angular.forEach(deviceClassEventTypesFiltered, function(deviceClassEventType) {
+        if(deviceClassEventType.deviceClassId === deviceClassId) {
+          var eventType = DS.get('eventType', deviceClassEventType.eventTypeId);
+          eventTypes.push(eventType);
+        }
+      });
+
+      return eventTypes;
+    };
+
     DSDeviceClass.getAllStateTypes = function(deviceClassId) {
       var deviceClassStateTypes = DSDeviceClassStateType.getAll();
       var deviceClassStateTypesFiltered = deviceClassStateTypes.filter(function(deviceClassStateType) {
@@ -1789,7 +1828,10 @@
      */
     function _createDeviceClassActionsTypes(resource, attrs) {
       var deviceClassActionTypes = DS.getAll('deviceClassActionType');
+      var deviceClassEventTypes = DS.getAll('deviceClassEventType');
+      var deviceClassStateTypes = DS.getAll('deviceClassStateType');
       var actionTypes = attrs.actionTypes;
+      var eventTypes = attrs.eventTypes;
       var stateTypes = attrs.stateTypes;
       var deviceClassId = attrs.id;
 
@@ -1817,6 +1859,30 @@
         }
       });
 
+      // EventTypes
+      angular.forEach(eventTypes, function(eventType) {
+        // Create eventType
+        var eventTypeInstance = DS.createInstance('eventType', eventType);
+        DS.inject('eventType', eventTypeInstance);
+
+        // Filtered deviceClassEventTypes
+        var deviceClassEventTypesFiltered = deviceClassEventTypes.filter(function(deviceClassEventType) {
+          return deviceClassEventType.deviceClassId === deviceClassId && deviceClassEventType.eventTypeId === eventType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(deviceClassEventTypesFiltered) && deviceClassEventTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> eventType)
+          deviceClassEventTypesId = deviceClassEventTypesId + 1;
+          var deviceClassEventTypeInstance = DS.createInstance('deviceClassEventType', {
+            id: deviceClassEventTypesId,
+            deviceClassId: deviceClassId,
+            eventTypeId: eventType.id
+          });
+          DS.inject('deviceClassEventType', deviceClassEventTypeInstance);
+        }
+      });
+
       // StateTypes
       angular.forEach(stateTypes, function(stateType) {
         // Create stateType
@@ -1824,7 +1890,7 @@
         DS.inject('stateType', stateTypeInstance);
 
         // Filtered deviceClassStateTypes
-        var deviceClassStateTypesFiltered = deviceClassActionTypes.filter(function(deviceClassStateType) {
+        var deviceClassStateTypesFiltered = deviceClassStateTypes.filter(function(deviceClassStateType) {
           return deviceClassStateType.deviceClassId === deviceClassId && deviceClassStateType.stateTypeId === stateType.id;
         });
 
@@ -2070,6 +2136,71 @@
       return setupMethodData;
     }
 
+
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.models')
+    .factory('DSDeviceClassEventType', DSDeviceClassEventTypeFactory)
+    .run(function(DSDeviceClassEventType) {});
+
+  DSDeviceClassEventTypeFactory.$inject = ['$log', 'DS', 'modelsHelper'];
+
+  function DSDeviceClassEventTypeFactory($log, DS, modelsHelper) {
+    
+    var staticMethods = {};
+
+    /*
+     * DataStore configuration
+     */
+    var DSDeviceClassEventType = DS.defineResource({
+
+      // Model configuration
+      name: 'deviceClassEventType',
+      relations: {
+        belongsTo: {
+          deviceClass: {
+            localField: 'deviceClass',
+            localKey: 'deviceClassId'
+          },
+          eventType: {
+            localField: 'eventType',
+            localKey: 'eventTypeId'
+          }
+        }
+      }
+
+    });
+
+    return DSDeviceClassEventType;
 
   }
 
