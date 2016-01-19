@@ -170,6 +170,21 @@
 
             break;
 
+          // RulesConfigurationChanged
+          case app.notificationTypes.rules.ruleConfigurationChanged:
+            $log.log('Rule configuration changed', data);
+
+            var rule = data.params.rule;
+            $log.log('Inject rule', rule);
+            var injectedRule = DS.inject('rule', rule);
+
+            // Send broadcast event
+            if(DS.is('rule', injectedRule)) {
+              $rootScope.$broadcast('ReloadView', injectedRule.name + ' was updated.');
+            }
+
+            break;
+
           default:
             $log.warn('Type of notification not handled:', data);
         }
