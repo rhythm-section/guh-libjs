@@ -98,7 +98,6 @@
       };
 
       ws.onmessage = function(message) {
-        $log.log('onmessage', message);
         var data = angular.fromJson(message.data);
 
         switch(data.notification) {
@@ -118,15 +117,12 @@
 
           // Devices.DeviceAdded
           case app.notificationTypes.devices.deviceAdded:
-            $log.log('Device added', data);
-
             var deviceId = data.params.device.id;
             var device = DS.get('device', deviceId);
 
             if(angular.isUndefined(device)) {
               var deviceData = data.params.device;
 
-              $log.log('Insert new device.');
               DSHttpAdapter
                 .GET(app.apiUrl + '/devices/' + deviceId + '/states')
                 .then(function(response) {
@@ -141,41 +137,30 @@
                     states: states
                   });
 
-                  $log.log('injectedItem', injectedItem);
-
                   // Send broadcast event
                   if(DS.is('device', injectedItem)) {
                     $rootScope.$broadcast('ReloadView', injectedItem.deviceClass.name + ' was added.');
                   }
                 });            
-            } else {
-              $log.log('Device already inserted.');
             }
 
             break;
 
           // Devices.DeviceRemoved
           case app.notificationTypes.devices.deviceRemoved:
-            $log.log('Device removed', data);
-
             var deviceId = data.params.deviceId;
             var ejectedItem = DS.eject('device', deviceId);
 
             if(angular.isDefined(ejectedItem)) {
               // Send broadcast event
               $rootScope.$broadcast('ReloadView', 'Device was removed.');
-            } else {
-              $log.log('Device not found, removing not possible.')
             }
 
             break;
 
           // RulesConfigurationChanged
           case app.notificationTypes.rules.ruleConfigurationChanged:
-            $log.log('Rule configuration changed', data);
-
             var rule = data.params.rule;
-            $log.log('Inject rule', rule);
             var injectedRule = DS.inject('rule', rule);
 
             // Send broadcast event
