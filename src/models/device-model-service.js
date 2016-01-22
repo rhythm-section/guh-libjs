@@ -219,12 +219,16 @@
     }
 
     /*
-     * Public method: confirmPairing(pairingTransactionId)
+     * Public method: confirmPairing(pairingTransactionId, secret)
      */
-    function confirmPairing(pairingTransactionId) {
+    function confirmPairing(pairingTransactionId, secret) {
       var options = {};
       
       options.pairingTransactionId = pairingTransactionId;
+
+      if(secret) {
+        options.secret = secret;
+      }
 
       return DS
         .adapters
