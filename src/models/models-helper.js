@@ -96,6 +96,7 @@
      */
     function _getInputTemplate(guhType, isChildOfActionType) {
       var allowedValues = (guhType.allowedValues === undefined) ? null : guhType.allowedValues;
+      var possibleValues = (guhType.possibleValues === undefined) ? null : guhType.possibleValues;
       var inputType = (guhType.inputType === undefined) ? null : guhType.inputType;
       var type = (guhType.type === undefined) ? null : guhType.type;
       var folderName = 'form';
@@ -129,7 +130,7 @@
           template = _getInputPath(folderName, directiveName, directiveName + '-color');
           break;
         case 'String':
-          if(allowedValues) {
+          if(allowedValues || possibleValues) {
             if(isChildOfActionType) {
               template = _getInputPath(folderName, directiveName, directiveName + '-select');
             } else {
