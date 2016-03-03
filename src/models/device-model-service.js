@@ -88,11 +88,9 @@
         if(angular.isArray(attrs)) {
           var arrayOfAttrs = attrs;
           angular.forEach(arrayOfAttrs, function(attrs) {
-            _addCustomName(resource, attrs);
             _createStates(resource, attrs);
           });
         } else {
-          _addCustomName(resource, attrs);
           _createStates(resource, attrs);
         }
       },
@@ -118,15 +116,7 @@
     });
 
     return DSDevice;
-
-
-    /*
-     * Private method: _addCustomName()
-     */
-    function _addCustomName(resource, attrs) {
-      var nameParameter = libs._.find(attrs.params, function(param) { return (param.name === 'name'); });
-      attrs.name = (nameParameter === undefined) ? 'Name' : nameParameter.value;
-    }
+    
 
     /*
      * Private method: _createStates(resource, attrs);
