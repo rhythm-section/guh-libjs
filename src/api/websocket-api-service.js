@@ -88,8 +88,8 @@
         });
       };
 
-      ws.onerror = function() {
-        $log.error('There was an error with the websocket connection.');
+      ws.onerror = function(event) {
+        $log.error('There was an error with the websocket connection.', ws, event);
 
         // Send broadcast event
         $rootScope.$apply(function() {
@@ -100,95 +100,100 @@
       ws.onmessage = function(message) {
         var data = angular.fromJson(message.data);
 
-        switch(data.notification) {
-          // Devices.StateChanged
-          case app.notificationTypes.devices.stateChanged:
-            var deviceId = data.params.deviceId;
-            var stateTypeId = data.params.stateTypeId;
-            var value = data.params.value;
+        if(angular.isDefined(data.notification)) {
+          switch(data.notification) {
+            // Devices.StateChanged
+            case app.notificationTypes.devices.stateChanged:
+              var deviceId = data.params.deviceId;
+              var stateTypeId = data.params.stateTypeId;
+              var value = data.params.value;
 
-            DS.inject('state', {
-              id: '' + deviceId + '_' + stateTypeId,
-              deviceId: deviceId,
-              stateTypeId: stateTypeId,
-              value: value
-            });
-            break;
+              DS.inject('state', {
+                id: '' + deviceId + '_' + stateTypeId,
+                deviceId: deviceId,
+                stateTypeId: stateTypeId,
+                value: value
+              });
+              break;
 
-          // Devices.DeviceAdded
-          case app.notificationTypes.devices.deviceAdded:
-            var deviceId = data.params.device.id;
-            var device = DS.get('device', deviceId);
+            // Devices.DeviceAdded
+            case app.notificationTypes.devices.deviceAdded:
+              var deviceId = data.params.device.id;
+              var device = DS.get('device', deviceId);
 
-            if(angular.isUndefined(device)) {
-              var deviceData = data.params.device;
+              if(angular.isUndefined(device)) {
+                var deviceData = data.params.device;
 
-              DSHttpAdapter
-                .GET(app.apiUrl + '/devices/' + deviceId + '/states')
-                .then(function(response) {
-                  var states = response.data;
+                DSHttpAdapter
+                  .GET(app.apiUrl + '/devices/' + deviceId + '/states')
+                  .then(function(response) {
+                    var states = response.data;
 
-                  var injectedItem = DS.inject('device', {
-                    deviceClassId: deviceData.deviceClassId,
-                    id: deviceData.id,
-                    name: deviceData.name,
-                    params: deviceData.params,
-                    setupComplete: deviceData.setupComplete,
-                    states: states
-                  });
+                    var injectedItem = DS.inject('device', {
+                      deviceClassId: deviceData.deviceClassId,
+                      id: deviceData.id,
+                      name: deviceData.name,
+                      params: deviceData.params,
+                      setupComplete: deviceData.setupComplete,
+                      states: states
+                    });
 
-                  // Send broadcast event
-                  if(DS.is('device', injectedItem)) {
-                    $rootScope.$broadcast('ReloadView', injectedItem.deviceClass.name + ' was added.');
-                  }
-                });            
-            }
+                    // Send broadcast event
+                    if(DS.is('device', injectedItem)) {
+                      $rootScope.$broadcast('ReloadView', injectedItem.deviceClass.name + ' was added.');
+                    }
+                  });            
+              }
 
-            break;
+              break;
 
-          // Devices.DeviceRemoved
-          case app.notificationTypes.devices.deviceRemoved:
-            var deviceId = data.params.deviceId;
-            var ejectedItem = DS.eject('device', deviceId);
+            // Devices.DeviceRemoved
+            case app.notificationTypes.devices.deviceRemoved:
+              var deviceId = data.params.deviceId;
+              var ejectedItem = DS.eject('device', deviceId);
 
-            if(angular.isDefined(ejectedItem)) {
+              if(angular.isDefined(ejectedItem)) {
+                // Send broadcast event
+                $rootScope.$broadcast('ReloadView', 'Device was removed.');
+              }
+
+              break;
+
+            // RulesConfigurationChanged
+            case app.notificationTypes.rules.ruleConfigurationChanged:
+              var rule = data.params.rule;
+              var injectedRule = DS.inject('rule', rule);
+
               // Send broadcast event
-              $rootScope.$broadcast('ReloadView', 'Device was removed.');
-            }
+              if(DS.is('rule', injectedRule)) {
+                $rootScope.$broadcast('ReloadView', injectedRule.name + ' was updated.');
+              }
 
-            break;
+              break;
 
-          // RulesConfigurationChanged
-          case app.notificationTypes.rules.ruleConfigurationChanged:
-            var rule = data.params.rule;
-            var injectedRule = DS.inject('rule', rule);
+            default:
+              $log.warn('Type of notification not handled:', data);
 
-            // Send broadcast event
-            if(DS.is('rule', injectedRule)) {
-              $rootScope.$broadcast('ReloadView', injectedRule.name + ' was updated.');
-            }
+            // if(data.notification === app.notificationTypes.devices.stateChanged) {
+            //   $log.log('Device state changed.', data);
 
-            break;
+            //   $log.log('websocketService.callbacks', websocketService.callbacks);
+            //   $log.log('data.params.deviceId', data.params.deviceId);
 
-          default:
-            $log.warn('Type of notification not handled:', data);
+            //   // Execute callback-function with right ID
+            //   if(libs._.has(websocketService.callbacks, data.params.deviceId)) {
+            //     var cb = websocketService.callbacks[data.params.deviceId];
+            //     cb(data);
+            //   }
+            // } else {
+            //   // $log.warn('Type of notification not handled:' + data.notification);
+            //   $log.warn('Type of notification not handled:', data);
+            // }
+          }
+
+        } else if(angular.isDefined(data.authenticationRequired)) {
+          $rootScope.$broadcast('Initialize', data);
         }
-
-        // if(data.notification === app.notificationTypes.devices.stateChanged) {
-        //   $log.log('Device state changed.', data);
-
-        //   $log.log('websocketService.callbacks', websocketService.callbacks);
-        //   $log.log('data.params.deviceId', data.params.deviceId);
-
-        //   // Execute callback-function with right ID
-        //   if(libs._.has(websocketService.callbacks, data.params.deviceId)) {
-        //     var cb = websocketService.callbacks[data.params.deviceId];
-        //     cb(data);
-        //   }
-        // } else {
-        //   // $log.warn('Type of notification not handled:' + data.notification);
-        //   $log.warn('Type of notification not handled:', data);
-        // }
       };
 
       websocketService.ws = ws;

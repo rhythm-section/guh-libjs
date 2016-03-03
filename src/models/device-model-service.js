@@ -152,8 +152,6 @@
      * Private method: _removeStates(resource, attrs)
      */
     function _removeStates(resource, attrs) {
-      $log.log('_removeStates', resource, attrs);
-
       var deviceId = attrs.id;
       var states = attrs.states;
 
@@ -199,9 +197,9 @@
     }
 
     /*
-     * Public method: pair(deviceClassId, deviceDescriptorId, deviceParams)
+     * Public method: pair(deviceClassId, deviceDescriptorId, deviceParams, name)
      */
-    function pair(deviceClassId, deviceDescriptorId, deviceParams) {
+    function pair(deviceClassId, deviceDescriptorId, deviceParams, name) {
       var options = {};
 
       options.deviceClassId = deviceClassId || '';
@@ -210,6 +208,10 @@
         options.deviceDescriptorId = deviceDescriptorId;
       } else {
         options.deviceParams = deviceParams || [];
+      }
+
+      if(angular.isDefined(name)) {
+        options.name = name;
       }
 
       return DS
@@ -237,10 +239,15 @@
     }
 
     /*
-     * Public method: add(deviceClassId, deviceDescriptorId, deviceParams)
+     * Public method: add(deviceClassId, deviceDescriptorId, deviceParams, name)
      */
-    function add(deviceClassId, deviceDescriptorId, deviceParams) {
+    function add(deviceClassId, deviceDescriptorId, deviceParams, name) {
       var device = {};
+
+      // name
+      if(angular.isDefined(name) && name !== '') {
+        device.name = name;
+      }
 
       // deviceClassId
       if(angular.isDefined(deviceClassId) && deviceClassId  !== '') {
