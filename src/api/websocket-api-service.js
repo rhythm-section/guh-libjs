@@ -33,11 +33,8 @@
 
   function websocketService($log, $rootScope, libs, app, DS, DSHttpAdapter) {
 
+    var ws = null;
     var websocketService = {
-      // Data
-      ws: null,
-
-      // Methods
       close: close,
       connect: connect,
       reconnect: reconnect
@@ -50,8 +47,8 @@
      * Public method: close()
      */
     function close() {
-      if(websocketService.ws) {
-        websocketService.ws = null;
+      if(ws) {
+        ws = null;
       }
     }
 
@@ -59,11 +56,11 @@
      * Public method: connect()
      */
     function connect() {
-      if(websocketService.ws) {
+      if(ws) {
         return;
       }
 
-      var ws = new WebSocket(app.websocketUrl);
+      ws = new WebSocket(app.websocketUrl);
 
       ws.onopen = function(event) {
         $log.log('Successfully connected with websocket.', ws, event);
@@ -174,8 +171,6 @@
           $rootScope.$broadcast('Initialize', data);
         }
       };
-
-      websocketService.ws = ws;
     }
 
     /*
