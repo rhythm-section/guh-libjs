@@ -36,14 +36,11 @@
     var websocketService = {
       // Data
       ws: null,
-      callbacks: {},
 
       // Methods
       close: close,
       connect: connect,
-      reconnect: reconnect,
-      subscribe: subscribe,
-      unsubscribe: unsubscribe
+      reconnect: reconnect
     };
 
     return websocketService;
@@ -62,8 +59,6 @@
      * Public method: connect()
      */
     function connect() {
-      $log.log('Connect to websocket.');
-
       if(websocketService.ws) {
         return;
       }
@@ -173,22 +168,6 @@
 
             default:
               $log.warn('Type of notification not handled:', data);
-
-            // if(data.notification === app.notificationTypes.devices.stateChanged) {
-            //   $log.log('Device state changed.', data);
-
-            //   $log.log('websocketService.callbacks', websocketService.callbacks);
-            //   $log.log('data.params.deviceId', data.params.deviceId);
-
-            //   // Execute callback-function with right ID
-            //   if(libs._.has(websocketService.callbacks, data.params.deviceId)) {
-            //     var cb = websocketService.callbacks[data.params.deviceId];
-            //     cb(data);
-            //   }
-            // } else {
-            //   // $log.warn('Type of notification not handled:' + data.notification);
-            //   $log.warn('Type of notification not handled:', data);
-            // }
           }
 
         } else if(angular.isDefined(data.authenticationRequired)) {
@@ -205,27 +184,6 @@
     function reconnect() {
       websocketService.close();
       websocketService.connect();
-    }
-
-    /*
-     * Public method: subscribe(id, cb)
-     */
-    function subscribe(id, cb) {
-      $log.log('Subscribe to websocket.');
-
-      if(!websocketService.ws) {
-        websocketService.connect();
-      }
-
-      websocketService.callbacks[id] = cb;
-    }
-
-    /*
-     * Public method: unsubscribe(id)
-     */
-    function unsubscribe(id) {
-      $log.log('Unsubscribe from websocket.', id);
-      delete websocketService.callbacks[id];
     }
 
   }
