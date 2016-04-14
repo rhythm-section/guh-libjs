@@ -30,9 +30,9 @@
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
+  DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', 'app', 'libs', 'websocketService', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
 
-  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
+  function DSDeviceClassFactory($log, $q, DS, app, libs, websocketService, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
     
     var staticMethods = {};
     var deviceClassActionTypesId = 0;
@@ -164,7 +164,23 @@
       return stateTypes;
     };
 
+    angular.extend(DSDeviceClass, {
+      load: load
+    });
+
     return DSDeviceClass;
+
+
+    function load() {
+      return websocketService
+        .send({
+          method: 'Devices.GetSupportedDevices'
+        })
+        .then(function(data) {
+          DSDeviceClass.inject(data.deviceClasses);
+          return DSDeviceClass.getAll();
+        });
+    }
 
 
     /*
@@ -424,7 +440,13 @@
       /* jshint validthis: true */
       var self = this;
 
-      return DSHttpAdapter.GET(app.apiUrl + '/deviceclasses/' + self.id + '/discover?params=' + angular.toJson(discoveryParams));
+      return websocketService.send({
+        method: 'Devices.GetDiscoveredDevices',
+        params: {
+          deviceClassId: self.id,
+          discoveryParams: angular.toJson(discoveryParams)
+        }
+      });
     }
 
     /*
