@@ -30,9 +30,9 @@
     .factory('DSState', DSStateFactory)
     .run(function(DSState) {});
 
-  DSStateFactory.$inject = ['$log', 'DS'];
+  DSStateFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
 
-  function DSStateFactory($log, DS) {
+  function DSStateFactory($log, $q, DS, websocketService) {
     
     var staticMethods = {};
 
@@ -76,7 +76,30 @@
 
     });
 
+    angular.extend(DSState, {
+      load: load
+    });
+
     return DSState;
+
+
+    function load(deviceId) {
+      return websocketService
+        .send({
+          method: 'Devices.GetStateValues',
+          params: {
+            deviceId: deviceId
+          }
+        })
+        .then(function(data) {
+          var states = data.values.map(function(state) {
+            state.deviceId = deviceId;
+            return state;
+          });
+          DSState.inject(states);
+          return DSState.getAll();
+        });
+    }
 
   }
 
