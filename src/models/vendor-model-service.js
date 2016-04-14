@@ -30,9 +30,9 @@
     .factory('DSVendor', DSVendorFactory)
     .run(function(DSVendor) {});
 
-  DSVendorFactory.$inject = ['$log', 'DS'];
+  DSVendorFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
 
-  function DSVendorFactory($log, DS) {
+  function DSVendorFactory($log, $q, DS, websocketService) {
     
     var staticMethods = {};
 
@@ -64,7 +64,23 @@
 
     });
 
+    angular.extend(DSVendor, {
+      load: load
+    });
+
     return DSVendor;
+
+
+    function load() {
+      return websocketService
+        .send({
+          method: 'Devices.GetSupportedVendors'
+        })
+        .then(function(data) {
+          DSVendor.inject(data.vendors);
+          return DSVendor.getAll();
+        });
+    }
 
   }
 
