@@ -29,18 +29,32 @@
     .module('guh.api')
     .factory('websocketService', websocketService);
 
-  websocketService.$inject = ['$log', '$rootScope', 'libs', 'app', 'DS', 'DSHttpAdapter'];
+  websocketService.$inject = ['$log', '$rootScope', '$q', 'libs', 'app', 'DS'];
 
-  function websocketService($log, $rootScope, libs, app, DS, DSHttpAdapter) {
+  function websocketService($log, $rootScope, $q, libs, app, DS) {
 
     var ws = null;
+    var callbacks = {};
+    var currentRequestId = 0;
     var websocketService = {
       close: close,
       connect: connect,
-      reconnect: reconnect
+      reconnect: reconnect,
+      send: send
     };
 
     return websocketService;
+
+    /*
+     * Private function: _getRequestId()
+     */
+    function _getRequestId() {
+      currentRequestId = currentRequestId + 1;
+      if(currentRequestId > 10000) {
+        currentRequestId = 0;
+      }
+      return currentRequestId;
+    };
 
 
     /*
@@ -100,6 +114,8 @@
               var stateTypeId = data.params.stateTypeId;
               var value = data.params.value;
 
+              $log.log('state changed', data);
+
               DS.inject('state', {
                 id: '' + deviceId + '_' + stateTypeId,
                 deviceId: deviceId,
@@ -114,27 +130,12 @@
               var device = DS.get('device', deviceId);
 
               if(angular.isUndefined(device)) {
-                var deviceData = data.params.device;
+                var injectedItem = DS.inject('device', data.params.device);
 
-                DSHttpAdapter
-                  .GET(app.apiUrl + '/devices/' + deviceId + '/states')
-                  .then(function(response) {
-                    var states = response.data;
-
-                    var injectedItem = DS.inject('device', {
-                      deviceClassId: deviceData.deviceClassId,
-                      id: deviceData.id,
-                      name: deviceData.name,
-                      params: deviceData.params,
-                      setupComplete: deviceData.setupComplete,
-                      states: states
-                    });
-
-                    // Send broadcast event
-                    if(DS.is('device', injectedItem)) {
-                      $rootScope.$broadcast('ReloadView', injectedItem.deviceClass.name + ' was added.');
-                    }
-                  });            
+                // Send broadcast event
+                if(DS.is('device', injectedItem)) {
+                  $rootScope.$broadcast('ReloadView', injectedItem.deviceClass.name + ' was added.');
+                }          
               }
 
               break;
@@ -151,24 +152,70 @@
 
               break;
 
-            // RulesConfigurationChanged
+            // Rules.ConfigurationChanged
             case app.notificationTypes.rules.ruleConfigurationChanged:
               var rule = data.params.rule;
-              var injectedRule = DS.inject('rule', rule);
+              var injectedItem = DS.inject('rule', rule);
 
               // Send broadcast event
-              if(DS.is('rule', injectedRule)) {
-                $rootScope.$broadcast('ReloadView', injectedRule.name + ' was updated.');
+              if(DS.is('rule', injectedItem)) {
+                $rootScope.$broadcast('ReloadView', injectedItem.name + ' was updated.');
+              }
+
+              break;
+
+            // Rules.RuleAdded
+            case app.notificationTypes.rules.ruleAdded:
+              var ruleId = data.params.rule.id;
+              var rule = DS.get('rule', ruleId);
+
+              if(angular.isUndefined(rule)) {
+                var injectedItem = DS.inject('rule', data.params.rule);
+
+                // Send broadcast event
+                if(DS.is('rule', injectedItem)) {
+                  $rootScope.$broadcast('ReloadView', injectedItem.name + ' was added.');
+                }
+              }
+
+              break;
+
+            // Rules.RuleRemoved
+            case app.notificationTypes.rules.ruleRemoved:
+              var ruleId = data.params.ruleId;
+              var ejectedItem = DS.eject('rule', ruleId);
+
+              if(angular.isDefined(ejectedItem)) {
+                // Send broadcast event
+                $rootScope.$broadcast('ReloadView', 'Rule was removed.');
               }
 
               break;
 
             default:
-              $log.warn('Type of notification not handled:', data);
+              // $log.warn('Type of notification not handled:', data);
           }
 
         } else if(angular.isDefined(data.authenticationRequired)) {
-          $rootScope.$broadcast('Initialize', data);
+          $rootScope.$apply(function() {
+            $rootScope.$broadcast('InitialHandshake', data);
+          });
+        } else if(callbacks.hasOwnProperty(data.id)) {
+          if(data.status === 'success') {
+            if(angular.isDefined(data.params.deviceError) && data.params.deviceError !== 'DeviceErrorNoError') {
+              $rootScope.$apply(callbacks[data.id].callback.reject(data.params.deviceError));
+            } else if(angular.isDefined(data.params.loggingError) && data.params.loggingError !== 'LoggingErrorNoError') {
+              $rootScope.$apply(callbacks[data.id].callback.reject(data.params.loggingError));
+            } else if(angular.isDefined(data.params.ruleError) && data.params.ruleError !== 'RuleErrorNoError') {
+              $rootScope.$apply(callbacks[data.id].callback.reject(data.params.ruleError));
+            } else {
+              $rootScope.$apply(callbacks[data.id].callback.resolve(data.params));
+            }
+          } else {
+            $rootScope.$apply(callbacks[data.id].callback.reject(data.error));
+          }
+          
+          delete callbacks[data.id];
         }
       };
     }
@@ -179,6 +226,25 @@
     function reconnect() {
       websocketService.close();
       websocketService.connect();
+    }
+
+    /*
+     * Public method: send(request)
+     */
+    function send(request) {
+      var defer = $q.defer();
+      var requestId = _getRequestId();
+
+      callbacks[requestId] = {
+        time: new Date(),
+        callback: defer
+      };
+
+      request.id = requestId;
+
+      ws.send(angular.toJson(request));
+
+      return defer.promise;
     }
 
   }
