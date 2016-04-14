@@ -334,9 +334,9 @@
     .factory('DSVendor', DSVendorFactory)
     .run(function(DSVendor) {});
 
-  DSVendorFactory.$inject = ['$log', 'DS'];
+  DSVendorFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
 
-  function DSVendorFactory($log, DS) {
+  function DSVendorFactory($log, $q, DS, websocketService) {
     
     var staticMethods = {};
 
@@ -368,7 +368,23 @@
 
     });
 
+    angular.extend(DSVendor, {
+      load: load
+    });
+
     return DSVendor;
+
+
+    function load() {
+      return websocketService
+        .send({
+          method: 'Devices.GetSupportedVendors'
+        })
+        .then(function(data) {
+          DSVendor.inject(data.vendors);
+          return DSVendor.getAll();
+        });
+    }
 
   }
 
@@ -517,9 +533,9 @@
     .factory('DSState', DSStateFactory)
     .run(function(DSState) {});
 
-  DSStateFactory.$inject = ['$log', 'DS'];
+  DSStateFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
 
-  function DSStateFactory($log, DS) {
+  function DSStateFactory($log, $q, DS, websocketService) {
     
     var staticMethods = {};
 
@@ -563,7 +579,30 @@
 
     });
 
+    angular.extend(DSState, {
+      load: load
+    });
+
     return DSState;
+
+
+    function load(deviceId) {
+      return websocketService
+        .send({
+          method: 'Devices.GetStateValues',
+          params: {
+            deviceId: deviceId
+          }
+        })
+        .then(function(data) {
+          var states = data.values.map(function(state) {
+            state.deviceId = deviceId;
+            return state;
+          });
+          DSState.inject(states);
+          return DSState.getAll();
+        });
+    }
 
   }
 
@@ -600,9 +639,9 @@
     .factory('DSRule', DSRuleFactory)
     .run(function(DSRule) {});
 
-  DSRuleFactory.$inject = ['$log', 'app', 'DS'];
+  DSRuleFactory.$inject = ['$log', '$q', 'app', 'DS', 'websocketService'];
 
-  function DSRuleFactory($log, app, DS) {
+  function DSRuleFactory($log, $q, app, DS, websocketService) {
     
     var staticMethods = {};
 
@@ -632,8 +671,49 @@
 
     });
 
+    angular.extend(DSRule, {
+      load: load,
+      add: add
+    });
+
     return DSRule;
 
+
+    function _loadDetails(ruleDescription) {
+      return websocketService
+        .send({
+          method: 'Rules.GetRuleDetails',
+          params: {
+            ruleId: ruleDescription.id
+          }
+        });
+    }
+
+    function load() {
+      return websocketService
+        .send({
+          method: 'Rules.GetRules'
+        })
+        .then(function(data) {
+          return $q.all(data.ruleDescriptions.map(function(ruleDescription) {
+            return _loadDetails(ruleDescription)
+              .then(function(data) {
+                DSRule.inject(data.rule);
+                return data.rule;
+              });
+          }));
+        })
+        .then(function(rules) {
+          return DSRule.getAll();
+        });
+    }
+
+    function add(rule) {
+      return websocketService.send({
+        method: 'Rules.AddRule',
+        params: rule
+      });
+    }
 
     /*
      * Public method: executeActions()
@@ -642,10 +722,12 @@
       /* jshint validthis: true */
       var self = this;
 
-      return DS
-        .adapters
-        .http
-        .POST(app.apiUrl + '/rules/' + self.id + "/executeactions");   
+      return websocketService.send({
+        method: 'Rules.ExecuteActions',
+        params: {
+          ruleId: self.id
+        }
+      });
     }
 
     /*
@@ -655,10 +737,12 @@
       /* jshint validthis: true */
       var self = this;
 
-      return DS
-        .adapters
-        .http
-        .POST(app.apiUrl + '/rules/' + self.id + "/executeexitactions");   
+      return websocketService.send({
+        method: 'Rules.ExecuteExitActions',
+        params: {
+          ruleId: self.id
+        }
+      });
     }
 
     /*
@@ -668,9 +752,94 @@
       /* jshint validthis: true */
       var self = this;
 
-      return DSRule.destroy(self.id);
+      return websocketService.send({
+        method: 'Rules.RemoveRule',
+        params: {
+          ruleId: self.id
+        }
+      });
     }
 
+
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.models')
+    .factory('DSPlugin', DSPluginFactory)
+    .run(function(DSPlugin) {});
+
+  DSPluginFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+
+  function DSPluginFactory($log, $q, DS, websocketService) {
+    
+    var staticMethods = {};
+
+    /*
+     * DataStore configuration
+     */
+    var DSPlugin = DS.defineResource({
+
+      // API configuration
+      endpoint: 'plugins',
+
+      // Model configuration
+      idAttribute: 'id',
+      name: 'plugin',
+      relations: {},
+
+      // Computed properties
+      computed: {},
+
+      // Instance methods
+      methods: {}
+
+    });
+
+    angular.extend(DSPlugin, {
+      load: load
+    });
+
+    return DSPlugin;
+
+
+    function load() {
+      return websocketService
+        .send({
+          method: 'Devices.GetPlugins'
+        })
+        .then(function(data) {
+          DSPlugin.inject(data.plugins);
+          return DSPlugin.getAll();
+        });
+    }
 
   }
 
@@ -1024,70 +1193,6 @@
 
   angular
     .module('guh.models')
-    .factory('DSLogs', DSLogsFactory)
-    .run(function(DSLogs) {});
-
-  DSLogsFactory.$inject = ['$log', 'DS'];
-
-  function DSLogsFactory($log, DS) {
-    
-    var staticMethods = {};
-
-    /*
-     * DataStore configuration
-     */
-    var DSLogs = DS.defineResource({
-
-      // API configuration
-      endpoint: 'logs',
-
-      // Model configuration
-      idAttribute: 'id',
-      name: 'logs',
-      relations: {},
-
-      // Computed properties
-      computed: {},
-
-      // Instance methods
-      methods: {}
-
-    });
-
-    return DSLogs;
-
-  }
-
-}());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
-    .module('guh.models')
     .factory('DSEventType', DSEventTypeFactory)
     .run(function(DSEventType) {});
 
@@ -1214,9 +1319,9 @@
     .factory('DSDevice', DSDeviceFactory)
     .run(function(DSDevice) {});
 
-  DSDeviceFactory.$inject = ['$log', '$httpParamSerializer', 'DS', 'libs', 'app', 'websocketService'];
+  DSDeviceFactory.$inject = ['$log', '$q', 'DS', 'libs', 'app', 'websocketService'];
 
-  function DSDeviceFactory($log, $httpParamSerializer, DS, libs, app, websocketService) {
+  function DSDeviceFactory($log, $q, DS, libs, app, websocketService) {
     
     var staticMethods = {};
 
@@ -1240,7 +1345,6 @@
         }
 
         // Not working (error: "Doh! You just changed the primary key of an object!") because states are injected before the state primary keys are generated
-
         // hasMany: {
         //   state: {
         //     localField: 'states',
@@ -1254,11 +1358,6 @@
 
       // Instance methods
       methods: {
-        // Websocket
-        subscribe: subscribe,
-        unsubscribe: unsubscribe,
-        
-        // API
         executeAction: executeAction,
         remove: remove,
         getDescription: getDescription,
@@ -1293,6 +1392,7 @@
     });
 
     angular.extend(DSDevice, {
+      load: load,
       add: add,
       edit: edit,
       pair: pair,
@@ -1336,6 +1436,17 @@
     }
 
 
+    function load() {
+      return websocketService
+        .send({
+          method: 'Devices.GetConfiguredDevices'
+        })
+        .then(function(data) {
+          DSDevice.inject(data.devices);
+          return DSDevice.getAll();
+        });
+    }
+
     /*
      * Public method: getDescription(delimiter)
      */
@@ -1351,92 +1462,74 @@
     }
 
     /*
-     * Public method: subscribe(cb)
-     */
-    function subscribe(cb) {
-      /* jshint validthis: true */
-      var self = this;
-
-      return websocketService.subscribe(self.id, cb);
-    }
-
-    /*
-     * Public method: unsubscribe()
-     */
-    function unsubscribe() {
-      /* jshint validthis: true */
-      var self = this;
-
-      return websocketService.unsubscribe(self.id);
-    }
-
-    /*
      * Public method: pair(deviceClassId, deviceDescriptorId, deviceParams, name)
      */
     function pair(deviceClassId, deviceDescriptorId, deviceParams, name) {
-      var options = {};
+      var params = {};
 
-      options.deviceClassId = deviceClassId || '';
+      params.deviceClassId = deviceClassId || '';
 
       if(angular.isDefined(deviceDescriptorId) && deviceDescriptorId !== '') {
-        options.deviceDescriptorId = deviceDescriptorId;
+        params.deviceDescriptorId = deviceDescriptorId;
       } else {
-        options.deviceParams = deviceParams || [];
+        params.deviceParams = deviceParams || [];
       }
 
       if(angular.isDefined(name)) {
-        options.name = name;
+        params.name = name;
       }
 
-      return DS
-        .adapters
-        .http
-        .POST(app.apiUrl + '/devices/pair', options);
+      return websocketService.send({
+        method: 'Devices.PairDevice',
+        params: params
+      });
     }
 
     /*
      * Public method: confirmPairing(pairingTransactionId, secret)
      */
     function confirmPairing(pairingTransactionId, secret) {
-      var options = {};
+      var params = {};
       
-      options.pairingTransactionId = pairingTransactionId;
+      params.pairingTransactionId = pairingTransactionId;
 
       if(secret) {
-        options.secret = secret;
+        params.secret = secret;
       }
 
-      return DS
-        .adapters
-        .http
-        .POST(app.apiUrl + '/devices/confirmpairing', options);      
+      return websocketService.send({
+        method: 'Devices.ConfirmPairing',
+        params: params
+      }); 
     }
 
     /*
      * Public method: add(deviceClassId, deviceDescriptorId, deviceParams, name)
      */
     function add(deviceClassId, deviceDescriptorId, deviceParams, name) {
-      var device = {};
+      var params = {};
 
       // name
       if(angular.isDefined(name) && name !== '') {
-        device.name = name;
+        params.name = name;
       }
 
       // deviceClassId
       if(angular.isDefined(deviceClassId) && deviceClassId  !== '') {
-        device.deviceClassId = deviceClassId;
+        params.deviceClassId = deviceClassId;
       }
 
       // deviceDescriptorId or deviceParams
       if(angular.isDefined(deviceDescriptorId) && deviceDescriptorId !== '') {
-        device.deviceDescriptorId = deviceDescriptorId;
+        params.deviceDescriptorId = deviceDescriptorId;
       } else if(angular.isDefined(deviceParams) && deviceParams !== []) {
-        device.deviceParams = deviceParams;
+        params.deviceParams = deviceParams;
       }
 
-      return DSDevice.create(device, {
-        cacheResponse: false
+      // Device gets inserted when notification "Devices.DeviceAdded" was received
+      return websocketService.send({
+        method: 'Devices.AddConfiguredDevice',
+        params: params
       });
     }
 
@@ -1468,20 +1561,19 @@
     function executeAction(actionType, params) {
       /* jshint validthis: true */
       var self = this;
-      var options = {};
+      var jsonRpcParams = {
+        actionTypeId: actionType.id,
+        deviceId: self.id
+      };
 
-      // options.params = actionType.getParams();
-      options.params = params;
+      if(angular.isDefined(params) && params !== {}) {
+        jsonRpcParams.params = params;
+      }
 
-      // return DS
-      //   .adapters
-      //   .http
-      //   .POST(app.apiUrl + '/devices/' + self.id + '/actions/' + actionType.id + '/execute.json', options);
-
-      return DS
-        .adapters
-        .http
-        .POST(app.apiUrl + '/devices/' + self.id + '/execute/' + actionType.id, options);
+      return websocketService.send({
+        method: 'Actions.ExecuteAction',
+        params: jsonRpcParams
+      });
     }
 
     /*
@@ -1490,18 +1582,18 @@
     function remove(params) {
       /* jshint validthis: true */
       var self = this;
-      var options = {};
+      var jsonRpcParams = {
+        deviceId: self.id
+      };
 
       if(angular.isDefined(params) && params !== {}) {
-        options.params = {
-          params: params
-        };
-        options.paramSerializer = function(params) {
-          return $httpParamSerializer(params).replace(/%5B/g, '[').replace(/%5D/g, ']');
-        };
+        jsonRpcParams.params = params;
       }
 
-      return DSDevice.destroy(self.id, options);
+      return websocketService.send({
+        method: 'Devices.RemoveConfiguredDevice',
+        params: jsonRpcParams
+      });
     }
 
     /*
@@ -1659,9 +1751,9 @@
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', 'DS', 'DSHttpAdapter', 'app', 'libs', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
+  DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', 'app', 'libs', 'websocketService', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
 
-  function DSDeviceClassFactory($log, DS, DSHttpAdapter, app, libs, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
+  function DSDeviceClassFactory($log, $q, DS, app, libs, websocketService, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
     
     var staticMethods = {};
     var deviceClassActionTypesId = 0;
@@ -1793,7 +1885,23 @@
       return stateTypes;
     };
 
+    angular.extend(DSDeviceClass, {
+      load: load
+    });
+
     return DSDeviceClass;
+
+
+    function load() {
+      return websocketService
+        .send({
+          method: 'Devices.GetSupportedDevices'
+        })
+        .then(function(data) {
+          DSDeviceClass.inject(data.deviceClasses);
+          return DSDeviceClass.getAll();
+        });
+    }
 
 
     /*
@@ -2053,7 +2161,13 @@
       /* jshint validthis: true */
       var self = this;
 
-      return DSHttpAdapter.GET(app.apiUrl + '/deviceclasses/' + self.id + '/discover?params=' + angular.toJson(discoveryParams));
+      return websocketService.send({
+        method: 'Devices.GetDiscoveredDevices',
+        params: {
+          deviceClassId: self.id,
+          discoveryParams: angular.toJson(discoveryParams)
+        }
+      });
     }
 
     /*
@@ -2835,29 +2949,40 @@
     .module('guh.api')
     .factory('websocketService', websocketService);
 
-  websocketService.$inject = ['$log', '$rootScope', 'libs', 'app', 'DS', 'DSHttpAdapter'];
+  websocketService.$inject = ['$log', '$rootScope', '$q', 'libs', 'app', 'DS'];
 
-  function websocketService($log, $rootScope, libs, app, DS, DSHttpAdapter) {
+  function websocketService($log, $rootScope, $q, libs, app, DS) {
 
+    var ws = null;
+    var callbacks = {};
+    var currentRequestId = 0;
     var websocketService = {
-      // Data
-      ws: null,
-
-      // Methods
       close: close,
       connect: connect,
-      reconnect: reconnect
+      reconnect: reconnect,
+      send: send
     };
 
     return websocketService;
+
+    /*
+     * Private function: _getRequestId()
+     */
+    function _getRequestId() {
+      currentRequestId = currentRequestId + 1;
+      if(currentRequestId > 10000) {
+        currentRequestId = 0;
+      }
+      return currentRequestId;
+    };
 
 
     /*
      * Public method: close()
      */
     function close() {
-      if(websocketService.ws) {
-        websocketService.ws = null;
+      if(ws) {
+        ws = null;
       }
     }
 
@@ -2865,11 +2990,11 @@
      * Public method: connect()
      */
     function connect() {
-      if(websocketService.ws) {
+      if(ws) {
         return;
       }
 
-      var ws = new WebSocket(app.websocketUrl);
+      ws = new WebSocket(app.websocketUrl);
 
       ws.onopen = function(event) {
         $log.log('Successfully connected with websocket.', ws, event);
@@ -2909,6 +3034,8 @@
               var stateTypeId = data.params.stateTypeId;
               var value = data.params.value;
 
+              $log.log('state changed', data);
+
               DS.inject('state', {
                 id: '' + deviceId + '_' + stateTypeId,
                 deviceId: deviceId,
@@ -2923,27 +3050,12 @@
               var device = DS.get('device', deviceId);
 
               if(angular.isUndefined(device)) {
-                var deviceData = data.params.device;
+                var injectedItem = DS.inject('device', data.params.device);
 
-                DSHttpAdapter
-                  .GET(app.apiUrl + '/devices/' + deviceId + '/states')
-                  .then(function(response) {
-                    var states = response.data;
-
-                    var injectedItem = DS.inject('device', {
-                      deviceClassId: deviceData.deviceClassId,
-                      id: deviceData.id,
-                      name: deviceData.name,
-                      params: deviceData.params,
-                      setupComplete: deviceData.setupComplete,
-                      states: states
-                    });
-
-                    // Send broadcast event
-                    if(DS.is('device', injectedItem)) {
-                      $rootScope.$broadcast('ReloadView', injectedItem.deviceClass.name + ' was added.');
-                    }
-                  });            
+                // Send broadcast event
+                if(DS.is('device', injectedItem)) {
+                  $rootScope.$broadcast('ReloadView', injectedItem.deviceClass.name + ' was added.');
+                }          
               }
 
               break;
@@ -2960,28 +3072,72 @@
 
               break;
 
-            // RulesConfigurationChanged
+            // Rules.ConfigurationChanged
             case app.notificationTypes.rules.ruleConfigurationChanged:
               var rule = data.params.rule;
-              var injectedRule = DS.inject('rule', rule);
+              var injectedItem = DS.inject('rule', rule);
 
               // Send broadcast event
-              if(DS.is('rule', injectedRule)) {
-                $rootScope.$broadcast('ReloadView', injectedRule.name + ' was updated.');
+              if(DS.is('rule', injectedItem)) {
+                $rootScope.$broadcast('ReloadView', injectedItem.name + ' was updated.');
+              }
+
+              break;
+
+            // Rules.RuleAdded
+            case app.notificationTypes.rules.ruleAdded:
+              var ruleId = data.params.rule.id;
+              var rule = DS.get('rule', ruleId);
+
+              if(angular.isUndefined(rule)) {
+                var injectedItem = DS.inject('rule', data.params.rule);
+
+                // Send broadcast event
+                if(DS.is('rule', injectedItem)) {
+                  $rootScope.$broadcast('ReloadView', injectedItem.name + ' was added.');
+                }
+              }
+
+              break;
+
+            // Rules.RuleRemoved
+            case app.notificationTypes.rules.ruleRemoved:
+              var ruleId = data.params.ruleId;
+              var ejectedItem = DS.eject('rule', ruleId);
+
+              if(angular.isDefined(ejectedItem)) {
+                // Send broadcast event
+                $rootScope.$broadcast('ReloadView', 'Rule was removed.');
               }
 
               break;
 
             default:
-              $log.warn('Type of notification not handled:', data);
+              // $log.warn('Type of notification not handled:', data);
           }
 
         } else if(angular.isDefined(data.authenticationRequired)) {
-          $rootScope.$broadcast('Initialize', data);
+          $rootScope.$apply(function() {
+            $rootScope.$broadcast('InitialHandshake', data);
+          });
+        } else if(callbacks.hasOwnProperty(data.id)) {
+          if(data.status === 'success') {
+            if(angular.isDefined(data.params.deviceError) && data.params.deviceError !== 'DeviceErrorNoError') {
+              $rootScope.$apply(callbacks[data.id].callback.reject(data.params.deviceError));
+            } else if(angular.isDefined(data.params.loggingError) && data.params.loggingError !== 'LoggingErrorNoError') {
+              $rootScope.$apply(callbacks[data.id].callback.reject(data.params.loggingError));
+            } else if(angular.isDefined(data.params.ruleError) && data.params.ruleError !== 'RuleErrorNoError') {
+              $rootScope.$apply(callbacks[data.id].callback.reject(data.params.ruleError));
+            } else {
+              $rootScope.$apply(callbacks[data.id].callback.resolve(data.params));
+            }
+          } else {
+            $rootScope.$apply(callbacks[data.id].callback.reject(data.error));
+          }
+          
+          delete callbacks[data.id];
         }
       };
-
-      websocketService.ws = ws;
     }
 
     /*
@@ -2990,6 +3146,25 @@
     function reconnect() {
       websocketService.close();
       websocketService.connect();
+    }
+
+    /*
+     * Public method: send(request)
+     */
+    function send(request) {
+      var defer = $q.defer();
+      var requestId = _getRequestId();
+
+      callbacks[requestId] = {
+        time: new Date(),
+        callback: defer
+      };
+
+      request.id = requestId;
+
+      ws.send(angular.toJson(request));
+
+      return defer.promise;
     }
 
   }
