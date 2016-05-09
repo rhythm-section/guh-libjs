@@ -26,7 +26,12 @@
 {
   "extends": "eslint:recommended",
   "env": {
-    "browser": true
+    "browser": true,
+    "mocha": true
+  },
+  "globals": {
+    "require": false,
+    "module": false
   },
   "parserOptions": {
     "ecmaVersion": 6,

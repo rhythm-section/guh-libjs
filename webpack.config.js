@@ -23,75 +23,237 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-var webpack = require('webpack');
+var _ = require('lodash');
+var minimist = require('minimist');
+var chalk = require('chalk');
 var path = require('path');
+var webpack = require('webpack');
+
+// Webpack plugins
 var CleanWebpackPlugin = require('clean-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
 
 
-module.exports = {
+var INCLUDE_FILES = [
+  path.resolve(__dirname, 'src')
+];
+
+var EXCLUDE_FILES = [
+  path.resolve(__dirname, 'src/api'),
+  path.resolve(__dirname, 'src/logging'),
+  path.resolve(__dirname, 'src/models'),
+  path.resolve(__dirname, 'src/**/*_test')
+];
+
+var DEFAULT_TARGET = 'BUILD';
+
+var DEFAULT_PARAMS = {
   entry: {
     lib: path.resolve(__dirname, 'src/index.js')
   },
   output: {
-    path: path.resolve(__dirname, 'build'),
     filename: '[name].js',
     sourceMapFilename: '[name].js.map',
   },
-  devTool: 'source-map',
   module: {
-    preLoaders: [
-      // Scripts
-      {
-        test: /\.js$/,
-        loader: 'babel!eslint',
-        include: path.resolve(__dirname, 'src'),
-        exclude: [
-          path.resolve(__dirname, 'src/api'),
-          path.resolve(__dirname, 'src/logging'),
-          path.resolve(__dirname, 'src/models')
-        ]
-      }
-    ],
+    preLoaders: [],
     loaders: [
       // HTML
       {
         test: /\.html$/,
         loader: 'html',
-        include: path.resolve(__dirname, 'src'),
-        exclude: [
-          path.resolve(__dirname, 'src/api'),
-          path.resolve(__dirname, 'src/logging'),
-          path.resolve(__dirname, 'src/models') 
-        ]
-      },
-      // Styles
-      {
-        test: /\.scss$/,
-        loader: 'style!css!sass',
-        include: path.resolve(__dirname, 'src'),
-        exclude: [
-          path.resolve(__dirname, 'src/api'),
-          path.resolve(__dirname, 'src/logging'),
-          path.resolve(__dirname, 'src/models') 
-        ]
+        include: INCLUDE_FILES,
+        exclude: EXCLUDE_FILES
       }
-    ]
+    ],
+    postLoaders: []
   },
   plugins: [
-    // Clean build directory before building
-    // Link: https://github.com/johnagan/clean-webpack-plugin
-    new CleanWebpackPlugin(['build'], {
-      root: __dirname,
-      verbose: true, 
-      dry: false
-    }),
-
     // Insert index.html with automatically added dependencies
     // Link: https://github.com/ampedandwired/html-webpack-plugin
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src/index.html'),
       inject: 'body'
     })
-  ]
+  ],
+  colors: true,
+  debug: true,
+  progress: true
 };
+
+var PARAMS_PER_TARGET = {
+
+  DEV: {
+    output: {
+      path: path.resolve(__dirname, 'dev')
+    },
+    module: {
+      preLoaders: [
+        // Scripts
+        {
+          test: /\.js$/,
+          loader: 'babel!eslint!webpack-module-hot-accept',
+          include: INCLUDE_FILES,
+          exclude: EXCLUDE_FILES
+        }
+      ],
+      loaders: [
+        // Styles
+        {
+          test: /\.scss$/,
+          loader: 'style!css?sourceMap&modules&localIdentName=[path][name]---[local]---[hash:base64:5]!sass?sourceMap',
+          include: INCLUDE_FILES,
+          exclude: EXCLUDE_FILES
+        }
+      ]
+    },
+    // Not working with ExtractTextWebpackPlugin => WHY?
+    plugins: [
+      // Automatically add 'module.hot.accept();' on the end of each js-module to hot reload modules when SASS files (with css modules) were changed
+      new webpack.HotModuleReplacementPlugin()
+    ],
+    devServer: {
+      inline: true,
+      hot: true,
+      contentBase: '/dev',
+      port: 1234
+    },
+    devtool: 'inline-source-map'
+  },
+
+  BUILD: {
+    output: {
+      path: path.resolve(__dirname, 'build')
+    },
+    module: {
+      preLoaders: [
+        // Scripts
+        {
+          test: /\.js$/,
+          loader: 'babel!eslint',
+          include: INCLUDE_FILES,
+          exclude: EXCLUDE_FILES
+        }
+      ],
+      loaders: [
+        // Styles
+        {
+          test: /\.scss$/,
+          loader: ExtractTextWebpackPlugin.extract('style', 'css?sourceMap&modules&localIdentName=[path][name]---[local]---[hash:base64:5]', 'sass?sourceMap'),
+          include: INCLUDE_FILES,
+          exclude: EXCLUDE_FILES
+        }
+      ]
+    },
+    plugins: [
+      new CleanWebpackPlugin([
+        'build'
+      ], {
+        root: __dirname,
+        verbose: true 
+      }),
+      new ExtractTextWebpackPlugin('styles.css')
+    ],
+    devtool: 'source-map'
+  },
+
+  DIST: {
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: '[name].min.js'
+    },
+    module: {
+      preLoaders: [
+        // Scripts
+        {
+          test: /\.js$/,
+          loader: 'babel!eslint',
+          include: INCLUDE_FILES,
+          exclude: EXCLUDE_FILES
+        }
+      ],
+      loaders: [
+        // Styles
+        {
+          test: /\.scss$/,
+          loader: ExtractTextWebpackPlugin.extract('style', 'css?sourceMap&modules&localIdentName=[path][name]---[local]---[hash:base64:5]', 'sass?sourceMap'),
+          include: INCLUDE_FILES,
+          exclude: EXCLUDE_FILES
+        }
+      ]
+    },
+    plugins: [
+      new CleanWebpackPlugin([
+        'dist'
+      ], {
+        root: __dirname,
+        verbose: true 
+      }),
+      new ExtractTextWebpackPlugin('styles.css'),
+      new webpack.optimize.UglifyJsPlugin({
+        mangle: false
+      })
+    ]
+  },
+
+  TEST: {
+  //   module: {
+  //     preLoaders: [
+  //       // Scripts
+  //       {
+  //         test: /\.js$/,
+  //         loader: 'babel!eslint',
+  //         include: [
+  //           path.resolve(__dirname, 'test.webpack'),
+  //           path.resolve(__dirname, 'src/**/*_test')
+  //         ]
+  //       }
+  //     ],
+  //     loaders: [
+  //       // Styles
+  //       {
+  //         test: /\.scss$/,
+  //         loader: 'style!css?sourceMap&modules&localIdentName=[path][name]---[local]---[hash:base64:5]!sass?sourceMap',
+  //         include: INCLUDE_FILES,
+  //         exclude: EXCLUDE_FILES
+  //       }
+  //     ]
+  //   },
+  //   devtool: 'inline-source-map'
+  }
+
+};
+
+
+var target = _resolveBuildTarget(DEFAULT_TARGET);
+var params = _.mergeWith(DEFAULT_PARAMS, PARAMS_PER_TARGET[target], _mergeArraysCustomizer);
+
+_printBuildInfo(target, params);
+
+module.exports = params;
+
+
+function _resolveBuildTarget(defaultTarget) {
+  var target = minimist(process.argv.slice(2)).TARGET;
+  if(!target) {
+    console.log('No build target provided, using default target instead.\n\n');
+    target = defaultTarget;
+  }
+  return target;
+}
+
+function _printBuildInfo(target, params) {
+  console.log('\nStarting ' + chalk.bold.green('"' + target + '"') + ' build');
+  if (target === 'DEV') {
+    console.log('Dev server: ' + chalk.bold.yellow('http://localhost:' + params.devServer.port) + '\n\n');
+  } else {
+    console.log('\n\n');
+  }
+}
+
+function _mergeArraysCustomizer(a, b) {
+  if(_.isArray(a)) {
+    return a.concat(b);
+  }
+}
