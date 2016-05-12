@@ -23,12 +23,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-{
-  "presets": [
-    "es2015"
-  ],
-  "plugins": [
-    "transform-object-assign",
-    "transform-object-rest-spread"
-  ]
-}
+import angular from 'angular';
+import angularMocks from 'angular-mocks';
+
+var testsContext = require.context('./src', true, /_test\.js$/);
+testsContext.keys().forEach(testsContext);

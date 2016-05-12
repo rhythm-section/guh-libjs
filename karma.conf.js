@@ -23,12 +23,88 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-{
-  "presets": [
-    "es2015"
-  ],
-  "plugins": [
-    "transform-object-assign",
-    "transform-object-rest-spread"
-  ]
+var path = require('path');
+var bourbon = require('node-bourbon').includePaths;
+var webpack = require('webpack');
+// var webpackConfig = require('./webpack.config');
+
+module.exports = function (config) {
+  config.set({
+    files: [
+      'test.webpack.js'
+    ],
+
+    frameworks: [
+      'mocha',
+      'chai',
+      'sinon'
+    ],
+
+    preprocessors: {
+      'test.webpack.js': [
+        'webpack',
+        'sourcemap'
+      ]
+    },
+
+    reporters: [
+      'mocha'
+    ],
+    
+    browsers: [
+      'PhantomJS'
+    ],
+
+    client: {
+      mocha: {
+        reporter: 'html', // change Karma's debug.html to the mocha web reporter
+        ui: 'bdd'
+      }
+    },
+
+    // webpack: webpackConfig,
+    webpack: {
+      module: {
+        loaders: [
+          // Scripts
+          {
+            test: /\.js$/,
+            loader: 'babel!eslint',
+            include: [
+              path.resolve(__dirname, 'test.webpack'),
+              path.resolve(__dirname, 'src')
+            ]
+          },
+          // Styles
+          {
+            test: /\.scss$/,
+            loader: 'style!css?sourceMap!sass?sourceMap&includePaths[]=' + bourbon,
+            include: path.resolve(__dirname, 'src'),
+            exclude: [
+              path.resolve(__dirname, 'src/api'),
+              path.resolve(__dirname, 'src/logging'),
+              path.resolve(__dirname, 'src/models')
+            ]
+          }
+        ]
+      },
+      devtool: 'inline-source-map'
+    },
+
+    webpackMiddleware: {
+      noInfo: 'errors-only'
+    },
+    
+    plugins: [
+      require('karma-chai'),
+      require('karma-chrome-launcher'),
+      require('karma-mocha'),
+      require('karma-mocha-reporter'),
+      require('karma-phantomjs-launcher'),
+      require('karma-sinon'),
+      require('karma-sourcemap-loader'),
+      require('karma-webpack')
+    ]
+
+  })
 }

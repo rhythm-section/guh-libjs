@@ -27,7 +27,9 @@ var _ = require('lodash');
 var minimist = require('minimist');
 var chalk = require('chalk');
 var path = require('path');
+var bourbon = require('node-bourbon').includePaths;
 var webpack = require('webpack');
+
 
 // Webpack plugins
 var CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -93,7 +95,7 @@ var PARAMS_PER_TARGET = {
         // Scripts
         {
           test: /\.js$/,
-          loader: 'babel!eslint!webpack-module-hot-accept',
+          loader: 'babel!eslint',
           include: INCLUDE_FILES,
           exclude: EXCLUDE_FILES
         }
@@ -102,7 +104,7 @@ var PARAMS_PER_TARGET = {
         // Styles
         {
           test: /\.scss$/,
-          loader: 'style!css?sourceMap&modules&localIdentName=[path][name]---[local]---[hash:base64:5]!sass?sourceMap',
+          loader: 'style!css!sass?sourceMap&includePaths[]=' + bourbon,
           include: INCLUDE_FILES,
           exclude: EXCLUDE_FILES
         }
@@ -140,7 +142,7 @@ var PARAMS_PER_TARGET = {
         // Styles
         {
           test: /\.scss$/,
-          loader: ExtractTextWebpackPlugin.extract('style', 'css?sourceMap&modules&localIdentName=[path][name]---[local]---[hash:base64:5]', 'sass?sourceMap'),
+          loader: ExtractTextWebpackPlugin.extract('style', 'css?sourceMap!sass?sourceMap&includePaths[]=' + bourbon),
           include: INCLUDE_FILES,
           exclude: EXCLUDE_FILES
         }
@@ -177,7 +179,7 @@ var PARAMS_PER_TARGET = {
         // Styles
         {
           test: /\.scss$/,
-          loader: ExtractTextWebpackPlugin.extract('style', 'css?sourceMap&modules&localIdentName=[path][name]---[local]---[hash:base64:5]', 'sass?sourceMap'),
+          loader: ExtractTextWebpackPlugin.extract('style', 'css?sourceMap!sass?sourceMap&includePaths[]=' + bourbon),
           include: INCLUDE_FILES,
           exclude: EXCLUDE_FILES
         }
