@@ -23,44 +23,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Angular
-import angular from 'angular';
-import ngRedux from 'ng-redux';
-
-// Store
-import reducer from '../reducers';
-import logger from './store-logger-config';
-import thunkMiddleware from 'redux-thunk';
+// Vendor
+import createLogger from 'redux-logger';
 
 
-angular
-  .module('lib.store', [
-    'ngRedux'
-  ])
-  .config(['$ngReduxProvider', $ngReduxProvider => {
-    $ngReduxProvider.createStoreWith(
-      reducer,
-      _getMiddleware(),
-      _getStoreEnhancers()
-    );
-  }]);
+const logger = createLogger({
+  level: 'info',
+  collapsed: true
+});
 
-function _getMiddleware() {
-  let middleware = [
-    thunkMiddleware
-  ];
-
-  if(__DEV__) {
-    middleware = [
-      ...middleware,
-      logger
-    ];
-  }
-
-  return middleware;
-}
-
-function _getStoreEnhancers() {
-  let storeEnhancers = [];
-  return storeEnhancers;
-}
+export default logger;

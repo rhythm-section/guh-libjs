@@ -77,6 +77,10 @@ var DEFAULT_PARAMS = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src/index.html'),
       inject: 'body'
+    }),
+    new webpack.DefinePlugin({
+      __DEV__: process.env.NODE_ENV !== 'production',
+      __PRODUCTION__: process.env.NODE_ENV === 'production'
     })
   ],
   colors: true,

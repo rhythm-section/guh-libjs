@@ -31,7 +31,9 @@
   },
   "globals": {
     "require": false,
-    "module": false
+    "module": false,
+    "__DEV__": false,
+    "__PRODUCTION__": false
   },
   "parserOptions": {
     "ecmaVersion": 6,
