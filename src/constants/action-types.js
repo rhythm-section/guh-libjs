@@ -23,44 +23,5 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Angular
-import angular from 'angular';
-import ngRedux from 'ng-redux';
-
-// Store
-import reducer from '../reducers';
-import logger from './store-logger-config';
-import thunkMiddleware from 'redux-thunk';
-
-
-angular
-  .module('guhLib.store', [
-    'ngRedux'
-  ])
-  .config(['$ngReduxProvider', $ngReduxProvider => {
-    $ngReduxProvider.createStoreWith(
-      reducer,
-      _getMiddleware(),
-      _getStoreEnhancers()
-    );
-  }]);
-
-function _getMiddleware() {
-  let middleware = [
-    thunkMiddleware
-  ];
-
-  if(__DEV__) {
-    middleware = [
-      ...middleware,
-      logger
-    ];
-  }
-
-  return middleware;
-}
-
-function _getStoreEnhancers() {
-  let storeEnhancers = [];
-  return storeEnhancers;
-}
+// App
+export const SAVE_SERVER_INFO = 'SAVE_SERVER_INFO';

@@ -26,7 +26,10 @@
 // Vendor
 import { combineReducers } from 'redux';
 
+// Reducers
+import appReducer from './app-reducer';
+
 
 export default combineReducers({
-  
+  app: appReducer
 });

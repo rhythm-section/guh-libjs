@@ -22,5 +22,42 @@
  *                                                                                     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-require('./build/lib');
-module.exports = 'lib';
+
+// Vendor
+import _ from 'lodash';
+import { Map } from 'immutable';
+
+// Constants
+import {
+  SAVE_SERVER_INFO
+} from '../constants/action-types';
+
+const INITIAL_STATE = Map({
+  serverInfo: Map({
+    protocolVersion: '',
+    server: '',
+    version: ''
+  })
+});
+
+
+export default function connection(state = INITIAL_STATE, action) {
+
+  if(!action && !action.type) {
+    return state;
+  }
+  
+  switch(action.type) {
+
+    case SAVE_SERVER_INFO:
+      if(state.has('serverInfo') && _.has(action, 'payload') && _.has(action.payload, 'handshake')) {
+        state = state.set('serverInfo', Map(action.payload.handshake));
+      }
+      return state;
+
+    default:
+      return state;
+
+  }
+  
+}

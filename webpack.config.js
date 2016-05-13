@@ -64,11 +64,13 @@ var DEFAULT_PARAMS = {
     'angular': 'angular',
     'es5-shim': 'es5-shim',
     'es6-shim': 'es6-shim',
+    'immutable': 'immutable',
     'lodash': 'lodash',
     'ng-redux': 'ng-redux',
     'redux': 'redux',
     'redux-logger': 'redux-logger',
-    'redux-thunk': 'redux-thunk'
+    'redux-thunk': 'redux-thunk',
+    'guh-libjs': 'guhLibJs'
   },
   module: {
     preLoaders: [],

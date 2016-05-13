@@ -23,33 +23,45 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Vendor
-import 'es5-shim';
-import 'es6-shim';
-
-// Constants
-import * as actionTypes from './constants/action-types';
-
-// Modules
-import store from './store';
-
-// Actions
-import * as appActions from './actions/app-actions';
-
 // Angular
 import angular from 'angular';
+import ngRedux from 'ng-redux';
 
+// Store
+import reducer from '../reducers';
+import logger from './store-logger-config';
+import thunkMiddleware from 'redux-thunk';
+
+
+function _getMiddleware() {
+  let middleware = [
+    thunkMiddleware
+  ];
+
+  if(__DEV__) {
+    middleware = [
+      ...middleware,
+      logger
+    ];
+  }
+
+  return middleware;
+}
+
+function _getStoreEnhancers() {
+  let storeEnhancers = [];
+  return storeEnhancers;
+}
 
 export default angular
-  .module('guhLib', [
-    store
+  .module('store', [
+    ngRedux
   ])
-  .config(['$ngReduxProvider', function($ngReduxProvider) {
-    console.log('$ngReduxProvider', $ngReduxProvider);
+  .config(['$ngReduxProvider', $ngReduxProvider => {
+    $ngReduxProvider.createStoreWith(
+      reducer,
+      _getMiddleware(),
+      _getStoreEnhancers()
+    );
   }])
   .name;
-
-
-export const actions = {
-  app: appActions
-};
