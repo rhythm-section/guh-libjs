@@ -23,18 +23,32 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Vendor
-import 'es5-shim';
-import 'es6-shim';
-
 // Angular
 import angular from 'angular';
+import ngRedux from 'ng-redux';
 
-// App
-import './store/store'
+// Store
+import reducer from '../reducers';
 
 
 angular
-  .module('lib', [
-    'lib.store'
-  ]);
+  .module('lib.store', [
+    'ngRedux'
+  ])
+  .config(['$ngReduxProvider', $ngReduxProvider => {
+    $ngReduxProvider.createStoreWith(
+      reducer,
+      _getMiddleware(),
+      _getStoreEnhancers()
+    );
+  }]);
+
+function _getMiddleware() {
+  let middleware = [];
+  return middleware;
+}
+
+function _getStoreEnhancers() {
+  let storeEnhancers = [];
+  return storeEnhancers;
+}

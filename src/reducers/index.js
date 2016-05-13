@@ -24,17 +24,9 @@
 
 
 // Vendor
-import 'es5-shim';
-import 'es6-shim';
-
-// Angular
-import angular from 'angular';
-
-// App
-import './store/store'
+import { combineReducers } from 'redux';
 
 
-angular
-  .module('lib', [
-    'lib.store'
-  ]);
+export default combineReducers({
+  
+});
