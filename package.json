@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "webpack-dev-server --TARGET='DEV'",
     "build": "webpack --TARGET='BUILD'",
+    "build-watch": "webpack --watch --TARGET='BUILD'",
     "dist": "webpack --TARGET='DIST'",
+    "dist-watch": "webpack --watch --TARGET='DIST'",
     "test": "./node_modules/karma/bin/karma start --single-run --TARGET='TEST'",
     "test-watch": "./node_modules/karma/bin/karma start --TARGET='TEST'"
   },
@@ -45,6 +47,7 @@
     "karma-sinon": "^1.0.5",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
+    "lodash": "^4.12.0",
     "minimist": "^1.2.0",
     "mocha": "^2.4.5",
     "node-bourbon": "^4.2.8",

@@ -34,7 +34,7 @@ import thunkMiddleware from 'redux-thunk';
 
 
 angular
-  .module('lib.store', [
+  .module('guhLib.store', [
     'ngRedux'
   ])
   .config(['$ngReduxProvider', $ngReduxProvider => {

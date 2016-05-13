@@ -56,7 +56,19 @@ var DEFAULT_PARAMS = {
   },
   output: {
     filename: '[name].js',
-    sourceMapFilename: '[name].js.map',
+    libraryTarget: 'umd',
+    library: 'lib',
+    sourceMapFilename: '[name].js.map'
+  },
+  externals: {
+    'angular': 'angular',
+    'es5-shim': 'es5-shim',
+    'es6-shim': 'es6-shim',
+    'lodash': 'lodash',
+    'ng-redux': 'ng-redux',
+    'redux': 'redux',
+    'redux-logger': 'redux-logger',
+    'redux-thunk': 'redux-thunk'
   },
   module: {
     preLoaders: [],

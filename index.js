@@ -22,19 +22,6 @@
  *                                                                                     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-
-// Vendor
-import 'es5-shim';
-import 'es6-shim';
-
-// Angular
-import angular from 'angular';
-
-// App
-import './store/store'
-
-
-var lib = angular
-  .module('guhLib', [
-    'guhLib.store'
-  ]);
+var es5Shim = require('es5-shim');
+require('./build/lib');
+module.exports = 'lib';
