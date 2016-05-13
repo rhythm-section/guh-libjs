@@ -44,9 +44,6 @@ export default angular
   .module('guhLib', [
     store
   ])
-  .config(['$ngReduxProvider', function($ngReduxProvider) {
-    console.log('$ngReduxProvider', $ngReduxProvider);
-  }])
   .name;
 
 

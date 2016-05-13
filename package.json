@@ -60,9 +60,11 @@
     "webpack-dev-server": "^1.14.1",
     "webpack-module-hot-accept": "^1.0.4"
   },
+  "peerDependencies": {},
   "//": "ng-redux 3.3.4-beta.0 has an error with combineReducer",
   "dependencies": {
     "angular": "^1.5.5",
+    "angular-ui-router": "^0.2.18",
     "es5-shim": "^4.5.8",
     "es6-shim": "^0.35.1",
     "immutable": "^3.8.1",
@@ -70,6 +72,7 @@
     "ng-redux": "=3.3.3",
     "redux": "^3.5.2",
     "redux-logger": "^2.6.1",
-    "redux-thunk": "^2.0.1"
+    "redux-thunk": "^2.0.1",
+    "redux-ui-router": "^0.5.1"
   }
 }

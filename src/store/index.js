@@ -25,7 +25,9 @@
 
 // Angular
 import angular from 'angular';
+import uiRouter from 'angular-ui-router';
 import ngRedux from 'ng-redux';
+import ngReduxRouter from 'redux-ui-router';
 
 // Store
 import reducer from '../reducers';
@@ -35,6 +37,7 @@ import thunkMiddleware from 'redux-thunk';
 
 function _getMiddleware() {
   let middleware = [
+    'ngUiRouterMiddleware',
     thunkMiddleware
   ];
 
@@ -55,13 +58,38 @@ function _getStoreEnhancers() {
 
 export default angular
   .module('store', [
-    ngRedux
+    uiRouter,
+    ngRedux,
+    ngReduxRouter
   ])
-  .config(['$ngReduxProvider', $ngReduxProvider => {
+  .config(['$ngReduxProvider', '$urlRouterProvider', '$stateProvider', ($ngReduxProvider, $urlRouterProvider, $stateProvider) => {
+
+    // Store
     $ngReduxProvider.createStoreWith(
       reducer,
       _getMiddleware(),
       _getStoreEnhancers()
     );
+
+    // States
+    $urlRouterProvider.otherwise('/dashboard');
+
+    $stateProvider.state('app', {
+      abstract: true,
+      template: '<guh-app />'
+    });
+
+      $stateProvider.state('app.dashboard', {
+        url: '/dashboard'
+      });
+
+      $stateProvider.state('app.things', {
+        url: '/things'
+      });
+
+      $stateProvider.state('app.rules', {
+        url: '/rules'
+      });
+
   }])
   .name;

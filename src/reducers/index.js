@@ -25,11 +25,13 @@
 
 // Vendor
 import { combineReducers } from 'redux';
+import { router } from 'redux-ui-router';
 
 // Reducers
 import appReducer from './app-reducer';
 
 
 export default combineReducers({
-  app: appReducer
+  app: appReducer,
+  router
 });
