@@ -24,8 +24,11 @@
 
 
 // Vendor
-import angular from 'angular';
+import 'es5-shim';
+import 'es6-shim';
 
+// Angular
+import angular from 'angular';
 
 angular
   .module('lib', []);
