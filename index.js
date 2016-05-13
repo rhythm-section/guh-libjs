@@ -22,6 +22,5 @@
  *                                                                                     *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-var es5Shim = require('es5-shim');
 require('./build/lib');
 module.exports = 'lib';
