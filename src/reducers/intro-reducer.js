@@ -23,9 +23,45 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// App
-export const SAVE_SERVER_INFO = 'SAVE_SERVER_INFO';
+// Vendor
+import _ from 'lodash';
+import { Map } from 'immutable';
 
-// Intro
-export const ADD_STEP = 'ADD_STEP';
-export const GO_TO_STEP = 'GO_TO_STEP';
+// Constants
+import {
+  ADD_STEP,
+  GO_TO_STEP
+} from '../constants/action-types';
+
+const INITIAL_STATE = Map({
+  steps: Map(),
+  visibleStep: ''
+});
+
+
+export default function intro(state = INITIAL_STATE, action) {
+
+  if(!action && !action.type) {
+    return state;
+  }
+  
+  switch(action.type) {
+
+    case ADD_STEP:
+      if(state.has('steps') && _.has(action, 'payload') && _.has(action.payload, 'step')) {
+        state = state.setIn(['steps', action.payload.step.name], action.payload.step);
+      }
+      return state;
+
+    case GO_TO_STEP:
+      if(state.hasIn(['steps', action.payload.stepName]) && _.has(action, 'payload') && _.has(action.payload, 'stepName')) {
+        state = state.set('visibleStep', action.payload.stepName);
+      }
+      return state;
+
+    default:
+      return state;
+
+  }
+  
+}

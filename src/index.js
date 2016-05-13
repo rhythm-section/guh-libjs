@@ -35,6 +35,7 @@ import store from './store';
 
 // Actions
 import * as appActions from './actions/app-actions';
+import * as introActions from './actions/intro-actions';
 
 // Angular
 import angular from 'angular';
@@ -48,5 +49,6 @@ export default angular
 
 
 export const actions = {
-  app: appActions
+  app: appActions,
+  intro: introActions
 };

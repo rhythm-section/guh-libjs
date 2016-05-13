@@ -23,9 +23,27 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// App
-export const SAVE_SERVER_INFO = 'SAVE_SERVER_INFO';
+// Constants
+import {
+  ADD_STEP,
+  GO_TO_STEP
+} from '../constants/action-types';
 
-// Intro
-export const ADD_STEP = 'ADD_STEP';
-export const GO_TO_STEP = 'GO_TO_STEP';
+
+export function addStep(step) {
+  return {
+    type: ADD_STEP,
+    payload: {
+      step
+    }
+  };
+}
+
+export function goToStep(stepName) {
+  return {
+    type: GO_TO_STEP,
+    payload: {
+      stepName
+    }
+  };
+}
