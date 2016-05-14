@@ -36,10 +36,14 @@ import {
   REMOVE_CONNECTION,
   CHANGE_STATUS
 } from '../constants/action-types';
+
 import {
   STATUS_CLOSE_RECEIVED
 } from '../constants/app-types';
 
+import {
+  REHYDRATE
+} from 'redux-persist/constants';
 
 const INITIAL_STATE = Map({
   availableConnections: Map(),
@@ -49,6 +53,9 @@ const INITIAL_STATE = Map({
 
 
 export default function connection(state = INITIAL_STATE, action) {
+
+  // REHYDRATE & ADD_CONNECTION
+  let availableConnections;
 
   // ADD_CONNECTION
   let defaultConnection;
@@ -60,35 +67,49 @@ export default function connection(state = INITIAL_STATE, action) {
   
   switch(action.type) {
 
-    case ADD_CONNECTION:
-      // if(state.has('availableConnections')) {
-      //   // Get first (and hopefully only) defaultConnection
-      //   defaultConnection = state.get('availableConnections').filter(availableConnection => availableConnection.get('default') === true).fisrt();
-      // }
+    case REHYDRATE:
+      // Hook which is called after state was fetched from IndexedDB (localForage)
+      if(_.has(action, 'payload') &&
+         _.has(action.payload, 'connection') &&
+         _.has(action.payload.connection, 'availableConnections')) {
+        availableConnections = action.payload.connection.get('availableConnections');
+        action.payload.connection = action.payload.connection.set('availableConnections', availableConnections.map(availableConnection => {
+          if(availableConnection.has('status')) {
+            availableConnection.set('status', STATUS_CLOSE_RECEIVED);
+          }
+        }));
+      }
+      return state;
 
+    case ADD_CONNECTION:
+      // Create the passed new connection
       if(_.has(action, 'payload') &&
          _.has(action.payload, 'newConnection')) {
         // Create Connection record for new connection
         newConnection = new Connection(action.payload.newConnection);
       }
 
-      // // If there is already a default connection (defaultConnection) defined, then use it's id and override it
-      // if(defaultConnection &&
-      //    typeof defaultConnection.get('id') !== undefined &&
-      //    newConnection &&
-      //    newConnection.get('default')) {
-      //   newConnection = newConnection.set('id', defaultConnection.get('id'));
-      // }
+      // Check if there is a default connection
+      if(state.has('availableConnections')) {
+        availableConnections = state.get('availableConnections')
 
-      // If newConnection should be the new defaultConnection
-      if(newConnection &&
+        // Get first (and hopefully only) defaultConnection
+        defaultConnection = availableConnections.filter(availableConnection => availableConnection.get('isDefault') === true).first();
+      }
+
+      // If there is already a default connection defined, then use it's id and override it
+      if(defaultConnection &&
+         typeof defaultConnection.get('id') !== undefined &&
+         newConnection &&
          newConnection.get('isDefault') &&
          state.has('defaultConnection')) {
-        console.log('Set default connection to ', newConnection.id);
+        newConnection = newConnection.set('id', defaultConnection.get('id'));
         state = state.set('defaultConnection', newConnection.id);
       }
 
-      if(state.has('availableConnections') && newConnection) {
+      // Add new connection
+      if(state.has('availableConnections') &&
+         newConnection) {
         state = state.setIn(['availableConnections', newConnection.id], newConnection);
       }
 

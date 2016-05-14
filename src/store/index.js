@@ -34,6 +34,11 @@ import reducer from '../reducers';
 import thunkMiddleware from 'redux-thunk';
 import logger from './store-logger-config';
 import createWebsocketMiddleware from '../middleware/websocket-middleware';
+import { persistStore, autoRehydrate } from 'redux-persist';
+import { REHYDRATE } from 'redux-persist/constants';
+import createActionBuffer from 'redux-action-buffer';
+import localForage from 'localForage';
+import immutableTransform from 'redux-persist-immutable';
 
 // Services
 import websocketService from '../services/websocket/websocket-service';
@@ -44,7 +49,8 @@ function _getMiddleware(websocketServiceProvider) {
   let middleware = [
     'ngUiRouterMiddleware',
     thunkMiddleware,
-    websocketMiddleware
+    websocketMiddleware,
+    createActionBuffer(REHYDRATE)
   ];
 
   if(__DEV__) {
@@ -58,7 +64,10 @@ function _getMiddleware(websocketServiceProvider) {
 }
 
 function _getStoreEnhancers() {
-  let storeEnhancers = [];
+  let storeEnhancers = [
+    autoRehydrate()
+  ];
+
   return storeEnhancers;
 }
 
@@ -98,5 +107,17 @@ export default angular
         url: '/rules'
       });
 
+  }])
+  .run(['$ngRedux', function($ngRedux) {
+    persistStore(
+      $ngRedux,
+      {
+        whitelist: [ 'connection' ],
+        storage: localForage,
+        transforms: [
+          immutableTransform
+        ]
+      }
+    );
   }])
   .name;

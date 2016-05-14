@@ -38,6 +38,7 @@ var ExtractTextWebpackPlugin = require('extract-text-webpack-plugin');
 
 
 var INCLUDE_FILES = [
+  path.resolve(__dirname, 'node_modules/redux-action-buffer/index.js'),
   path.resolve(__dirname, 'src')
 ];
 
