@@ -71,11 +71,11 @@ export default function connection(state = INITIAL_STATE, action) {
       // Hook which is called after state was fetched from IndexedDB (localForage)
       if(_.has(action, 'payload') &&
          _.has(action.payload, 'connection') &&
-         _.has(action.payload.connection, 'availableConnections')) {
+         action.payload.connection.has('availableConnections')) {
         availableConnections = action.payload.connection.get('availableConnections');
         action.payload.connection = action.payload.connection.set('availableConnections', availableConnections.map(availableConnection => {
           if(availableConnection.has('status')) {
-            availableConnection.set('status', STATUS_CLOSE_RECEIVED);
+            return availableConnection.set('status', STATUS_CLOSE_RECEIVED);
           }
         }));
       }
