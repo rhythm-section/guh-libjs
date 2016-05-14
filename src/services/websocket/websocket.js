@@ -23,21 +23,35 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Vendor
-import { combineReducers } from 'redux';
-import { router } from 'redux-ui-router';
+export default class Websocket {
 
-// Reducers
-import appReducer from './app-reducer';
-import websocketReducer from './websocket-reducer';
-import introReducer from './intro-reducer';
-import connectionReducer from './connection-reducer';
+  constructor() {
+    this._ws = null;
+  }
 
+  get ws() {
+    return this._ws;
+  }
 
-export default combineReducers({
-  router,
-  app: appReducer,
-  websocket: websocketReducer,
-  intro: introReducer,
-  connection: connectionReducer
-});
+  open(url) {
+    console.log('open', url);
+    if(this._ws !== null) {
+      this._ws.close();
+    }
+
+    return this._ws = new WebSocket(url);
+  }
+
+  close() {
+    console.log('close', this);
+    if(this._ws !== null) {
+      this._ws.close();
+    }
+    this._ws = null; 
+  }
+
+  send(message) {
+    console.log('message', message);
+  }
+
+}

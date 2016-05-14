@@ -24,20 +24,23 @@
 
 
 // Vendor
-import { combineReducers } from 'redux';
-import { router } from 'redux-ui-router';
+import { Record } from 'immutable';
 
-// Reducers
-import appReducer from './app-reducer';
-import websocketReducer from './websocket-reducer';
-import introReducer from './intro-reducer';
-import connectionReducer from './connection-reducer';
+// Constants
+import {
+  DEFAULT_HOST,
+  DEFAULT_PORT,
+  DEFAULT_SSL,
+  STATUS_CLOSE_RECEIVED
+} from '../constants/app-types';
 
 
-export default combineReducers({
-  router,
-  app: appReducer,
-  websocket: websocketReducer,
-  intro: introReducer,
-  connection: connectionReducer
+export const Connection = new Record({
+  id: undefined,
+  host: DEFAULT_HOST,
+  port: DEFAULT_PORT,
+  ssl: DEFAULT_SSL,
+  status: STATUS_CLOSE_RECEIVED,
+  isDefault: false,
+  isFetching: false
 });

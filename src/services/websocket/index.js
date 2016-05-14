@@ -24,20 +24,13 @@
 
 
 // Vendor
-import { combineReducers } from 'redux';
-import { router } from 'redux-ui-router';
+import angular from 'angular';
 
-// Reducers
-import appReducer from './app-reducer';
-import websocketReducer from './websocket-reducer';
-import introReducer from './intro-reducer';
-import connectionReducer from './connection-reducer';
+// Services
+import WebsocketService from './websocket-service';
 
 
-export default combineReducers({
-  router,
-  app: appReducer,
-  websocket: websocketReducer,
-  intro: introReducer,
-  connection: connectionReducer
-});
+export default angular
+  .module('websocket', [])
+  .provider('websocketService', WebsocketService)
+  .name;

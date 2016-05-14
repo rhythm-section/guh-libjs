@@ -23,21 +23,17 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Vendor
-import { combineReducers } from 'redux';
-import { router } from 'redux-ui-router';
-
-// Reducers
-import appReducer from './app-reducer';
-import websocketReducer from './websocket-reducer';
-import introReducer from './intro-reducer';
-import connectionReducer from './connection-reducer';
+import Websocket from './websocket';
 
 
-export default combineReducers({
-  router,
-  app: appReducer,
-  websocket: websocketReducer,
-  intro: introReducer,
-  connection: connectionReducer
-});
+export default class WebsocketService extends Websocket {
+
+  $get() {
+    return {
+      open: (url) => super.open(url),
+      close: () => super.close(),
+      send: (message) => super.send(message)
+    };
+  }
+
+}

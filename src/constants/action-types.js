@@ -26,6 +26,24 @@
 // App
 export const SAVE_SERVER_INFO = 'SAVE_SERVER_INFO';
 
+// Websocket
+export const OPEN_REQUEST = 'OPEN_REQUEST';
+export const OPEN_PENDING = 'OPEN_PENDING';
+export const OPEN_RECEIVED = 'OPEN_RECEIVED';
+export const CLOSE_REQUEST = 'CLOSE_REQUEST';
+export const CLOSE_PENDING = 'CLOSE_PENDING';
+export const CLOSE_RECEIVED = 'CLOSE_RECEIVED';
+export const ERROR_RECEIVED = 'ERROR_RECEIVED';
+export const MESSAGE_RECEIVED = 'MESSAGE_RECEIVED';
+export const SEND_REQUEST = 'SEND_REQUEST';
+export const SEND_PENDING = 'SEND_PENDING';
+export const SEND_RECEIVED = 'SEND_RECEIVED';
+
 // Intro
 export const ADD_STEP = 'ADD_STEP';
 export const GO_TO_STEP = 'GO_TO_STEP';
+
+// Connection
+export const ADD_CONNECTION = 'ADD_CONNECTION';
+export const REMOVE_CONNECTION = 'REMOVE_CONNECTION';
+export const CHANGE_STATUS = 'CHANGE_STATUS';

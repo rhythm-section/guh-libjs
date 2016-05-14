@@ -1,0 +1,90 @@
+<!-- 
+  Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+-->
+
+
+<div ng-class="connect.styles.element">
+  <h6>Connect</h6>
+
+  <pre>View: {{ connect.view | json }}</pre>
+
+  <div ng-show="connect.view.changeConnection">
+    <!-- Connection list -->
+    <ul class="list">
+      <li class="item" ng-repeat="connection in connect.connections track by $index">
+        <p ng-click="connect.openConnection(connection)">{{ connection.ssl ? 'wss' : 'ws' }}://{{ connection.host }}:{{ connection.port }} {{ connection.status }}</p>
+        <button type="button" ng-click="connect.closeConnection(connection)" ng-disabled="connection.status !== connect.constants.STATUS_OPEN_RECEIVED">Close</button>
+        <button type="button" ng-click="connect.editConnection(connection)" ng-disabled="connection.isDefault">Edit</button>
+        <button type="button" ng-click="connect.removeConnection(connection)" ng-disabled="connection.isDefault">Remove</button>
+      </li>
+    </ul>
+
+    <!-- Add new connection -->
+    <button type="button" ng-click="connect.addConnection()">Add</button>
+  </div>
+
+  <!-- Add new connection wizard -->
+  <div ng-show="connect.view.addConnection">
+    <form name="connect.setConnectionForm" novalidate ng-submit="connect.saveConnection(connect.setConnectionForm.$valid, connect.newConnection)">
+
+      <!-- Host -->
+      <label for="host">IP address/Host name</label>
+      <input id="host"
+             name="host"
+             required
+             type="text"
+             ng-model="connect.newConnection.host"
+             ng-model-options="{ debounce: 200 }"
+             guh-ip-host-validator />
+      <div ng-messages="connect.setConnectionForm.host.$error" ng-show="connect.setConnectionForm.host.$dirty && connect.setConnectionForm.host.$invalid">
+        <p ng-message="required">IP address or host name is required.</p>
+        <p ng-message="ipHost">Entered IP address (v4) or host name not valid.</p>
+      </div>
+
+      <!-- Port, SSL -->
+      <label for="port">Port</label>
+      <input id="port"
+             name="port"
+             required
+             type="number"
+             ng-model="connect.newConnection.port"
+             ng-model-options="{ debounce: 200 }"
+             ng-min="0"
+             ng-max="65535" />
+      <div ng-messages="connect.setConnectionForm.port.$error" ng-show="connect.setConnectionForm.port.$dirty && connect.setConnectionForm.port.$invalid">
+        <p ng-message="required">Port is required.</p>
+        <p ng-message="number">Port has to be a number.</p>
+        <p ng-message="min">The port number has to be between 0 and 65535.</p>
+        <p ng-message="max">The port number has to be between 0 and 65535.</p>
+      </div>
+
+      <div class="input input_type_checkbox">
+        <input id="ssl"
+               name="ssl"
+               type="checkbox"
+               ng-model="connect.newConnection.ssl" />
+        <label for="ssl">SSL</label>
+      </div>
+      
+      <button type="submit" ng-disabled="!connect.setConnectionForm.$valid">Save</button>
+    </form>
+  </div>
+</div>

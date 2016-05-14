@@ -23,21 +23,55 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Vendor
-import { combineReducers } from 'redux';
-import { router } from 'redux-ui-router';
+import { expect } from 'chai';
+import { should } from 'chai';
 
-// Reducers
-import appReducer from './app-reducer';
-import websocketReducer from './websocket-reducer';
-import introReducer from './intro-reducer';
-import connectionReducer from './connection-reducer';
+import ConnectController from './connect-controller';
+import styles from './connect.scss';
 
+let controller;
 
-export default combineReducers({
-  router,
-  app: appReducer,
-  websocket: websocketReducer,
-  intro: introReducer,
-  connection: connectionReducer
+describe('ConnectController', () => {
+
+  beforeEach(function() {
+    controller = new ConnectController(styles);
+  });
+
+  // constructor()
+  // it('should have a connections array', () => {
+  //   controller
+  //     .should.have.property('connections')
+  //     .that.is.an('array');
+  // });
+
+  // it('should have a default connection inside the connections array', () => {
+  //   controller.connections.length.should.equal(1);
+  //   controller.connections[0].protocol.should.equal('ws');
+  //   controller.connections[0].host.should.equal('localhost');
+  //   controller.connections[0].port.should.equal(4444);
+  // });
+
+  // it('should have a newConnection object', () => {
+  //   controller
+  //     .should.have.property('newConnection')
+  //     .that.is.an('object')
+  //     .that.deep.equals({});
+  // });
+
+  // // addConnection()
+  // describe('#addConnection()', () => {
+  //   it('should set/reset the newConnection object', () => {
+  //     controller.addConnection();
+
+  //     controller
+  //       .should.have.property('newConnection')
+  //       .that.is.an('object')
+  //       .that.deep.equals({
+  //         protocol: 'ws',
+  //         host: '',
+  //         port: 0
+  //       });
+  //   });
+  // });
+
 });

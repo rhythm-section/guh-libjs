@@ -24,20 +24,56 @@
 
 
 // Vendor
-import { combineReducers } from 'redux';
-import { router } from 'redux-ui-router';
+import _ from 'lodash';
+import { Map } from 'immutable';
 
-// Reducers
-import appReducer from './app-reducer';
-import websocketReducer from './websocket-reducer';
-import introReducer from './intro-reducer';
-import connectionReducer from './connection-reducer';
+// Constants
+import {
+  OPEN_REQUEST,
+  OPEN_PENDING,
+  OPEN_RECEIVED,
+  CLOSE_REQUEST,
+  CLOSE_PENDING,
+  CLOSE_RECEIVED,
+  ERROR_RECEIVED,
+  MESSAGE_RECEIVED,
+  SEND_REQUEST,
+  SEND_PENDING,
+  SEND_RECEIVED
+} from '../constants/action-types';
+import * as connectionConstants from '../constants/app-types';
 
-
-export default combineReducers({
-  router,
-  app: appReducer,
-  websocket: websocketReducer,
-  intro: introReducer,
-  connection: connectionReducer
+const INITIAL_STATE = Map({
+  status: connectionConstants.STATUS_CLOSE_RECEIVED
 });
+
+
+export default function websocket(state = INITIAL_STATE, action = {}) {
+
+  if(!action && !action.type) {
+    return state;
+  }
+
+  switch(action.type) {
+
+    case OPEN_REQUEST:
+    case OPEN_PENDING:
+    case OPEN_RECEIVED:
+    case CLOSE_REQUEST:
+    case CLOSE_PENDING:
+    case CLOSE_RECEIVED:
+    case ERROR_RECEIVED:
+      if(state.has('status') && _.has(action, 'meta') && _.has(action.meta, 'status')) {
+        state = state.set('status', action.meta.status);
+      }
+      return state;
+
+    case MESSAGE_RECEIVED:
+      console.log('websocket message received', state, action);
+      return state;
+
+    default:
+      return state;
+
+  }
+}

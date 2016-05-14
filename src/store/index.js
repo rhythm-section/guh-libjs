@@ -31,14 +31,20 @@ import ngReduxRouter from 'redux-ui-router';
 
 // Store
 import reducer from '../reducers';
-import logger from './store-logger-config';
 import thunkMiddleware from 'redux-thunk';
+import logger from './store-logger-config';
+import createWebsocketMiddleware from '../middleware/websocket-middleware';
+
+// Services
+import websocketService from '../services/websocket/websocket-service';
 
 
-function _getMiddleware() {
+function _getMiddleware(websocketServiceProvider) {
+  let websocketMiddleware = createWebsocketMiddleware(websocketServiceProvider);
   let middleware = [
     'ngUiRouterMiddleware',
-    thunkMiddleware
+    thunkMiddleware,
+    websocketMiddleware
   ];
 
   if(__DEV__) {
@@ -62,12 +68,13 @@ export default angular
     ngRedux,
     ngReduxRouter
   ])
-  .config(['$ngReduxProvider', '$urlRouterProvider', '$stateProvider', ($ngReduxProvider, $urlRouterProvider, $stateProvider) => {
+  .provider('websocketService', websocketService)
+  .config(['$ngReduxProvider', '$urlRouterProvider', '$stateProvider', 'websocketServiceProvider', ($ngReduxProvider, $urlRouterProvider, $stateProvider, websocketServiceProvider) => {
 
     // Store
     $ngReduxProvider.createStoreWith(
       reducer,
-      _getMiddleware(),
+      _getMiddleware(websocketServiceProvider),
       _getStoreEnhancers()
     );
 

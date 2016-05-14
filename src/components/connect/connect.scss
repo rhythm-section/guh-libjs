@@ -23,21 +23,36 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Vendor
-import { combineReducers } from 'redux';
-import { router } from 'redux-ui-router';
+// @import 'reset-css/reset.css';
+@import 'bourbon';
 
-// Reducers
-import appReducer from './app-reducer';
-import websocketReducer from './websocket-reducer';
-import introReducer from './intro-reducer';
-import connectionReducer from './connection-reducer';
+$grey: #676767;
 
 
-export default combineReducers({
-  router,
-  app: appReducer,
-  websocket: websocketReducer,
-  intro: introReducer,
-  connection: connectionReducer
-});
+.element {
+
+  svg {
+    display: none;
+  }
+
+
+//   ul {
+//     list-style-type: none;
+//     // composes: padding from "./shared/styles/layout.scss";
+//   }
+
+//   li {
+
+//   }
+
+
+//   label,
+//   input {
+//     display: block;
+//   }
+
+//   input {
+//     // @include appearance(none);
+//     border: 1px solid lighten($grey, 50%);
+//   }
+}

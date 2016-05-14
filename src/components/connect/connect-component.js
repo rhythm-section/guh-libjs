@@ -23,21 +23,29 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Vendor
-import { combineReducers } from 'redux';
-import { router } from 'redux-ui-router';
+// Controller
+import controller from './connect-controller';
 
-// Reducers
-import appReducer from './app-reducer';
-import websocketReducer from './websocket-reducer';
-import introReducer from './intro-reducer';
-import connectionReducer from './connection-reducer';
+// Template
+import template from './connect.html';
 
 
-export default combineReducers({
-  router,
-  app: appReducer,
-  websocket: websocketReducer,
-  intro: introReducer,
-  connection: connectionReducer
-});
+const connectComponent = {
+  bindings: {
+    // Inputs
+    availableConnections: '<',
+    activeConnection: '<',
+    isFetching: '<',
+
+    // Outputs
+    onAddConnection: '&',
+    onRemoveConnection: '&',
+    onOpenConnection: '&',
+    onCloseConnection: '&'
+  },
+  controller: controller,
+  controllerAs: 'connect',
+  template
+};
+
+export default connectComponent;

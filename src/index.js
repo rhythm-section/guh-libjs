@@ -27,18 +27,24 @@
 import 'es5-shim';
 import 'es6-shim';
 
+// Angular
+import angular from 'angular';
+
 // Constants
 import * as actionTypes from './constants/action-types';
+import * as appTypes from './constants/app-types';
 
 // Modules
 import store from './store';
 
 // Actions
 import * as appActions from './actions/app-actions';
+import * as websocketActions from './actions/websocket-actions';
 import * as introActions from './actions/intro-actions';
+import * as connectionActions from './actions/connection-actions';
 
-// Angular
-import angular from 'angular';
+// Components
+import connectComponent from './components/connect/connect-component';
 
 
 export default angular
@@ -48,7 +54,20 @@ export default angular
   .name;
 
 
+export const constants = {
+  actionTypes,
+  appTypes
+};
+
+
 export const actions = {
   app: appActions,
-  intro: introActions
+  websocket: websocketActions,
+  intro: introActions,
+  connection: connectionActions
 };
+
+
+export const components = {
+  connect: connectComponent
+}

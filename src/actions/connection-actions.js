@@ -23,21 +23,38 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Vendor
-import { combineReducers } from 'redux';
-import { router } from 'redux-ui-router';
-
-// Reducers
-import appReducer from './app-reducer';
-import websocketReducer from './websocket-reducer';
-import introReducer from './intro-reducer';
-import connectionReducer from './connection-reducer';
+// Constants
+import {
+  ADD_CONNECTION,
+  REMOVE_CONNECTION,
+  CHANGE_STATUS
+} from '../constants/action-types';
 
 
-export default combineReducers({
-  router,
-  app: appReducer,
-  websocket: websocketReducer,
-  intro: introReducer,
-  connection: connectionReducer
-});
+export function addConnection(newConnection) {
+  return {
+    type: ADD_CONNECTION,
+    payload: {
+      newConnection
+    }
+  };
+}
+
+export function removeConnection(id) {  
+  return {
+    type: REMOVE_CONNECTION,
+    payload: {
+      id
+    }
+  };
+}
+
+export function changeStatus(id, status) {
+  return {
+    type: CHANGE_STATUS,
+    payload: {
+      id,
+      status
+    }
+  };
+}

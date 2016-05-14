@@ -23,21 +23,26 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Vendor
-import { combineReducers } from 'redux';
-import { router } from 'redux-ui-router';
+/*
+ * Connection
+ */
 
-// Reducers
-import appReducer from './app-reducer';
-import websocketReducer from './websocket-reducer';
-import introReducer from './intro-reducer';
-import connectionReducer from './connection-reducer';
+export const DEFAULT_HOST = 'localhost';
+export const DEFAULT_PORT = 8080;
+export const DEFAULT_SSL = false;
+
+export const STATUS_OPEN_REQUEST = 'open';
+export const STATUS_OPEN_PENDING = 'opening';
+export const STATUS_OPEN_RECEIVED = 'opened';
+export const STATUS_CLOSE_REQUEST = 'close';
+export const STATUS_CLOSE_PENDING = 'closing';
+export const STATUS_CLOSE_RECEIVED = 'closed';
+export const STATUS_ERROR_RECEIVED = 'error';
 
 
-export default combineReducers({
-  router,
-  app: appReducer,
-  websocket: websocketReducer,
-  intro: introReducer,
-  connection: connectionReducer
-});
+/*
+ * Intro
+ */
+
+export const STEP_CONNECT = 'connect';
+export const STEP_LOAD = 'load';
