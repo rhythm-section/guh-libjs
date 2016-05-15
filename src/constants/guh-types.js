@@ -23,35 +23,20 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-export default class Websocket {
+/*
+ * Notifications
+ */
 
-  constructor() {
-    this._ws = null;
-  }
+export const DEVICES_DEVICE_ADDED = 'Devices.DeviceAdded';
+export const DEVICES_DEVICE_CHANGED = 'Devices.DeviceChanged';
+export const DEVICES_DEVICE_REMOVED = 'Devices.DeviceRemoved';
 
-  get ws() {
-    return this._ws;
-  }
+export const EVENTS_EVENT_TRIGGERED = 'Events.EventTriggered';
 
-  open(url) {
-    if(this._ws !== null) {
-      this._ws.close();
-    }
-    return this._ws = new WebSocket(url);
-  }
+export const LOGGING_LOG_DATABASE_UPDATED = 'Logging.LogDatabaseUpdated';
+export const LOGGING_LOG_ENTRY_ADDED = 'Logging.LogEntryAdded';
 
-  close() {
-    if(this._ws !== null) {
-      this._ws.close();
-    }
-    this._ws = null; 
-  }
-
-  send(message) {
-    if(this._ws === null) {
-      return;
-    }
-    this._ws.send(JSON.stringify(message));
-  }
-
-}
+export const RULES_RULE_ACTIVE_CHANGED = 'Rules.RuleActiveChanged ';
+export const RULES_RULE_ADDED = 'Rules.RuleAdded';
+export const RULES_RULE_CONFIGURATION_CHANGED = 'Rules.RuleConfigurationChanged';
+export const RULES_RULE_REMOVED = 'Rules.RuleRemoved';

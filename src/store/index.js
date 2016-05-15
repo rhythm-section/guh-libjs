@@ -48,8 +48,8 @@ function _getMiddleware(websocketServiceProvider) {
   let websocketMiddleware = createWebsocketMiddleware(websocketServiceProvider);
   let middleware = [
     'ngUiRouterMiddleware',
-    thunkMiddleware,
     websocketMiddleware,
+    thunkMiddleware,
     createActionBuffer(REHYDRATE)
   ];
 

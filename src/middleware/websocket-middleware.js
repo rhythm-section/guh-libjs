@@ -49,6 +49,20 @@ import {
   STEP_LOAD
 } from '../constants/app-types';
 
+import {
+  DEVICES_DEVICE_ADDED,
+  DEVICES_DEVICE_CHANGED,
+  DEVICES_DEVICE_REMOVED,
+  EVENTS_EVENT_TRIGGERED,
+  LOGGING_LOG_DATABASE_UPDATED,
+  LOGGING_LOG_ENTRY_ADDED,
+  RULES_RULE_ACTIVE_CHANGED,
+  RULES_RULE_ADDED,
+  RULES_RULE_CONFIGURATION_CHANGED,
+  RULES_RULE_REMOVED
+} from '../constants/guh-types';
+
+
 // Actions
 import * as appActions from '../actions/app-actions';
 import * as websocketActions from '../actions/websocket-actions';
@@ -57,6 +71,7 @@ import * as connectionActions from '../actions/connection-actions';
 
 
 export default function createWebsocketMiddleware(websocketService) {
+
   return ({ dispatch, getState }) => (next) => (action) => {
     if(typeof action === 'function') {
       return action({ dispatch, getState, websocketService });
@@ -81,8 +96,15 @@ export default function createWebsocketMiddleware(websocketService) {
 
     const onMessage = (dispatch) => message => {
       let data = JSON.parse(message.data);
+      
+      if(_.has(data.notification)) {
+        console.log('notification received', data.notification);
+      } else if(_.has(data.id) &&
+        data.id === 0) {
+        // Apply initial handshake
+        dispatch(appActions.saveServerInfo(data));
+      }
 
-      dispatch(appActions.saveServerInfo(data));
       dispatch(websocketActions.receivedMessage(data));
     }
 
