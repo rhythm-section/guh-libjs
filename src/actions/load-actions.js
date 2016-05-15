@@ -23,23 +23,100 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// Vendor
-import { combineReducers } from 'redux';
-import { router } from 'redux-ui-router';
+// Constants
+import {
+  LOAD_DATA_REQUEST,
+  LOAD_DATA_PENDING,
+  LOAD_DATA_RECEIVED,
+  ADD_DATA_PART_TYPES,
+  LOAD_DATA_PART_REQUEST,
+  LOAD_DATA_PART_PENDING,
+  LOAD_DATA_PART_RECEIVED
+} from '../constants/action-types';
 
-// Reducers
-import appReducer from './app-reducer';
-import websocketReducer from './websocket-reducer';
-import introReducer from './intro-reducer';
-import connectionReducer from './connection-reducer';
-import loadReducer from './load-reducer';
+// Actions
+// import DevicesActions from './devices-actions.js';
 
 
-export default combineReducers({
-  router,
-  app: appReducer,
-  websocket: websocketReducer,
-  intro: introReducer,
-  connection: connectionReducer,
-  load: loadReducer
-});
+export default class LoadActions {
+
+  constructor() {
+  // constructor(DevicesActions) {
+    // this.devicesActions = DevicesActions;
+  }
+
+  loadData(dataPartTypes) {
+    return (dispatch) => {
+      // dispatch(this.devicesActions.getSupportedDevices());
+
+      return {
+        type: LOAD_DATA_PENDING
+      };
+    };
+    // console.log('loadData()', dataPartTypes);
+    // dispatch(loadDataPending());
+  }
+
+}
+
+LoadActions.$inject = [];
+// LoadActions.$inject = ['DevicesActions'];
+
+
+// export function loadDataRequest(dataPartTypes) {
+//   return dispatch => {
+//     dispatch(loadDataPending());
+//     dispatch(addDataPartTypes(dataPartTypes));
+
+//     dataPartTypes.map(dataPartType => dispatch(loadDataPartRequest(dataPartType)));
+//   };
+// }
+
+// export function loadDataPending() {
+//   return {
+//     type: LOAD_DATA_PENDING
+//   };
+// }
+
+// export function loadDataReceived() {
+//   return {
+//     type: LOAD_DATA_RECEIVED
+//   };
+// }
+
+// export function addDataPartTypes(dataPartTypes) {
+//   return {
+//     type: ADD_DATA_PART_TYPES,
+//     payload: {
+//       dataPartTypes
+//     }
+//   };
+// }
+
+// export function loadDataPartRequest(currentDataPartType) {
+//   return dispatch => {
+//     loadDataPartPending(currentDataPartType);
+
+//     if(currentDataPartType === 'devices') {
+//       dispatch(DevicesActions.getSupportedDevices());
+//     }
+//   };
+// }
+
+// export function loadDataPartPending(currentDataPartType) {
+//   return {
+//     type: LOAD_DATA_PART_PENDING,
+//     payload: {
+//       currentDataPartType
+//     }
+//   };
+// }
+
+// export function loadDataPartReceived(currentDataPartType) {
+//   return {
+//     type: LOAD_DATA_PART_RECEIVED,
+//     payload: {
+//       currentDataPartType
+//     }
+//   };
+// }

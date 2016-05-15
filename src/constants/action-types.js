@@ -23,10 +23,14 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
-// App
+/*
+ * App
+ */
 export const SAVE_SERVER_INFO = 'SAVE_SERVER_INFO';
 
-// Websocket
+/*
+ * Websocket
+ */
 export const OPEN_REQUEST = 'OPEN_REQUEST';
 export const OPEN_PENDING = 'OPEN_PENDING';
 export const OPEN_RECEIVED = 'OPEN_RECEIVED';
@@ -39,11 +43,26 @@ export const SEND_REQUEST = 'SEND_REQUEST';
 export const SEND_PENDING = 'SEND_PENDING';
 export const SEND_RECEIVED = 'SEND_RECEIVED';
 
-// Intro
+/*
+ * Intro
+ */
 export const ADD_STEP = 'ADD_STEP';
 export const GO_TO_STEP = 'GO_TO_STEP';
 
-// Connection
+/*
+ * Connection
+ */
 export const ADD_CONNECTION = 'ADD_CONNECTION';
 export const REMOVE_CONNECTION = 'REMOVE_CONNECTION';
 export const CHANGE_STATUS = 'CHANGE_STATUS';
+
+/*
+ * Load
+ */
+export const LOAD_DATA_REQUEST = 'LOAD_DATA_REQUEST';
+export const LOAD_DATA_PENDING = 'LOAD_DATA_PENDING';
+export const LOAD_DATA_RECEIVED = 'LOAD_DATA_RECEIVED';
+export const ADD_DATA_PART_TYPES = 'ADD_DATA_PART_TYPES';
+export const LOAD_DATA_PART_REQUEST = 'LOAD_DATA_PART_REQUEST';
+export const LOAD_DATA_PART_PENDING = 'LOAD_DATA_PART_PENDING';
+export const LOAD_DATA_PART_RECEIVED = 'LOAD_DATA_PART_RECEIVED';

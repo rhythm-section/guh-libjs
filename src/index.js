@@ -42,6 +42,7 @@ import * as appActions from './actions/app-actions';
 import * as websocketActions from './actions/websocket-actions';
 import * as introActions from './actions/intro-actions';
 import * as connectionActions from './actions/connection-actions';
+import LoadActions from './actions/load-actions';
 
 // Components
 import connectComponent from './components/connect/connect-component';
@@ -64,10 +65,11 @@ export const actions = {
   app: appActions,
   websocket: websocketActions,
   intro: introActions,
-  connection: connectionActions
+  connection: connectionActions,
+  load: LoadActions
 };
 
 
 export const components = {
   connect: connectComponent
-}
+};
