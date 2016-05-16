@@ -113,9 +113,6 @@
               var deviceId = data.params.deviceId;
               var stateTypeId = data.params.stateTypeId;
               var value = data.params.value;
-
-              $log.log('state changed', data);
-
               DS.inject('state', {
                 id: '' + deviceId + '_' + stateTypeId,
                 deviceId: deviceId,
@@ -196,11 +193,12 @@
               // $log.warn('Type of notification not handled:', data);
           }
 
-        } else if(angular.isDefined(data.authenticationRequired)) {
+        // } else if(angular.isDefined(data.authenticationRequired)) {
+        } else if(angular.isDefined(data.id) && data.id === 0) {
           $rootScope.$apply(function() {
             $rootScope.$broadcast('InitialHandshake', data);
           });
-        } else if(callbacks.hasOwnProperty(data.id)) {
+        } else if(angular.isDefined(data.id)) {
           if(data.status === 'success') {
             if(angular.isDefined(data.params.deviceError) && data.params.deviceError !== 'DeviceErrorNoError') {
               $rootScope.$apply(callbacks[data.id].callback.reject(data.params.deviceError));
