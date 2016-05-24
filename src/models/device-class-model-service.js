@@ -189,13 +189,7 @@
     function _getInputPath(name, filename) {
       var classType = _getClassType(name);
 
-      if(classType === 'device' || classType === 'gateway') {
-        return app.basePaths.devices + 'detail/device-class-templates/' + filename + app.fileExtensions.html;
-      } else if(classType === 'service' || classType === 'dev-service') {
-        return app.basePaths.services + 'detail/device-class-templates/' + filename + app.fileExtensions.html;
-      } else {
-        return '';
-      }
+      return 'app/containers/thing-details/device-class-templates/' + filename + app.fileExtensions.html;
     }
 
     /*
@@ -444,7 +438,7 @@
         method: 'Devices.GetDiscoveredDevices',
         params: {
           deviceClassId: self.id,
-          discoveryParams: angular.toJson(discoveryParams)
+          discoveryParams: discoveryParams
         }
       });
     }
