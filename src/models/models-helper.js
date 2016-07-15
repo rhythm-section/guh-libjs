@@ -34,121 +34,12 @@
   function modelsHelper($log, $q, DS, File, app) {
 
     var modelsHelper = {
-      addUiData: addUiData,
       checkTemplateUrl: checkTemplateUrl,
       setBasePath: setBasePath
     };
 
     return modelsHelper;
 
-
-    /*
-     * Private method: _getInputPath(directiveName, filename)
-     */
-    function _getInputPath(folderName, directiveName, filename) {
-      if(directiveName) {
-        return app.basePaths.ui + folderName + '/' + directiveName + '-templates/' + filename + app.fileExtensions.html;
-      } else {
-        return app.basePaths.ui + folderName + '/templates/' + filename + app.fileExtensions.html;
-      }
-    }
-
-    /*
-     * Private method: _getActionTemplates(actionType)
-     */
-    function _getActionTemplate(actionType) {
-      var paramTypes = (actionType.paramTypes === undefined) ? null : actionType.paramTypes;
-      var folderName = 'form';
-      var directiveName = 'form-field';
-
-      if(angular.isArray(paramTypes)) {
-        if(paramTypes.length === 0) {
-          actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-button');
-        } else {
-          actionType.templateUrl = undefined;
-        }
-        // if(paramTypes.length <= 0) {
-        //   // ActionType
-        //   actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
-        // } else if(paramTypes.length === 1) {
-        //   // ActionType
-        //   actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-default');
-
-        //   // ParamType
-        //   // paramTypes[0].templateUrl = _getInputTemplate(paramTypes[0], true);
-        // } else if(paramTypes.length > 1) {
-        //   // ActionType
-        //   actionType.templateUrl = _getInputPath(folderName, directiveName, directiveName + '-execute');
-
-        //   // ParamTypes
-        //   // angular.forEach(paramTypes, function(paramType, index) {
-        //   //   actionType.paramTypes[index].templateUrl = _getInputTemplate(paramType, true);
-        //   // });
-        // }
-      } else {
-        $log.warn('guh.models.modelsHelper | The property paramTypes is not of type Array.', guhType);
-      }
-    }
-
-    /*
-     * Private method: _getInputTemplate(guhType, isChildOfActionType)
-     * guhType can be of type: ParamType, StateType
-     */
-    function _getInputTemplate(guhType, isChildOfActionType) {
-      var allowedValues = (guhType.allowedValues === undefined) ? null : guhType.allowedValues;
-      var possibleValues = (guhType.possibleValues === undefined) ? null : guhType.possibleValues;
-      var inputType = (guhType.inputType === undefined) ? null : guhType.inputType;
-      var type = (guhType.type === undefined) ? null : guhType.type;
-      var folderName = 'form';
-      var directiveName = 'form-field';
-      var template;
-
-      switch(type) {
-        case 'Bool':
-          if(isChildOfActionType) {
-            template = _getInputPath(folderName, directiveName, directiveName + '-toggle-button');
-          } else {
-            template = _getInputPath(folderName, directiveName, directiveName + '-checkbox');
-          }
-          break;
-        case 'Int':
-        case 'Uint':
-          if(isChildOfActionType) {
-            template = _getInputPath(folderName, directiveName, directiveName + '-range');
-          } else {
-            template = _getInputPath(folderName, directiveName, directiveName + '-number-integer');
-          }
-          break;
-        case 'Double':
-          if(isChildOfActionType) {
-            template = _getInputPath(folderName, directiveName, directiveName + '-range');
-          } else {
-            template = _getInputPath(folderName, directiveName, directiveName + '-number-decimal');
-          }
-          break;
-        case 'Color':
-          template = _getInputPath(folderName, directiveName, directiveName + '-color');
-          break;
-        case 'String':
-          if(allowedValues || possibleValues) {
-            if(isChildOfActionType) {
-              template = _getInputPath(folderName, directiveName, directiveName + '-select');
-            } else {
-              template = _getInputPath(folderName, directiveName, directiveName + '-select');
-            }
-          } else if(inputType) {
-            template = _getInputPath(folderName, directiveName, directiveName + app.inputTypes[inputType]);
-          } else {
-            template = _getInputPath(folderName, directiveName, directiveName + '-text');
-          }
-          break;
-        default:
-          template = _getInputPath(folderName, directiveName, 'template-not-available');
-          // template = null;
-      }
-
-      return template;
-    }
 
     /*
      * Private method: _getValue(guhType)
@@ -181,37 +72,7 @@
 
       return value;
     }
-
-
-    /*
-     * Public method: addUiData(guhType)
-     * guhType can be of type: ActionType, StateType, ParamType
-     */
-    function addUiData(guhType, isChildOfActionType) {
-      var type;
-
-      if(DS.is('actionType', guhType)) {
-        guhType.actionTemplateUrl = _getActionTemplate(guhType);
-        type = 'actionType';
-        // _setActionTemplates(guhType);
-      } else if(DS.is('stateType', guhType)) {
-        isChildOfActionType = false;
-        guhType.inputTemplateUrl = _getInputTemplate(guhType, isChildOfActionType);
-        // guhType.operator = app.valueOperator.is.operators[0];
-        // guhType.value = _getValue(guhType);
-        type = 'stateType';
-        // guhType.templateUrl = _getInputTemplate(guhType);
-      } else {
-        guhType.inputTemplateUrl = _getInputTemplate(guhType, isChildOfActionType);
-        // guhType.value = _getValue(guhType);
-        type = 'paramType';
-        // guhType.templateUrl = _getInputTemplate(guhType);
-      }
-
-      // $log.log('Template of ' + type + ' [' + guhType.name + ' / ' + guhType.type + ']: ', guhType.templateUrl);
-
-      return guhType;
-    }
+    
 
     /*
      * Public method: checkTemplateUrl(templateUrl)

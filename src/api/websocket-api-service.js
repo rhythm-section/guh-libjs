@@ -29,9 +29,9 @@
     .module('guh.api')
     .factory('websocketService', websocketService);
 
-  websocketService.$inject = ['$log', '$rootScope', '$q', 'libs', 'app', 'DS'];
+  websocketService.$inject = ['$log', '$rootScope', '$q', 'DS'];
 
-  function websocketService($log, $rootScope, $q, libs, app, DS) {
+  function websocketService($log, $rootScope, $q, DS) {
 
     var ws = null;
     var callbacks = {};
@@ -69,16 +69,18 @@
     /*
      * Public method: connect()
      */
-    function connect() {
+    function connect(url) {
       if(ws) {
         return;
       }
 
-      ws = new WebSocket(app.websocketUrl);
+      if(angular.isUndefined(url)) {
+        $log.error('guh.api.websocketService:factory', 'Missing argument: url');
+      }
+
+      ws = new WebSocket(url);
 
       ws.onopen = function(event) {
-        $log.log('Successfully connected with websocket.', ws, event);
-
         // Send broadcast event
         $rootScope.$apply(function() {
           $rootScope.$broadcast('WebsocketConnected', 'Successful connected to guh.');
@@ -86,8 +88,6 @@
       };
 
       ws.onclose = function(event) {
-        $log.log('Closed websocket connection.', ws, event);
-
         // Send broadcast event
         $rootScope.$apply(function() {
           $rootScope.$broadcast('WebsocketConnectionLost', 'The app has lost the connection to guh. Please check if you are connected to your network and if guh is running correctly.');
@@ -95,8 +95,6 @@
       };
 
       ws.onerror = function(event) {
-        $log.error('There was an error with the websocket connection.', ws, event);
-
         // Send broadcast event
         $rootScope.$apply(function() {
           $rootScope.$broadcast('WebsocketConnectionError', 'There was an error connecting to guh.');
@@ -108,21 +106,8 @@
 
         if(angular.isDefined(data.notification)) {
           switch(data.notification) {
-            // Devices.StateChanged
-            case app.notificationTypes.devices.stateChanged:
-              var deviceId = data.params.deviceId;
-              var stateTypeId = data.params.stateTypeId;
-              var value = data.params.value;
-              DS.inject('state', {
-                id: '' + deviceId + '_' + stateTypeId,
-                deviceId: deviceId,
-                stateTypeId: stateTypeId,
-                value: value
-              });
-              break;
-
             // Devices.DeviceAdded
-            case app.notificationTypes.devices.deviceAdded:
+            case 'Devices.DeviceAdded':
               var deviceId = data.params.device.id;
               var device = DS.get('device', deviceId);
 
@@ -137,32 +122,51 @@
 
               break;
 
+
+            // TODO: Devices.DeviceChanged
+
+
             // Devices.DeviceRemoved
-            case app.notificationTypes.devices.deviceRemoved:
+            case 'Devices.DeviceRemoved':
               var deviceId = data.params.deviceId;
               var ejectedItem = DS.eject('device', deviceId);
 
               if(angular.isDefined(ejectedItem)) {
                 // Send broadcast event
-                $rootScope.$broadcast('ReloadView', 'Device was removed.');
+                $rootScope.$broadcast('ReloadView', 'Device was removed.', ejectedItem);
               }
 
               break;
 
-            // Rules.ConfigurationChanged
-            case app.notificationTypes.rules.ruleConfigurationChanged:
-              var rule = data.params.rule;
-              var injectedItem = DS.inject('rule', rule);
 
-              // Send broadcast event
-              if(DS.is('rule', injectedItem)) {
-                $rootScope.$broadcast('ReloadView', injectedItem.name + ' was updated.');
-              }
-
+            // Devices.StateChanged
+            case 'Devices.StateChanged':
+              var deviceId = data.params.deviceId;
+              var stateTypeId = data.params.stateTypeId;
+              var value = data.params.value;
+              DS.inject('state', {
+                id: '' + deviceId + '_' + stateTypeId,
+                deviceId: deviceId,
+                stateTypeId: stateTypeId,
+                value: value
+              });
               break;
+
+
+            // TODO: Events.EventTriggered
+
+
+            // TODO: Logging.LogDatabaseUpdated
+
+
+            // TODO: Logging.LogEntryAdded
+
+
+            // TODO: Rules.RuleActiveChanged
+
 
             // Rules.RuleAdded
-            case app.notificationTypes.rules.ruleAdded:
+            case 'Rules.RuleAdded':
               var ruleId = data.params.rule.id;
               var rule = DS.get('rule', ruleId);
 
@@ -177,8 +181,22 @@
 
               break;
 
+
+            // Rules.ConfigurationChanged
+            case 'Rules.ConfigurationChanged':
+              var rule = data.params.rule;
+              var injectedItem = DS.inject('rule', rule);
+
+              // Send broadcast event
+              if(DS.is('rule', injectedItem)) {
+                $rootScope.$broadcast('ReloadView', injectedItem.name + ' was updated.');
+              }
+
+              break;
+
+
             // Rules.RuleRemoved
-            case app.notificationTypes.rules.ruleRemoved:
+            case 'Rules.RuleRemoved':
               var ruleId = data.params.ruleId;
               var ejectedItem = DS.eject('rule', ruleId);
 
@@ -188,6 +206,7 @@
               }
 
               break;
+
 
             default:
               // $log.warn('Type of notification not handled:', data);
@@ -201,11 +220,11 @@
         } else if(angular.isDefined(data.id)) {
           if(data.status === 'success') {
             if(angular.isDefined(data.params.deviceError) && data.params.deviceError !== 'DeviceErrorNoError') {
-              $rootScope.$apply(callbacks[data.id].callback.reject(data.params.deviceError));
+              $rootScope.$apply(callbacks[data.id].callback.reject(data.params));
             } else if(angular.isDefined(data.params.loggingError) && data.params.loggingError !== 'LoggingErrorNoError') {
-              $rootScope.$apply(callbacks[data.id].callback.reject(data.params.loggingError));
+              $rootScope.$apply(callbacks[data.id].callback.reject(data.params));
             } else if(angular.isDefined(data.params.ruleError) && data.params.ruleError !== 'RuleErrorNoError') {
-              $rootScope.$apply(callbacks[data.id].callback.reject(data.params.ruleError));
+              $rootScope.$apply(callbacks[data.id].callback.reject(data.params));
             } else {
               $rootScope.$apply(callbacks[data.id].callback.resolve(data.params));
             }
@@ -219,11 +238,11 @@
     }
 
     /*
-     * Public method: reconnect()
+     * Public method: reconnect(url)
      */
-    function reconnect() {
+    function reconnect(url) {
       websocketService.close();
-      websocketService.connect();
+      websocketService.connect(url);
     }
 
     /*

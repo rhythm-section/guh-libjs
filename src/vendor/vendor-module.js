@@ -26,18 +26,11 @@
   'use strict';
 
   angular
-    .module('guh.models', [
-      // Datastore
-      'js-data'
-    ])
+    .module('guh.vendor', [])
     .config(config);
 
-  config.$inject = ['DSProvider'];
+  config.$inject = [];
 
-  function config(DSProvider) {
-    DSProvider
-      .defaults
-      .debug = false;
-  }
+  function config() {}
 
 }());

@@ -30,9 +30,9 @@
     .factory('DSDevice', DSDeviceFactory)
     .run(function(DSDevice) {});
 
-  DSDeviceFactory.$inject = ['$log', '$q', 'DS', 'libs', 'app', 'websocketService'];
+  DSDeviceFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
 
-  function DSDeviceFactory($log, $q, DS, libs, app, websocketService) {
+  function DSDeviceFactory($log, $q, DS, websocketService) {
     
     var staticMethods = {};
 
@@ -142,7 +142,6 @@
 
       angular.forEach(states, function(state, index) {
         var ejectedItem = DS.eject('state', '' + deviceId + '_' + state.stateTypeId);
-        $log.log('ejected state', ejectedItem);
       });
     }
 
@@ -298,7 +297,9 @@
       };
 
       if(angular.isDefined(params) && params !== {}) {
-        jsonRpcParams.params = params;
+        angular.forEach(params, function(value, key) {
+          jsonRpcParams[key] = value;
+        });
       }
 
       return websocketService.send({

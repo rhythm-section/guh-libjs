@@ -30,9 +30,9 @@
     .factory('DSRule', DSRuleFactory)
     .run(function(DSRule) {});
 
-  DSRuleFactory.$inject = ['$log', '$q', 'app', 'DS', 'websocketService'];
+  DSRuleFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
 
-  function DSRuleFactory($log, $q, app, DS, websocketService) {
+  function DSRuleFactory($log, $q, DS, websocketService) {
     
     var staticMethods = {};
 

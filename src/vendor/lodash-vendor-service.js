@@ -26,18 +26,19 @@
   'use strict';
 
   angular
-    .module('guh.models', [
-      // Datastore
-      'js-data'
-    ])
-    .config(config);
+    .module('guh.vendor')
+    .factory('_', lodashService);
 
-  config.$inject = ['DSProvider'];
+  lodashService.$inject = ['$log', '$window'];
 
-  function config(DSProvider) {
-    DSProvider
-      .defaults
-      .debug = false;
+  function lodashService($log, $window) {
+
+    if(!$window._) {
+      $log.error('guh.vendor.lodashService:factory', '_ is not defined on window object');
+    }
+
+    return $window._;
+
   }
 
 }());

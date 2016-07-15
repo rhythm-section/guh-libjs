@@ -30,9 +30,9 @@
     .factory('DSDeviceClassEventType', DSDeviceClassEventTypeFactory)
     .run(function(DSDeviceClassEventType) {});
 
-  DSDeviceClassEventTypeFactory.$inject = ['$log', 'DS', 'modelsHelper'];
+  DSDeviceClassEventTypeFactory.$inject = ['$log', 'DS'];
 
-  function DSDeviceClassEventTypeFactory($log, DS, modelsHelper) {
+  function DSDeviceClassEventTypeFactory($log, DS) {
     
     var staticMethods = {};
 

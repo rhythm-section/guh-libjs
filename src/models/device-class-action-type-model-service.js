@@ -30,9 +30,9 @@
     .factory('DSDeviceClassActionType', DSDeviceClassActionTypeFactory)
     .run(function(DSDeviceClassActionType) {});
 
-  DSDeviceClassActionTypeFactory.$inject = ['$log', 'DS', 'modelsHelper'];
+  DSDeviceClassActionTypeFactory.$inject = ['$log', 'DS'];
 
-  function DSDeviceClassActionTypeFactory($log, DS, modelsHelper) {
+  function DSDeviceClassActionTypeFactory($log, DS) {
     
     var staticMethods = {};
 
