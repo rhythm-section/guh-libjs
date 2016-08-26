@@ -3094,9 +3094,9 @@
     .module('guh.api')
     .factory('websocketService', websocketService);
 
-  websocketService.$inject = ['$log', '$rootScope', '$q', 'DS'];
+  websocketService.$inject = ['$log', '$rootScope', '$q', '$timeout', 'DS'];
 
-  function websocketService($log, $rootScope, $q, DS) {
+  function websocketService($log, $rootScope, $q, $timeout, DS) {
 
     var ws = null;
     var callbacks = {};
@@ -3127,6 +3127,7 @@
      */
     function close() {
       if(ws) {
+        ws.close();
         ws = null;
       }
     }
@@ -3145,6 +3146,12 @@
 
       ws = new WebSocket(url);
 
+      // Timeout if connecting takes to long (can take up to 1 minute, with the timeout only 2 seconds)
+      $timeout(function() {
+        ws.close();
+        ws = null;
+      }, 2000);
+
       ws.onopen = function(event) {
         // Send broadcast event
         $rootScope.$apply(function() {
@@ -3153,10 +3160,17 @@
       };
 
       ws.onclose = function(event) {
-        // Send broadcast event
-        $rootScope.$apply(function() {
-          $rootScope.$broadcast('WebsocketConnectionLost', 'The app has lost the connection to guh. Please check if you are connected to your network and if guh is running correctly.');
-        });
+        // Safari is not calling onerror but calls onclose with code = 1006
+        if(event.code === 1006) {
+          $rootScope.$apply(function() {
+            $rootScope.$broadcast('WebsocketConnectionError', 'There was an error connecting to guh.');
+          });
+        } else {
+          // Send broadcast event
+          $rootScope.$apply(function() {
+            $rootScope.$broadcast('WebsocketConnectionLost', 'The app has lost the connection to guh. Please check if you are connected to your network and if guh is running correctly.');
+          });
+        }
       };
 
       ws.onerror = function(event) {
