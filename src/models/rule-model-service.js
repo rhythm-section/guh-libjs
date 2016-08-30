@@ -30,9 +30,9 @@
     .factory('DSRule', DSRuleFactory)
     .run(function(DSRule) {});
 
-  DSRuleFactory.$inject = ['$log', 'app', 'DS'];
+  DSRuleFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
 
-  function DSRuleFactory($log, app, DS) {
+  function DSRuleFactory($log, $q, DS, websocketService) {
     
     var staticMethods = {};
 
@@ -62,8 +62,49 @@
 
     });
 
+    angular.extend(DSRule, {
+      load: load,
+      add: add
+    });
+
     return DSRule;
 
+
+    function _loadDetails(ruleDescription) {
+      return websocketService
+        .send({
+          method: 'Rules.GetRuleDetails',
+          params: {
+            ruleId: ruleDescription.id
+          }
+        });
+    }
+
+    function load() {
+      return websocketService
+        .send({
+          method: 'Rules.GetRules'
+        })
+        .then(function(data) {
+          return $q.all(data.ruleDescriptions.map(function(ruleDescription) {
+            return _loadDetails(ruleDescription)
+              .then(function(data) {
+                DSRule.inject(data.rule);
+                return data.rule;
+              });
+          }));
+        })
+        .then(function(rules) {
+          return DSRule.getAll();
+        });
+    }
+
+    function add(rule) {
+      return websocketService.send({
+        method: 'Rules.AddRule',
+        params: rule
+      });
+    }
 
     /*
      * Public method: executeActions()
@@ -72,10 +113,12 @@
       /* jshint validthis: true */
       var self = this;
 
-      return DS
-        .adapters
-        .http
-        .POST(app.apiUrl + '/rules/' + self.id + "/executeactions");   
+      return websocketService.send({
+        method: 'Rules.ExecuteActions',
+        params: {
+          ruleId: self.id
+        }
+      });
     }
 
     /*
@@ -85,10 +128,12 @@
       /* jshint validthis: true */
       var self = this;
 
-      return DS
-        .adapters
-        .http
-        .POST(app.apiUrl + '/rules/' + self.id + "/executeexitactions");   
+      return websocketService.send({
+        method: 'Rules.ExecuteExitActions',
+        params: {
+          ruleId: self.id
+        }
+      });
     }
 
     /*
@@ -98,7 +143,12 @@
       /* jshint validthis: true */
       var self = this;
 
-      return DSRule.destroy(self.id);
+      return websocketService.send({
+        method: 'Rules.RemoveRule',
+        params: {
+          ruleId: self.id
+        }
+      });
     }
 
 

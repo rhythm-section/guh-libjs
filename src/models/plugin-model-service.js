@@ -27,77 +27,51 @@
 
   angular
     .module('guh.models')
-    .factory('DSState', DSStateFactory)
-    .run(function(DSState) {});
+    .factory('DSPlugin', DSPluginFactory)
+    .run(function(DSPlugin) {});
 
-  DSStateFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  DSPluginFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
 
-  function DSStateFactory($log, $q, DS, websocketService) {
+  function DSPluginFactory($log, $q, DS, websocketService) {
     
     var staticMethods = {};
 
     /*
      * DataStore configuration
      */
-    var DSState = DS.defineResource({
+    var DSPlugin = DS.defineResource({
 
       // API configuration
-      endpoint: 'states',
+      endpoint: 'plugins',
 
       // Model configuration
-      // idAttribute: 'stateTypeId',
-      idAttribute: 'compoundId',
-      name: 'state',
-      relations: {
-        belongsTo: {
-          device: {
-            localField: 'device',
-            localKey: 'deviceId',
-            parent: true
-          }
-        },
-        hasOne: {
-          stateType: {
-            localField: 'stateType',
-            localKey: 'stateTypeId'
-          }
-        }
-      },
+      idAttribute: 'id',
+      name: 'plugin',
+      relations: {},
 
       // Computed properties
-      computed: {
-        compoundId: ['deviceId', 'stateTypeId', 'value', function (deviceId, stateTypeId, value) {
-          return '' + deviceId + '_' + stateTypeId;
-        }]
-      },
+      computed: {},
 
       // Instance methods
       methods: {}
 
     });
 
-    angular.extend(DSState, {
+    angular.extend(DSPlugin, {
       load: load
     });
 
-    return DSState;
+    return DSPlugin;
 
 
-    function load(deviceId) {
+    function load() {
       return websocketService
         .send({
-          method: 'Devices.GetStateValues',
-          params: {
-            deviceId: deviceId
-          }
+          method: 'Devices.GetPlugins'
         })
         .then(function(data) {
-          var states = data.values.map(function(state) {
-            state.deviceId = deviceId;
-            return state;
-          });
-          DSState.inject(states);
-          return DSState.getAll();
+          DSPlugin.inject(data.plugins);
+          return DSPlugin.getAll();
         });
     }
 

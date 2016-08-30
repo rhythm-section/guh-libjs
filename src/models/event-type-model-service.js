@@ -30,9 +30,9 @@
     .factory('DSEventType', DSEventTypeFactory)
     .run(function(DSEventType) {});
 
-  DSEventTypeFactory.$inject = ['$log', 'DS', 'modelsHelper'];
+  DSEventTypeFactory.$inject = ['$log', 'DS'];
 
-  function DSEventTypeFactory($log, DS, modelsHelper) {
+  function DSEventTypeFactory($log, DS) {
     
     var staticMethods = {};
 
@@ -95,11 +95,6 @@
       } else {
         attrs.phrase = phrase + ' is detected and parameters are';
       }
-
-      // Add templateUrl to paramTypes
-      angular.forEach(paramTypes, function(paramType) {
-        paramType = modelsHelper.addUiData(paramType);
-      });
     }
 
 

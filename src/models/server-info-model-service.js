@@ -27,79 +27,30 @@
 
   angular
     .module('guh.models')
-    .factory('DSState', DSStateFactory)
-    .run(function(DSState) {});
+    .factory('DSServerInfo', DSServerInfoFactory)
+    .run(function(DSServerInfo) {});
 
-  DSStateFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
 
-  function DSStateFactory($log, $q, DS, websocketService) {
-    
-    var staticMethods = {};
+  DSServerInfoFactory.$inject = ['$log', 'LocalForage'];
 
-    /*
-     * DataStore configuration
-     */
-    var DSState = DS.defineResource({
+  function DSServerInfoFactory($log, LocalForage) {
 
-      // API configuration
-      endpoint: 'states',
+    LocalForage.localForageStore.registerAdapter('localForage', LocalForage.localForageAdapter, { default: true });
 
-      // Model configuration
-      // idAttribute: 'stateTypeId',
-      idAttribute: 'compoundId',
-      name: 'state',
+    var ServerInfo = LocalForage.localForageStore.defineResource({
+      name: 'serverInfo',
       relations: {
         belongsTo: {
-          device: {
-            localField: 'device',
-            localKey: 'deviceId',
+          settings: {
+            localField: 'settings',
+            foreignKey: 'settingsId',
             parent: true
           }
-        },
-        hasOne: {
-          stateType: {
-            localField: 'stateType',
-            localKey: 'stateTypeId'
-          }
         }
-      },
-
-      // Computed properties
-      computed: {
-        compoundId: ['deviceId', 'stateTypeId', 'value', function (deviceId, stateTypeId, value) {
-          return '' + deviceId + '_' + stateTypeId;
-        }]
-      },
-
-      // Instance methods
-      methods: {}
-
+      }
     });
 
-    angular.extend(DSState, {
-      load: load
-    });
-
-    return DSState;
-
-
-    function load(deviceId) {
-      return websocketService
-        .send({
-          method: 'Devices.GetStateValues',
-          params: {
-            deviceId: deviceId
-          }
-        })
-        .then(function(data) {
-          var states = data.values.map(function(state) {
-            state.deviceId = deviceId;
-            return state;
-          });
-          DSState.inject(states);
-          return DSState.getAll();
-        });
-    }
+    return ServerInfo;
 
   }
 

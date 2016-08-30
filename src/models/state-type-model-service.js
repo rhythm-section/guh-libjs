@@ -30,9 +30,9 @@
     .factory('DSStateType', DSStateTypeFactory)
     .run(function(DSStateType) {});
 
-  DSStateTypeFactory.$inject = ['$log', 'DS', 'modelsHelper'];
+  DSStateTypeFactory.$inject = ['$log', 'DS'];
 
-  function DSStateTypeFactory($log, DS, modelsHelper) {
+  function DSStateTypeFactory($log, DS) {
     
     var staticMethods = {};
 
@@ -48,13 +48,6 @@
       idAttribute: 'id',
       name: 'stateType',
       relations: {
-        // belongsTo: {
-        //   deviceClass: {
-        //     localField: 'deviceClass',
-        //     localKey: 'deviceClassId',
-        //     parent: true
-        //   }
-        // }
         hasMany: {
           deviceClassStateType: {
             localField: 'deviceClassStateTypes',
@@ -90,7 +83,6 @@
      * Private method: _addUiData(resource, attrs)
      */
     function _addUiData(resource, attrs) {
-      // var paramTypes = attrs.paramTypes;
       var regExp = /\s\[([^)]+)\]/;                 // Value inside brackets []
       var searchUnit = name.replace(regExp, '');    // Get value inside brackets
       var phrase = attrs.name;
@@ -102,9 +94,6 @@
 
       // phrase
       attrs.phrase = 'When value of ' + phrase;
-
-      // Add templateUrl to stateType
-      attrs = modelsHelper.addUiData(attrs);
     }
 
   }

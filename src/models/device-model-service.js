@@ -30,9 +30,9 @@
     .factory('DSDevice', DSDeviceFactory)
     .run(function(DSDevice) {});
 
-  DSDeviceFactory.$inject = ['$log', '$httpParamSerializer', 'DS', 'libs', 'app', 'websocketService'];
+  DSDeviceFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
 
-  function DSDeviceFactory($log, $httpParamSerializer, DS, libs, app, websocketService) {
+  function DSDeviceFactory($log, $q, DS, websocketService) {
     
     var staticMethods = {};
 
@@ -56,7 +56,6 @@
         }
 
         // Not working (error: "Doh! You just changed the primary key of an object!") because states are injected before the state primary keys are generated
-
         // hasMany: {
         //   state: {
         //     localField: 'states',
@@ -70,11 +69,6 @@
 
       // Instance methods
       methods: {
-        // Websocket
-        subscribe: subscribe,
-        unsubscribe: unsubscribe,
-        
-        // API
         executeAction: executeAction,
         remove: remove,
         getDescription: getDescription,
@@ -109,6 +103,7 @@
     });
 
     angular.extend(DSDevice, {
+      load: load,
       add: add,
       edit: edit,
       pair: pair,
@@ -147,10 +142,20 @@
 
       angular.forEach(states, function(state, index) {
         var ejectedItem = DS.eject('state', '' + deviceId + '_' + state.stateTypeId);
-        $log.log('ejected state', ejectedItem);
       });
     }
 
+
+    function load() {
+      return websocketService
+        .send({
+          method: 'Devices.GetConfiguredDevices'
+        })
+        .then(function(data) {
+          DSDevice.inject(data.devices);
+          return DSDevice.getAll();
+        });
+    }
 
     /*
      * Public method: getDescription(delimiter)
@@ -167,92 +172,74 @@
     }
 
     /*
-     * Public method: subscribe(cb)
-     */
-    function subscribe(cb) {
-      /* jshint validthis: true */
-      var self = this;
-
-      return websocketService.subscribe(self.id, cb);
-    }
-
-    /*
-     * Public method: unsubscribe()
-     */
-    function unsubscribe() {
-      /* jshint validthis: true */
-      var self = this;
-
-      return websocketService.unsubscribe(self.id);
-    }
-
-    /*
      * Public method: pair(deviceClassId, deviceDescriptorId, deviceParams, name)
      */
     function pair(deviceClassId, deviceDescriptorId, deviceParams, name) {
-      var options = {};
+      var params = {};
 
-      options.deviceClassId = deviceClassId || '';
+      params.deviceClassId = deviceClassId || '';
 
       if(angular.isDefined(deviceDescriptorId) && deviceDescriptorId !== '') {
-        options.deviceDescriptorId = deviceDescriptorId;
+        params.deviceDescriptorId = deviceDescriptorId;
       } else {
-        options.deviceParams = deviceParams || [];
+        params.deviceParams = deviceParams || [];
       }
 
       if(angular.isDefined(name)) {
-        options.name = name;
+        params.name = name;
       }
 
-      return DS
-        .adapters
-        .http
-        .POST(app.apiUrl + '/devices/pair', options);
+      return websocketService.send({
+        method: 'Devices.PairDevice',
+        params: params
+      });
     }
 
     /*
      * Public method: confirmPairing(pairingTransactionId, secret)
      */
     function confirmPairing(pairingTransactionId, secret) {
-      var options = {};
+      var params = {};
       
-      options.pairingTransactionId = pairingTransactionId;
+      params.pairingTransactionId = pairingTransactionId;
 
       if(secret) {
-        options.secret = secret;
+        params.secret = secret;
       }
 
-      return DS
-        .adapters
-        .http
-        .POST(app.apiUrl + '/devices/confirmpairing', options);      
+      return websocketService.send({
+        method: 'Devices.ConfirmPairing',
+        params: params
+      }); 
     }
 
     /*
      * Public method: add(deviceClassId, deviceDescriptorId, deviceParams, name)
      */
     function add(deviceClassId, deviceDescriptorId, deviceParams, name) {
-      var device = {};
+      var params = {};
 
       // name
       if(angular.isDefined(name) && name !== '') {
-        device.name = name;
+        params.name = name;
       }
 
       // deviceClassId
       if(angular.isDefined(deviceClassId) && deviceClassId  !== '') {
-        device.deviceClassId = deviceClassId;
+        params.deviceClassId = deviceClassId;
       }
 
       // deviceDescriptorId or deviceParams
       if(angular.isDefined(deviceDescriptorId) && deviceDescriptorId !== '') {
-        device.deviceDescriptorId = deviceDescriptorId;
+        params.deviceDescriptorId = deviceDescriptorId;
       } else if(angular.isDefined(deviceParams) && deviceParams !== []) {
-        device.deviceParams = deviceParams;
+        params.deviceParams = deviceParams;
       }
 
-      return DSDevice.create(device, {
-        cacheResponse: false
+      // Device gets inserted when notification "Devices.DeviceAdded" was received
+      return websocketService.send({
+        method: 'Devices.AddConfiguredDevice',
+        params: params
       });
     }
 
@@ -284,20 +271,19 @@
     function executeAction(actionType, params) {
       /* jshint validthis: true */
       var self = this;
-      var options = {};
+      var jsonRpcParams = {
+        actionTypeId: actionType.id,
+        deviceId: self.id
+      };
 
-      // options.params = actionType.getParams();
-      options.params = params;
+      if(angular.isDefined(params) && params !== {}) {
+        jsonRpcParams.params = params;
+      }
 
-      // return DS
-      //   .adapters
-      //   .http
-      //   .POST(app.apiUrl + '/devices/' + self.id + '/actions/' + actionType.id + '/execute.json', options);
-
-      return DS
-        .adapters
-        .http
-        .POST(app.apiUrl + '/devices/' + self.id + '/execute/' + actionType.id, options);
+      return websocketService.send({
+        method: 'Actions.ExecuteAction',
+        params: jsonRpcParams
+      });
     }
 
     /*
@@ -306,18 +292,20 @@
     function remove(params) {
       /* jshint validthis: true */
       var self = this;
-      var options = {};
+      var jsonRpcParams = {
+        deviceId: self.id
+      };
 
       if(angular.isDefined(params) && params !== {}) {
-        options.params = {
-          params: params
-        };
-        options.paramSerializer = function(params) {
-          return $httpParamSerializer(params).replace(/%5B/g, '[').replace(/%5D/g, ']');
-        };
+        angular.forEach(params, function(value, key) {
+          jsonRpcParams[key] = value;
+        });
       }
 
-      return DSDevice.destroy(self.id, options);
+      return websocketService.send({
+        method: 'Devices.RemoveConfiguredDevice',
+        params: jsonRpcParams
+      });
     }
 
     /*

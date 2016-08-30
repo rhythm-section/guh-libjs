@@ -30,9 +30,9 @@
     .factory('DSActionType', DSActionTypeFactory)
     .run(function(DSActionType) {});
 
-  DSActionTypeFactory.$inject = ['$log', 'DS', 'modelsHelper'];
+  DSActionTypeFactory.$inject = ['$log', 'DS'];
 
-  function DSActionTypeFactory($log, DS, modelsHelper) {
+  function DSActionTypeFactory($log, DS) {
     
     var staticMethods = {};
 
@@ -48,13 +48,6 @@
       idAttribute: 'id',
       name: 'actionType',
       relations: {
-        // belongsTo: {
-        //   deviceClass: {
-        //     localField: 'deviceClass',
-        //     localKey: 'deviceClassId',
-        //     parent: true
-        //   }
-        // },
         hasMany: {
           deviceClassActionType: {
             localField: 'deviceClassActionTypes',
@@ -101,16 +94,6 @@
       if(angular.isArray(paramTypes) && paramTypes.length > 0) {
         attrs.phrase = attrs.phrase + ' with parameters';
       }
-
-      // Add templateUrl to paramTypes
-      var isChildOfActionType = true;
-      angular.forEach(paramTypes, function(paramType) {
-        paramType = modelsHelper.addUiData(paramType, isChildOfActionType);
-        // paramType.dependsOnTrigger = false;
-      });
-
-      // Add templateUrl to actionType & paramTypes
-      attrs = modelsHelper.addUiData(attrs);
     }
 
 

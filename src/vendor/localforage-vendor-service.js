@@ -26,80 +26,18 @@
   'use strict';
 
   angular
-    .module('guh.models')
-    .factory('DSState', DSStateFactory)
-    .run(function(DSState) {});
+    .module('guh.vendor')
+    .factory('localforage', localforageService);
 
-  DSStateFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  localforageService.$inject = ['$log', '$window'];
 
-  function DSStateFactory($log, $q, DS, websocketService) {
-    
-    var staticMethods = {};
+  function localforageService($log, $window) {
 
-    /*
-     * DataStore configuration
-     */
-    var DSState = DS.defineResource({
-
-      // API configuration
-      endpoint: 'states',
-
-      // Model configuration
-      // idAttribute: 'stateTypeId',
-      idAttribute: 'compoundId',
-      name: 'state',
-      relations: {
-        belongsTo: {
-          device: {
-            localField: 'device',
-            localKey: 'deviceId',
-            parent: true
-          }
-        },
-        hasOne: {
-          stateType: {
-            localField: 'stateType',
-            localKey: 'stateTypeId'
-          }
-        }
-      },
-
-      // Computed properties
-      computed: {
-        compoundId: ['deviceId', 'stateTypeId', 'value', function (deviceId, stateTypeId, value) {
-          return '' + deviceId + '_' + stateTypeId;
-        }]
-      },
-
-      // Instance methods
-      methods: {}
-
-    });
-
-    angular.extend(DSState, {
-      load: load
-    });
-
-    return DSState;
-
-
-    function load(deviceId) {
-      return websocketService
-        .send({
-          method: 'Devices.GetStateValues',
-          params: {
-            deviceId: deviceId
-          }
-        })
-        .then(function(data) {
-          var states = data.values.map(function(state) {
-            state.deviceId = deviceId;
-            return state;
-          });
-          DSState.inject(states);
-          return DSState.getAll();
-        });
+    if(!$window.localforage) {
+      $log.error('guh.vendor.localforageService:factory', 'localforage is not defined on window object');
     }
+
+    return $window.localforage;
 
   }
 

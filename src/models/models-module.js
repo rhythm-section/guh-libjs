@@ -32,24 +32,9 @@
     ])
     .config(config);
 
-  config.$inject = ['DSHttpAdapterProvider', 'DSProvider', 'app'];
+  config.$inject = ['DSProvider'];
 
-  function config(DSHttpAdapterProvider, DSProvider, app) {
-    DSHttpAdapterProvider
-      .defaults
-      .log = false;
-
-    DSHttpAdapterProvider
-      .defaults
-      .deserialize = function deserialize(resourceConfig, data) {
-        return data ? ('data' in data ? data.data : data) : data;
-      };
-
-
-    DSProvider
-      .defaults
-      .basePath = app.apiUrl;
-
+  function config(DSProvider) {
     DSProvider
       .defaults
       .debug = false;

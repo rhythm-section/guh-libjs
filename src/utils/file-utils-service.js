@@ -26,81 +26,47 @@
   'use strict';
 
   angular
-    .module('guh.models')
-    .factory('DSState', DSStateFactory)
-    .run(function(DSState) {});
+    .module('guh.utils')
+    .factory('File', FileFactory);
 
-  DSStateFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  FileFactory.$inject = ['$log', '$templateCache'];
 
-  function DSStateFactory($log, $q, DS, websocketService) {
+  function FileFactory($log, $templateCache) {
     
-    var staticMethods = {};
+    var File = {
+      checkFile: checkFile
+    };
+
+    return File;
+
 
     /*
-     * DataStore configuration
+     * Public method: checkFile(path, file)
      */
-    var DSState = DS.defineResource({
+    function checkFile(path, file) {
+      // if(app.environment === 'production') {
+        // Production: One $templateCache entry per template
+        var cacheObject = $templateCache.get(path + file);
 
-      // API configuration
-      endpoint: 'states',
-
-      // Model configuration
-      // idAttribute: 'stateTypeId',
-      idAttribute: 'compoundId',
-      name: 'state',
-      relations: {
-        belongsTo: {
-          device: {
-            localField: 'device',
-            localKey: 'deviceId',
-            parent: true
-          }
-        },
-        hasOne: {
-          stateType: {
-            localField: 'stateType',
-            localKey: 'stateTypeId'
-          }
+        if(cacheObject !== undefined) {
+          return true;
+        } else {
+          return false;
         }
-      },
+      /*} else if(app.environment === 'development') {
+        // Development: One HTML file per template
+        var request = new XMLHttpRequest();
 
-      // Computed properties
-      computed: {
-        compoundId: ['deviceId', 'stateTypeId', 'value', function (deviceId, stateTypeId, value) {
-          return '' + deviceId + '_' + stateTypeId;
-        }]
-      },
+        request.open('HEAD', path + file, false);
+        request.send();
 
-      // Instance methods
-      methods: {}
-
-    });
-
-    angular.extend(DSState, {
-      load: load
-    });
-
-    return DSState;
-
-
-    function load(deviceId) {
-      return websocketService
-        .send({
-          method: 'Devices.GetStateValues',
-          params: {
-            deviceId: deviceId
-          }
-        })
-        .then(function(data) {
-          var states = data.values.map(function(state) {
-            state.deviceId = deviceId;
-            return state;
-          });
-          DSState.inject(states);
-          return DSState.getAll();
-        });
+        if(request.status === 200) {
+          return true;
+        } else {
+          return false;
+        }
+      }*/
     }
-
   }
 
 }());
