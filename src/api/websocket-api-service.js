@@ -34,6 +34,7 @@
   function websocketService($log, $rootScope, $q, $timeout, DS) {
 
     var ws = null;
+    var connectionTimer;
     var callbacks = {};
     var currentRequestId = 0;
     var websocketService = {
@@ -82,12 +83,16 @@
       ws = new WebSocket(url);
 
       // Timeout if connecting takes to long (can take up to 1 minute, with the timeout only 2 seconds)
-      $timeout(function() {
+      connectionTimer = $timeout(function() {
         ws.close();
         ws = null;
       }, 2000);
 
       ws.onopen = function(event) {
+        if(connectionTimer) {
+          $timeout.cancel(connectionTimer);
+        }
+
         // Send broadcast event
         $rootScope.$apply(function() {
           $rootScope.$broadcast('WebsocketConnected', 'Successful connected to guh.');
