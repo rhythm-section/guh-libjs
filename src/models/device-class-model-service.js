@@ -30,11 +30,13 @@
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', '_', 'websocketService', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
+  DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', '_', 'websocketService', 'modelsHelper', 'DSDeviceClassParamType', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
 
-  function DSDeviceClassFactory($log, $q, DS, _, websocketService, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
+  function DSDeviceClassFactory($log, $q, DS, _, websocketService, modelsHelper, DSDeviceClassParamType, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
     
     var staticMethods = {};
+    var deviceClassDiscoveryParamTypesId = 0;
+    var deviceClassParamTypesId = 0;
     var deviceClassActionTypesId = 0;
     var deviceClassEventTypesId = 0;
     var deviceClassStateTypesId = 0;
@@ -59,6 +61,14 @@
           }
         },
         hasMany: {
+          deviceClassDiscoveryParamType: {
+            localField: 'deviceClassDiscoveryParamTypes',
+            foreignKey: 'deviceClassId'
+          },
+          deviceClassParamType: {
+            localField: 'deviceClassParamTypes',
+            foreignKey: 'deviceClassId'
+          },
           deviceClassActionType: {
             localField: 'deviceClassActionTypes',
             foreignKey: 'deviceClassId'
@@ -92,11 +102,11 @@
           var arrayOfAttrs = attrs;
           angular.forEach(arrayOfAttrs, function(attrs) {
             _mapStates(resource, attrs);
-            _createDeviceClassActionsTypes(resource, attrs);
+            _createDeviceClassParamTypes(resource, attrs);
           });
         } else {
           _mapStates(resource, attrs);
-          _createDeviceClassActionsTypes(resource, attrs);
+          _createDeviceClassParamTypes(resource, attrs);
         }
       }
 
@@ -197,16 +207,69 @@
     }
 
     /*
-     * Private method:_createDeviceClassActionsTypes()
+     * Private method:_createDeviceClassParamTypes()
      */
-    function _createDeviceClassActionsTypes(resource, attrs) {
+    function _createDeviceClassParamTypes(resource, attrs) {
+      var deviceClassDiscoveryParamTypes = DS.getAll('deviceClassDiscoveryParamType');
+      var deviceClassParamTypes = DS.getAll('deviceClassParamType');
       var deviceClassActionTypes = DS.getAll('deviceClassActionType');
       var deviceClassEventTypes = DS.getAll('deviceClassEventType');
       var deviceClassStateTypes = DS.getAll('deviceClassStateType');
+      var discoveryParamTypes = attrs.discoveryParamTypes;
+      var paramTypes = attrs.paramTypes;
       var actionTypes = attrs.actionTypes;
       var eventTypes = attrs.eventTypes;
       var stateTypes = attrs.stateTypes;
       var deviceClassId = attrs.id;
+
+
+      // DiscoveryParamTypes
+      angular.forEach(discoveryParamTypes, function(discoveryParamType) {
+        // Create discoveryParamType
+        var discoveryParamTypeInstance = DS.createInstance('paramType', discoveryParamType);
+        DS.inject('paramType', discoveryParamTypeInstance);
+
+        // Filtered deviceClassDiscoveryParamTypes
+        var deviceClassDiscoveryParamTypesFiltered = deviceClassDiscoveryParamTypes.filter(function(deviceClassDiscoveryParamType) {
+          return deviceClassDiscoveryParamType.deviceClassId === deviceClassId && deviceClassDiscoveryParamType.paramTypeId === discoveryParamType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(deviceClassDiscoveryParamTypesFiltered) && deviceClassDiscoveryParamTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> discoveryParamType)
+          deviceClassDiscoveryParamTypesId = deviceClassDiscoveryParamTypesId + 1;
+          var deviceClassDiscoveryParamTypeInstance = DS.createInstance('deviceClassDiscoveryParamType', {
+            id: deviceClassDiscoveryParamTypesId,
+            deviceClassId: deviceClassId,
+            paramTypeId: discoveryParamType.id
+          });
+          DS.inject('deviceClassDiscoveryParamType', deviceClassDiscoveryParamTypeInstance);
+        }
+      });
+
+      // ParamTypes
+      angular.forEach(paramTypes, function(paramType) {
+        // Create paramType
+        var paramTypeInstance = DS.createInstance('paramType', paramType);
+        DS.inject('paramType', paramTypeInstance);
+
+        // Filtered deviceClassParamTypes
+        var deviceClassParamTypesFiltered = deviceClassParamTypes.filter(function(deviceClassParamType) {
+          return deviceClassParamType.deviceClassId === deviceClassId && deviceClassParamType.paramTypeId === paramType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(deviceClassParamTypesFiltered) && deviceClassParamTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> paramType)
+          deviceClassParamTypesId = deviceClassParamTypesId + 1;
+          var deviceClassParamTypeInstance = DS.createInstance('deviceClassParamType', {
+            id: deviceClassParamTypesId,
+            deviceClassId: deviceClassId,
+            paramTypeId: paramType.id
+          });
+          DS.inject('deviceClassParamType', deviceClassParamTypeInstance);
+        }
+      });
 
       // ActionTypes
       angular.forEach(actionTypes, function(actionType) {
