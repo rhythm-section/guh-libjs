@@ -56,6 +56,14 @@
           actionTypeParamType: {
             localField: 'actionTypeParamTypes',
             foreignKey: 'paramTypeId'
+          },
+          eventTypeParamType: {
+            localField: 'eventTypeParamTypes',
+            foreignKey: 'paramTypeId'
+          },
+          pluginParamType: {
+            localField: 'pluginParamTypes',
+            foreignKey: 'paramTypeId'
           }
         }
       },
