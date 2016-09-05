@@ -27,48 +27,38 @@
 
   angular
     .module('guh.models')
-    .factory('DSParamType', DSParamTypeFactory)
-    .run(function(DSParamType) {});
+    .factory('DSActionTypeParamType', DSActionTypeParamTypeFactory)
+    .run(function(DSActionTypeParamType) {});
 
-  DSParamTypeFactory.$inject = ['$log', 'DS'];
+  DSActionTypeParamTypeFactory.$inject = ['$log', 'DS'];
 
-  function DSParamTypeFactory($log, DS) {
+  function DSActionTypeParamTypeFactory($log, DS) {
     
     var staticMethods = {};
 
     /*
      * DataStore configuration
      */
-    var DSParamType = DS.defineResource({
+    var DSActionTypeParamType = DS.defineResource({
 
       // Model configuration
-      name: 'paramType',
+      name: 'actionTypeParamType',
       relations: {
-        hasMany: {
-          deviceClassDiscoveryParamType: {
-            localField: 'deviceClassDiscoveryParamTypes',
-            foreignKey: 'paramTypeId'
+        belongsTo: {
+          actionType: {
+            localField: 'actionType',
+            localKey: 'actionTypeId'
           },
-          deviceClassParamType: {
-            localField: 'deviceClassParamTypes',
-            foreignKey: 'paramTypeId'
-          },
-          actionTypeParamType: {
-            localField: 'actionTypeParamTypes',
-            foreignKey: 'paramTypeId'
+          paramType: {
+            localField: 'paramType',
+            localKey: 'paramTypeId'
           }
         }
-      },
-
-      // Computed properties
-      computed: {},
-
-      // Instance methods
-      methods: {}
+      }
 
     });
 
-    return DSParamType;
+    return DSActionTypeParamType;
 
   }
 

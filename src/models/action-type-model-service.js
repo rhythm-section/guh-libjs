@@ -35,6 +35,7 @@
   function DSActionTypeFactory($log, DS) {
     
     var staticMethods = {};
+    var actionTypeParamTypesId = 0;
 
     /*
      * DataStore configuration
@@ -53,6 +54,10 @@
             localField: 'deviceClassActionTypes',
             foreignKey: 'actionTypeId'
           },
+          actionTypeParamType: {
+            localField: 'actionTypeParamTypes',
+            foreignKey: 'actionTypeId'
+          }
         }
       },
 
@@ -71,9 +76,11 @@
           var arrayOfAttrs = attrs;
           angular.forEach(arrayOfAttrs, function(attrs) {
             _addUiData(resource, attrs);
+            _createActionTypeParamTypes(resource, attrs);
           });
         } else {
           _addUiData(resource, attrs);
+          _createActionTypeParamTypes(resource, attrs);
         }
       }
 
@@ -96,6 +103,40 @@
       }
     }
 
+    /*
+     * Private method:_createActionTypeParamTypes()
+     */
+    function _createActionTypeParamTypes(resource, attrs) {
+      var actionTypeParamTypes = DS.getAll('actionTypeParamType');
+      var paramTypes = attrs.paramTypes;
+      var actionTypeId = attrs.id;
+
+
+      // ParamTypes
+      angular.forEach(paramTypes, function(paramType) {
+        // Create paramType
+        var paramTypeInstance = DS.createInstance('paramType', paramType);
+        DS.inject('paramType', paramTypeInstance);
+
+        // Filtered actionTypeParamTypes
+        var actionTypeParamTypesFiltered = actionTypeParamTypes.filter(function(actionTypeParamType) {
+          return actionTypeParamType.actionTypeId === actionTypeId && actionTypeParamType.paramTypeId === paramType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(actionTypeParamTypesFiltered) && actionTypeParamTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> paramType)
+          actionTypeParamTypesId = actionTypeParamTypesId + 1;
+          var actionTypeParamTypeInstance = DS.createInstance('actionTypeParamType', {
+            id: actionTypeParamTypesId,
+            actionTypeId: actionTypeId,
+            paramTypeId: paramType.id
+          });
+          DS.inject('actionTypeParamType', actionTypeParamTypeInstance);
+        }
+      });
+    }
+
 
     /*
      * Public method: getParams()
@@ -108,7 +149,7 @@
 
       angular.forEach(paramTypes, function(paramType) {
         params.push({
-          name: paramType.name,
+          id: paramType.id,
           value: paramType.value
         });
       });
@@ -126,21 +167,21 @@
 
       angular.forEach(params, function(param) {
         if(actionParamType !== undefined && eventParamType !== undefined) {
-          if(param.name === actionParamType.name) {
+          if(param.paramTypeId === actionParamType.id) {
             ruleActionParams.push({
-              name: param.name,
+              paramTypeId: param.paramTypeId,
               eventParamName: eventParamType.name,
               eventTypeId: eventParamType.eventDescriptor.eventTypeId
             });
           } else {
             ruleActionParams.push({
-              name: param.name,
+              paramTypeId: param.paramTypeId,
               value: param.value
             });
           }
         } else {
           ruleActionParams.push({
-            name: param.name,
+            paramTypeId: param.paramTypeId,
             value: param.value
           });
         }
