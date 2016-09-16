@@ -30,9 +30,9 @@
     .factory('DSRule', DSRuleFactory)
     .run(function(DSRule) {});
 
-  DSRuleFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  DSRuleFactory.$inject = ['$log', '$q', 'DS', 'apiService'];
 
-  function DSRuleFactory($log, $q, DS, websocketService) {
+  function DSRuleFactory($log, $q, DS, apiService) {
     
     var staticMethods = {};
 
@@ -71,7 +71,7 @@
 
 
     function _loadDetails(ruleDescription) {
-      return websocketService
+      return apiService
         .send({
           method: 'Rules.GetRuleDetails',
           params: {
@@ -81,7 +81,7 @@
     }
 
     function load() {
-      return websocketService
+      return apiService
         .send({
           method: 'Rules.GetRules'
         })
@@ -100,7 +100,7 @@
     }
 
     function add(rule) {
-      return websocketService.send({
+      return apiService.send({
         method: 'Rules.AddRule',
         params: rule
       });
@@ -113,7 +113,7 @@
       /* jshint validthis: true */
       var self = this;
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Rules.ExecuteActions',
         params: {
           ruleId: self.id
@@ -128,7 +128,7 @@
       /* jshint validthis: true */
       var self = this;
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Rules.ExecuteExitActions',
         params: {
           ruleId: self.id
@@ -143,7 +143,7 @@
       /* jshint validthis: true */
       var self = this;
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Rules.RemoveRule',
         params: {
           ruleId: self.id

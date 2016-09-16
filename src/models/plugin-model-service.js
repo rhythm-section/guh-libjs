@@ -30,9 +30,9 @@
     .factory('DSPlugin', DSPluginFactory)
     .run(function(DSPlugin) {});
 
-  DSPluginFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  DSPluginFactory.$inject = ['$log', '$q', 'DS', 'apiService'];
 
-  function DSPluginFactory($log, $q, DS, websocketService) {
+  function DSPluginFactory($log, $q, DS, apiService) {
     
     var staticMethods = {};
 
@@ -65,7 +65,7 @@
 
 
     function load() {
-      return websocketService
+      return apiService
         .send({
           method: 'Devices.GetPlugins'
         })

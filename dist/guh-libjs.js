@@ -396,6 +396,166 @@
   'use strict';
 
   angular
+    .module('guh.utils', [])
+    .config(config);
+
+  config.$inject = [];
+
+  function config() {}
+
+  // module.exports = angular.module('guh.utils');
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+
+  angular
+    .module('guh.utils')
+    .factory('LocalForage', LocalForage);
+
+
+  LocalForage.$inject = ['$log'];
+
+  function LocalForage($log) {
+
+    // jshint unused:false 
+    var LocalForage = {
+      localForageAdapter: new DSLocalForageAdapter(),
+      localForageStore: new JSData.DS()
+    };
+
+    return LocalForage;
+
+  }
+
+}());
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.utils')
+    .factory('File', FileFactory);
+
+  FileFactory.$inject = ['$log', '$templateCache'];
+
+  function FileFactory($log, $templateCache) {
+    
+    var File = {
+      checkFile: checkFile
+    };
+
+    return File;
+
+
+    /*
+     * Public method: checkFile(path, file)
+     */
+    function checkFile(path, file) {
+      // if(app.environment === 'production') {
+        // Production: One $templateCache entry per template
+        var cacheObject = $templateCache.get(path + file);
+
+        if(cacheObject !== undefined) {
+          return true;
+        } else {
+          return false;
+        }
+      /*} else if(app.environment === 'development') {
+        // Development: One HTML file per template
+        var request = new XMLHttpRequest();
+
+        request.open('HEAD', path + file, false);
+        request.send();
+
+        if(request.status === 200) {
+          return true;
+        } else {
+          return false;
+        }
+      }*/
+    }
+  }
+
+}());
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
     .module('guh.models', [
       // Datastore
       'js-data'
@@ -443,9 +603,9 @@
     .factory('DSVendor', DSVendorFactory)
     .run(function(DSVendor) {});
 
-  DSVendorFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  DSVendorFactory.$inject = ['$log', '$q', 'DS', 'apiService'];
 
-  function DSVendorFactory($log, $q, DS, websocketService) {
+  function DSVendorFactory($log, $q, DS, apiService) {
     
     var staticMethods = {};
 
@@ -485,7 +645,7 @@
 
 
     function load() {
-      return websocketService
+      return apiService
         .send({
           method: 'Devices.GetSupportedVendors'
         })
@@ -631,9 +791,9 @@
     .factory('DSState', DSStateFactory)
     .run(function(DSState) {});
 
-  DSStateFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  DSStateFactory.$inject = ['$log', '$q', 'DS', 'apiService'];
 
-  function DSStateFactory($log, $q, DS, websocketService) {
+  function DSStateFactory($log, $q, DS, apiService) {
     
     var staticMethods = {};
 
@@ -685,7 +845,7 @@
 
 
     function load(deviceId) {
-      return websocketService
+      return apiService
         .send({
           method: 'Devices.GetStateValues',
           params: {
@@ -858,9 +1018,9 @@
     .factory('DSRule', DSRuleFactory)
     .run(function(DSRule) {});
 
-  DSRuleFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  DSRuleFactory.$inject = ['$log', '$q', 'DS', 'apiService'];
 
-  function DSRuleFactory($log, $q, DS, websocketService) {
+  function DSRuleFactory($log, $q, DS, apiService) {
     
     var staticMethods = {};
 
@@ -899,7 +1059,7 @@
 
 
     function _loadDetails(ruleDescription) {
-      return websocketService
+      return apiService
         .send({
           method: 'Rules.GetRuleDetails',
           params: {
@@ -909,7 +1069,7 @@
     }
 
     function load() {
-      return websocketService
+      return apiService
         .send({
           method: 'Rules.GetRules'
         })
@@ -928,7 +1088,7 @@
     }
 
     function add(rule) {
-      return websocketService.send({
+      return apiService.send({
         method: 'Rules.AddRule',
         params: rule
       });
@@ -941,7 +1101,7 @@
       /* jshint validthis: true */
       var self = this;
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Rules.ExecuteActions',
         params: {
           ruleId: self.id
@@ -956,7 +1116,7 @@
       /* jshint validthis: true */
       var self = this;
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Rules.ExecuteExitActions',
         params: {
           ruleId: self.id
@@ -971,7 +1131,7 @@
       /* jshint validthis: true */
       var self = this;
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Rules.RemoveRule',
         params: {
           ruleId: self.id
@@ -1015,9 +1175,9 @@
     .factory('DSPlugin', DSPluginFactory)
     .run(function(DSPlugin) {});
 
-  DSPluginFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  DSPluginFactory.$inject = ['$log', '$q', 'DS', 'apiService'];
 
-  function DSPluginFactory($log, $q, DS, websocketService) {
+  function DSPluginFactory($log, $q, DS, apiService) {
     
     var staticMethods = {};
 
@@ -1050,7 +1210,7 @@
 
 
     function load() {
-      return websocketService
+      return apiService
         .send({
           method: 'Devices.GetPlugins'
         })
@@ -1394,9 +1554,9 @@
     .factory('DSDevice', DSDeviceFactory)
     .run(function(DSDevice) {});
 
-  DSDeviceFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  DSDeviceFactory.$inject = ['$log', '$q', 'DS', 'apiService'];
 
-  function DSDeviceFactory($log, $q, DS, websocketService) {
+  function DSDeviceFactory($log, $q, DS, apiService) {
     
     var staticMethods = {};
 
@@ -1511,7 +1671,7 @@
 
 
     function load() {
-      return websocketService
+      return apiService
         .send({
           method: 'Devices.GetConfiguredDevices'
         })
@@ -1553,7 +1713,7 @@
         params.name = name;
       }
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Devices.PairDevice',
         params: params
       });
@@ -1571,7 +1731,7 @@
         params.secret = secret;
       }
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Devices.ConfirmPairing',
         params: params
       }); 
@@ -1601,7 +1761,7 @@
       }
 
       // Device gets inserted when notification "Devices.DeviceAdded" was received
-      return websocketService.send({
+      return apiService.send({
         method: 'Devices.AddConfiguredDevice',
         params: params
       });
@@ -1644,7 +1804,7 @@
         jsonRpcParams.params = params;
       }
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Actions.ExecuteAction',
         params: jsonRpcParams
       });
@@ -1666,7 +1826,7 @@
         });
       }
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Devices.RemoveConfiguredDevice',
         params: jsonRpcParams
       });
@@ -1827,9 +1987,9 @@
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', '_', 'websocketService', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
+  DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', '_', 'apiService', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
 
-  function DSDeviceClassFactory($log, $q, DS, _, websocketService, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
+  function DSDeviceClassFactory($log, $q, DS, _, apiService, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
     
     var staticMethods = {};
     var deviceClassActionTypesId = 0;
@@ -1961,7 +2121,7 @@
 
 
     function load() {
-      return websocketService
+      return apiService
         .send({
           method: 'Devices.GetSupportedDevices'
         })
@@ -2117,7 +2277,7 @@
       /* jshint validthis: true */
       var self = this;
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Devices.GetDiscoveredDevices',
         params: {
           deviceClassId: self.id,
@@ -2363,13 +2523,15 @@
     .run(function(DSConnection) {});
 
 
-  DSConnectionFactory.$inject = ['$log', 'LocalForage'];
+  DSConnectionFactory.$inject = ['$log', 'LocalForage', 'cloudWebsocketService'];
 
-  function DSConnectionFactory($log, LocalForage) {
+  function DSConnectionFactory($log, LocalForage, cloudWebsocketService) {
 
     LocalForage.localForageStore.registerAdapter('localForage', LocalForage.localForageAdapter, { default: true });
 
-    var Connection = LocalForage.localForageStore.defineResource({
+    var tunnelCreated = false;
+
+    var DSConnection = LocalForage.localForageStore.defineResource({
       name: 'connection',
       relations: {
         belongsTo: {
@@ -2382,7 +2544,425 @@
       }
     });
 
-    return Connection;
+    angular.extend(DSConnection, {
+      getConnections: getConnections,
+      createTunnel: createTunnel,
+      isTunnelCreated: isTunnelCreated
+    });
+
+    return DSConnection;
+
+
+    /*
+     * Static method: createTunnel(connectionId)
+     */
+
+    function createTunnel(connectionId) {
+      if(connectionId) {
+        return cloudWebsocketService
+          .send({
+            method: 'Connection.CreateTunnel',
+            params: {
+              connectionId: connectionId
+            }
+          })
+          .then(function(tunnelData) {
+            tunnelCreated = true;
+
+            return DSConnection
+              .create({
+                id: tunnelData.tunnel.id,
+                activationTimeStamp: tunnelData.tunnel.activationTimeStamp,
+                clientConnection: tunnelData.tunnel.clientConnection,
+                // tunnelId: tunnelData.tunnel.id,
+                serverConnection: tunnelData.tunnel.serverConnection
+              })
+              .then(function(connection) {
+                return tunnelData.tunnel;
+              })
+              .catch(function(error) {
+                return error;
+              });
+          })
+          .catch(function(error) {
+            tunnelCreated = false;
+            return error;
+          });
+      } else {
+        $log.error('Parameter "connectionId" missing.');
+        tunnelCreated = false;
+      }
+    }
+
+    /*
+     * Static method: isTunnelCreated()
+     */
+
+    function isTunnelCreated() {
+      return tunnelCreated;
+    }
+
+    /*
+     * Static method: getConnections()
+     */
+
+    function getConnections() {
+      // $log.log('getConnections');
+
+      return cloudWebsocketService
+        .send({
+          method: 'Connection.GetConnections'
+        });
+    }
+
+  }
+
+}());
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+// (function() {
+//   'use strict';
+
+//   angular
+//     .module('guh.models')
+//     .provider('DSCloud', DSCloudProvider)
+//     .run(function(DSCloud) {});
+
+//   DSCloudProvider.$inject = [];
+
+//   function DSCloudProvider() {
+    
+//     var clientId = '6ac82de6a2ba454394f9022b6a733885';
+//     var clientSecret = 'd63eece1b725419f80961a9b1c49f8d4';
+//     var grantType = 'password';
+
+//     var provider = {
+//       ssl: true,
+//       baseUrl: '',
+//       loginUrl: '/auth/login',
+//       signupUrl: '/auth/signup',
+//       $get: $get
+//     };
+
+//     return provider;
+
+
+//     /*
+//      * Provider method: $get()
+//      */
+
+//     $get.$inject = ['$log', '$q', '$http', 'DS', 'DSAuthentication'];
+
+//     function $get($log, $q, $http, DS, DSAuthentication) {
+
+//       var authenticated = false;
+
+//       /*
+//        * DataStore configuration
+//        */
+//       var DSCloud = DS.defineResource({
+
+//         // Model configuration
+//         name: 'cloud',
+//         relations: {},
+
+//         // Computed properties
+//         computed: {},
+
+//         // Instance methods
+//         methods: {}
+
+//       });
+
+//       angular.extend(DSCloud, {
+//         login: login,
+//         logout: logout,
+//         isAuthenticated: isAuthenticated
+//       });
+
+//       return DSCloud;
+
+
+//       /*
+//        * Public method: login(username, password)
+//        */
+//       function login(username, password) {
+//         var protocol = provider.ssl ? 'https' : 'http';
+
+//         return $http({
+//           method: 'POST',
+//           url: protocol + '://' + provider.baseUrl + provider.loginUrl,
+//           // http://stackoverflow.com/questions/24710503/how-do-i-post-urlencoded-form-data-with-http-in-angularjs
+//           headers: {
+//             'Content-Type' : 'application/x-www-form-urlencoded'
+//           },
+//           transformRequest: function(obj) {
+//             var str = [];
+
+//             for(var p in obj) {
+//               str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+//             }
+            
+//             return str.join('&');
+//           },
+//           data: {
+//             'grant_type': grantType,
+//             'username': username,
+//             'password': password
+//           }
+//         }).then(function success(response) {
+//           if(angular.isDefined(response.data)) {
+//             var data = response.data;
+
+//             authenticated = true;
+
+//             $log.log('success', response);
+
+//             return DSAuthentication.create({
+//               id: 'cloudUser',
+//               accessToken: data.access_token,
+//               expiresIn: data.expires_in,
+//               refreshToken: data.refresh_token,
+//               tokenType: data.token_type
+//             })
+//             .then(function(response) {
+//               return response;
+//             })
+//             .catch(function(error) {
+//               return error;
+//             });
+//           } else {
+//             return $q.reject('Field "data" missing in response.');
+//           }
+//         }, function failure(error) {
+//           authenticated = false;
+//           return error;
+//         });
+//       }
+
+//       /*
+//        * Public method: logout()
+//        */
+//       function logout() {
+//         $log.log('Cloud.logout');
+//       }
+
+//       /*
+//        * Public method: isAuthenticated()
+//        */
+//       function isAuthenticated() {
+//         return authenticated;
+//       }
+//     }
+//   }
+
+// }());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.models')
+    .factory('DSAuthentication', DSAuthenticationFactory)
+    .run(function(DSAuthentication) {});
+
+
+  DSAuthenticationFactory.$inject = ['$log', '$q', 'LocalForage', 'cloudWebsocketService'];
+  // DSAuthenticationFactory.$inject = ['$log', '$q', 'cloudService', 'LocalForage', 'apiService'];
+
+  function DSAuthenticationFactory($log, $q, LocalForage, cloudWebsocketService) {
+  // function DSAuthenticationFactory($log, $q, cloudService, LocalForage, apiService) {
+
+    LocalForage.localForageStore.registerAdapter('localForage', LocalForage.localForageAdapter, { default: true });
+
+    var cloudUserAuthenticated = false;
+    var connectionAuthenticated = false;
+
+    var DSAuthentication = LocalForage.localForageStore.defineResource({
+      name: 'authentication',
+      relations: {},
+      methods: {
+        isAuthenticated: isAuthenticated
+      }
+    });
+
+    angular.extend(DSAuthentication, {
+      // authenticateCloudUser: authenticateCloudUser,
+      authenticateConnection: authenticateConnection
+    });
+
+    return DSAuthentication;
+
+
+    /*
+     * Static method: authenticateCloudUser(username, password)
+     */
+
+    // function authenticateCloudUser(username, password) {
+    //   $log.log('DSAuthentication:factory.authenticateLocalUser', username, password);
+
+    //   // Fiware authentication
+    //   return cloudService
+    //     .login(username, password)
+    //     .then(function(response) {
+    //       if(angular.isDefined(response.data)) {
+    //         var data = response.data;
+
+    //         cloudUserAuthenticated = true;
+
+    //         return DSAuthentication.create({
+    //           id: 'cloudUser',
+    //           accessToken: data.access_token,
+    //           expiresIn: data.expires_in,
+    //           refreshToken: data.refresh_token,
+    //           tokenType: data.token_type
+    //         })
+    //         .then(function(response) {
+    //           return response;
+    //         })
+    //         .catch(function(error) {
+    //           return error;
+    //         });
+    //       } else {
+    //         return $q.reject('Field "data" missing in response.');
+    //       }
+    //     })
+    //     .catch(function(error) {
+    //       cloudUserAuthenticated = false;
+    //       return error;
+    //     });
+    // }
+
+    /*
+     * Static method: authenticateConnection(id, name, token, type)
+     */
+
+    function authenticateConnection(id, name, token, type) {
+      // $log.log('DSAuthentication:factory.authenticateConnection', id, name, token, type);
+      return cloudWebsocketService.send({
+        method: 'Authentication.Authenticate',
+        params: {
+          id: id,
+          name: name,
+          token: token,
+          type: type
+        }
+      })
+      .then(function(response) {
+        return response;
+
+        // if(angular.isDefined(response.connectionId)) {
+        //   connectionAuthenticated = true;
+
+        //   return DSAuthentication.create({
+        //     id: 'connection',
+        //     connectionId: id,
+        //     name: name,
+        //     token: token
+        //   })
+        //   .then(function(response) {
+        //     return response;
+        //   })
+        //   .catch(function(error) {
+        //     return error;
+        //   });
+        // } else {
+        //   return $q.reject('Field "connectionId" missing in response.');
+        // }
+      })
+      .catch(function(error) {
+        connectionAuthenticated = false;
+        return error;
+      });;
+    }
+
+
+    /*
+     * Public method: isLocalUserAuthenticated()
+     */
+
+    function isAuthenticated() {
+      // $log.log('isAuthenticated', this);
+
+      if(this.id === 'cloudUser') {
+        return cloudUserAuthenticated;  
+      }/* else if(this.id === 'connection') {
+        return connectionAuthenticated;
+      }*/ else {
+        return false;
+      }
+    }
+
+
+    /*
+     * Public method: isLocalUserAuthenticated()
+     */
+
+    // function isLocalUserAuthenticated() {
+
+    // }
+
+    /*
+     * Public method: isCloudUserAuthenticated()
+     */
+
+    // function isCloudUserAuthenticated() {
+
+    // }
+
+    /*
+     * Public method: isConnectionAuthenticated()
+     */
+
+    // function isConnectionAuthenticated() {
+
+    // }
 
   }
 
@@ -2542,166 +3122,6 @@
   }
 
 }());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
-    .module('guh.utils', [])
-    .config(config);
-
-  config.$inject = [];
-
-  function config() {}
-
-  // module.exports = angular.module('guh.utils');
-
-}());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-
-  angular
-    .module('guh.utils')
-    .factory('LocalForage', LocalForage);
-
-
-  LocalForage.$inject = ['$log'];
-
-  function LocalForage($log) {
-
-    // jshint unused:false 
-    var LocalForage = {
-      localForageAdapter: new DSLocalForageAdapter(),
-      localForageStore: new JSData.DS()
-    };
-
-    return LocalForage;
-
-  }
-
-}());
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
-    .module('guh.utils')
-    .factory('File', FileFactory);
-
-  FileFactory.$inject = ['$log', '$templateCache'];
-
-  function FileFactory($log, $templateCache) {
-    
-    var File = {
-      checkFile: checkFile
-    };
-
-    return File;
-
-
-    /*
-     * Public method: checkFile(path, file)
-     */
-    function checkFile(path, file) {
-      // if(app.environment === 'production') {
-        // Production: One $templateCache entry per template
-        var cacheObject = $templateCache.get(path + file);
-
-        if(cacheObject !== undefined) {
-          return true;
-        } else {
-          return false;
-        }
-      /*} else if(app.environment === 'development') {
-        // Development: One HTML file per template
-        var request = new XMLHttpRequest();
-
-        request.open('HEAD', path + file, false);
-        request.send();
-
-        if(request.status === 200) {
-          return true;
-        } else {
-          return false;
-        }
-      }*/
-    }
-  }
-
-}());
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                                     *
  * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
@@ -3055,7 +3475,7 @@
   'use strict';
 
   angular
-    .module('guh.api', [])
+    .module('guh.connection', [])
     .config(config);
 
   config.$inject = [];
@@ -3091,41 +3511,26 @@
   'use strict';
 
   angular
-    .module('guh.api')
+    .module('guh.connection')
     .factory('websocketService', websocketService);
 
-  websocketService.$inject = ['$log', '$rootScope', '$q', '$timeout', 'DS'];
+  websocketService.$inject = ['$log', '$rootScope', '$q', '$timeout'];
 
-  function websocketService($log, $rootScope, $q, $timeout, DS) {
+  function websocketService($log, $rootScope, $q, $timeout) {
 
     var ws = null;
     var connectionTimer;
-    var callbacks = {};
-    var currentRequestId = 0;
     var websocketService = {
       close: close,
       connect: connect,
       reconnect: reconnect,
-      send: send
+      send: send,
+      onmessage: angular.noop
     };
 
     return websocketService;
 
-    /*
-     * Private function: _getRequestId()
-     */
-    function _getRequestId() {
-      currentRequestId = currentRequestId + 1;
-      if(currentRequestId > 10000) {
-        currentRequestId = 0;
-      }
-      return currentRequestId;
-    };
 
-
-    /*
-     * Public method: close()
-     */
     function close() {
       if(ws) {
         ws.close();
@@ -3133,9 +3538,6 @@
       }
     }
 
-    /*
-     * Public method: connect()
-     */
     function connect(url) {
       if(ws) {
         return;
@@ -3158,7 +3560,6 @@
           $timeout.cancel(connectionTimer);
         }
 
-        // Send broadcast event
         $rootScope.$apply(function() {
           $rootScope.$broadcast('WebsocketConnected', 'Successful connected to guh.');
         });
@@ -3171,7 +3572,6 @@
             $rootScope.$broadcast('WebsocketConnectionError', 'There was an error connecting to guh.');
           });
         } else {
-          // Send broadcast event
           $rootScope.$apply(function() {
             $rootScope.$broadcast('WebsocketConnectionLost', 'The app has lost the connection to guh. Please check if you are connected to your network and if guh is running correctly.');
           });
@@ -3179,173 +3579,744 @@
       };
 
       ws.onerror = function(event) {
-        // Send broadcast event
         $rootScope.$apply(function() {
           $rootScope.$broadcast('WebsocketConnectionError', 'There was an error connecting to guh.');
         });
+
+        return event;
       };
 
-      ws.onmessage = function(message) {
-        var data = angular.fromJson(message.data);
+      ws.onmessage = function(event) {
+        var response = angular.fromJson(event.data);
 
-        if(angular.isDefined(data.notification)) {
-          switch(data.notification) {
-            // Devices.DeviceAdded
-            case 'Devices.DeviceAdded':
-              var deviceId = data.params.device.id;
-              var device = DS.get('device', deviceId);
-
-              if(angular.isUndefined(device)) {
-                var injectedItem = DS.inject('device', data.params.device);
-
-                // Send broadcast event
-                if(DS.is('device', injectedItem)) {
-                  $rootScope.$broadcast('ReloadView', injectedItem.deviceClass.name + ' was added.');
-                }          
-              }
-
-              break;
-
-
-            // TODO: Devices.DeviceChanged
-
-
-            // Devices.DeviceRemoved
-            case 'Devices.DeviceRemoved':
-              var deviceId = data.params.deviceId;
-              var ejectedItem = DS.eject('device', deviceId);
-
-              if(angular.isDefined(ejectedItem)) {
-                // Send broadcast event
-                $rootScope.$broadcast('ReloadView', 'Device was removed.', ejectedItem);
-              }
-
-              break;
-
-
-            // Devices.StateChanged
-            case 'Devices.StateChanged':
-              var deviceId = data.params.deviceId;
-              var stateTypeId = data.params.stateTypeId;
-              var value = data.params.value;
-              DS.inject('state', {
-                id: '' + deviceId + '_' + stateTypeId,
-                deviceId: deviceId,
-                stateTypeId: stateTypeId,
-                value: value
-              });
-              break;
-
-
-            // TODO: Events.EventTriggered
-
-
-            // TODO: Logging.LogDatabaseUpdated
-
-
-            // TODO: Logging.LogEntryAdded
-
-
-            // TODO: Rules.RuleActiveChanged
-
-
-            // Rules.RuleAdded
-            case 'Rules.RuleAdded':
-              var ruleId = data.params.rule.id;
-              var rule = DS.get('rule', ruleId);
-
-              if(angular.isUndefined(rule)) {
-                var injectedItem = DS.inject('rule', data.params.rule);
-
-                // Send broadcast event
-                if(DS.is('rule', injectedItem)) {
-                  $rootScope.$broadcast('ReloadView', injectedItem.name + ' was added.');
-                }
-              }
-
-              break;
-
-
-            // Rules.ConfigurationChanged
-            case 'Rules.ConfigurationChanged':
-              var rule = data.params.rule;
-              var injectedItem = DS.inject('rule', rule);
-
-              // Send broadcast event
-              if(DS.is('rule', injectedItem)) {
-                $rootScope.$broadcast('ReloadView', injectedItem.name + ' was updated.');
-              }
-
-              break;
-
-
-            // Rules.RuleRemoved
-            case 'Rules.RuleRemoved':
-              var ruleId = data.params.ruleId;
-              var ejectedItem = DS.eject('rule', ruleId);
-
-              if(angular.isDefined(ejectedItem)) {
-                // Send broadcast event
-                $rootScope.$broadcast('ReloadView', 'Rule was removed.');
-              }
-
-              break;
-
-
-            default:
-              // $log.warn('Type of notification not handled:', data);
-          }
-
-        // } else if(angular.isDefined(data.authenticationRequired)) {
-        } else if(angular.isDefined(data.id) && data.id === 0) {
-          $rootScope.$apply(function() {
-            $rootScope.$broadcast('InitialHandshake', data);
-          });
-        } else if(angular.isDefined(data.id)) {
-          if(data.status === 'success') {
-            if(angular.isDefined(data.params.deviceError) && data.params.deviceError !== 'DeviceErrorNoError') {
-              $rootScope.$apply(callbacks[data.id].callback.reject(data.params));
-            } else if(angular.isDefined(data.params.loggingError) && data.params.loggingError !== 'LoggingErrorNoError') {
-              $rootScope.$apply(callbacks[data.id].callback.reject(data.params));
-            } else if(angular.isDefined(data.params.ruleError) && data.params.ruleError !== 'RuleErrorNoError') {
-              $rootScope.$apply(callbacks[data.id].callback.reject(data.params));
-            } else {
-              $rootScope.$apply(callbacks[data.id].callback.resolve(data.params));
-            }
-          } else {
-            $rootScope.$apply(callbacks[data.id].callback.reject(data.error));
-          }
-          
-          delete callbacks[data.id];
-        }
+        // $log.log('%cwebsocketService:onmessage', 'color: #da7469', response, websocketService);
+        websocketService.onmessage(response);
       };
     }
 
-    /*
-     * Public method: reconnect(url)
-     */
     function reconnect(url) {
       websocketService.close();
       websocketService.connect(url);
     }
 
-    /*
-     * Public method: send(request)
-     */
+    function send(request) {
+      // $log.log('%cwebsocketService:send', 'color: #da7469', request);
+      ws.send(angular.toJson(request));
+    }
+
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.connection')
+    .factory('localWebsocketService', localWebsocketService);
+
+  localWebsocketService.$inject = ['$log', '$rootScope', '$q', 'cloudService', 'websocketService'];
+
+  function localWebsocketService($log, $rootScope, $q, cloudService, websocketService) {
+  
+    var currentRequestId = 0;
+    var callbacks = {};
+    var localWebsocketService = {
+      send: send,
+      onmessage: angular.noop,
+      getOnMessageCallback: _getOnMessageCallback
+    };
+
+    return localWebsocketService;
+
+
+    function _onmessage(response) {
+      // $log.log('%clocalWebsocket:_onmessage', 'color: #4f98da', response, callbacks);
+
+      localWebsocketService.onmessage(response);
+    }
+
+    function _getOnMessageCallback() {
+      return _onmessage;
+    }
+
+
+    function send(request) {
+      websocketService.send(request);
+    }
+
+  }
+
+}());
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.connection')
+    .factory('cloudWebsocketService', cloudWebsocketService);
+
+  cloudWebsocketService.$inject = ['$log', '$rootScope', '$q', 'cloudService', 'websocketService'];
+
+  function cloudWebsocketService($log, $rootScope, $q, cloudService, websocketService) {
+  
+    var currentRequestId = 0;
+    var callbacks = {};
+    var cloudWebsocketService = {
+      send: send,
+      onmessage: angular.noop,
+      getOnMessageCallback: _getOnMessageCallback
+    };
+
+    return cloudWebsocketService;
+
+
+    function _getRequestId() {
+      currentRequestId = currentRequestId + 1;
+
+      if(currentRequestId > 10000) {
+        currentRequestId = 0;
+      }
+
+      return currentRequestId;
+    }
+
+    function _onmessage(response) {
+      // $log.log('%ccloudWebsocket:_onmessage', 'color: #bada55', response, callbacks);
+
+      if(angular.isDefined(response.notification)) {
+        _notificationHandler(response);
+      } else if(angular.isDefined(response.server) &&
+                angular.isDefined(response.version)) {
+        $rootScope.$apply(function() {
+          $rootScope.$broadcast('InitialHandshake', response);
+        });
+      } else if(angular.isDefined(response.id)) {
+        _responseHandler(response);
+      }
+    }
+
+    function _getOnMessageCallback() {
+      return _onmessage;
+    }
+
+    function _notificationHandler(response) {
+      var notification = response.notification;
+
+      switch(notification) {
+        // TODO: Connection.ConnectionAdded
+
+
+        // TODO: Connection.ConnectionRemoved
+
+
+        case 'Connection.DataReceived':
+          if(angular.isDefined(response.params) &&
+            angular.isDefined(response.params.tunnelId) &&
+            response.params.tunnelId === cloudService.getTunnelId() &&
+            angular.isDefined(response.params.data)) {
+            cloudWebsocketService.onmessage(response.params.data);
+          }
+          break;
+
+        // TODO: Connection.TunnelAdded
+
+
+        // TODO: Connection.TunnelRemoved
+
+
+        default:
+          // $log.warn('cloudWebsocket:notification', 'Notification not handled.', response);
+      }
+    }
+
+    function _responseHandler(response) {
+      if(response.status === 'success') {
+        if(angular.isDefined(response.params.authenticationError) &&
+           response.params.authenticationError !== 'AuthenticationErrorSuccess') {
+          $rootScope.$apply(callbacks[response.id].callback.reject(response.params));
+        } else if(angular.isDefined(response.params.connectionError) &&
+                  response.params.connectionError !== 'ConnectionErrorNoError') {
+          $rootScope.$apply(callbacks[response.id].callback.reject(response.params));
+        }/* else if(angular.isDefined(response.params.authenticationError) ||
+                  angular.isDefined(response.params.connectionError)) {
+          // Response has to be from cloud (only responses with authenticationError or connectionError are coming from cloud)
+          $rootScope.$apply(callbacks[response.id].callback.resolve(response.params));
+        } */else {
+          $rootScope.$apply(callbacks[response.id].callback.resolve(response.params));
+        }
+      } else {
+        $rootScope.$apply(callbacks[response.id].callback.reject(response));
+      }
+
+      delete callbacks[response.id];
+    }
+
+
     function send(request) {
       var defer = $q.defer();
       var requestId = _getRequestId();
+      var tunnelId = cloudService.getTunnelId();
 
       callbacks[requestId] = {
         time: new Date(),
-        callback: defer
+        callback: defer,
+        request: request
       };
 
-      request.id = requestId;
+      // var callbackString = '';
+      // angular.forEach(callbacks, function(value, key) {
+      //   callbackString = callbackString + key + '-' + value.request.method + ':';
+      // });
+      // $log.log('%ccloudWebsocketService:send', 'color: #bada55', requestId, request, callbackString);
 
-      ws.send(angular.toJson(request));
+      if(angular.isDefined(tunnelId)) {
+        request = {
+          id: requestId,
+          method: 'Connection.SendData',
+          params: {
+            data: request,
+            tunnelId: tunnelId
+          }
+        };
+      } else {
+        request.id = requestId;
+      }
+
+      websocketService.send(request);
 
       return defer.promise;
+    }
+
+  }
+
+}());
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.cloud', [])
+    .config(config);
+
+  config.$inject = [];
+
+  function config() {}
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.cloud')
+    .provider('cloudService', Cloud);
+
+  Cloud.$inject = [];
+
+  function Cloud() {
+    
+    var grantType = 'password';
+
+    var provider = {
+      ssl: true,
+      baseUrl: '',
+      loginUrl: '/auth/login',
+      signupUrl: '/auth/signup',
+      $get: $get
+    };
+
+    return provider;
+
+
+    /*
+     * Provider method: $get()
+     */
+
+    $get.$inject = ['$log', '$q', '$http'];
+
+    function $get($log, $q, $http) {
+      var authenticated = false;
+      var tunnelId;
+      var service = {
+        login: login,
+        logout: logout,
+        isAuthenticated: isAuthenticated,
+        getTunnelId: getTunnelId,
+        setTunnelId: setTunnelId,
+      };
+
+      return service;
+
+
+      /*
+       * Public method: login(username, password)
+       */
+      function login(username, password) {
+        var protocol = provider.ssl ? 'https' : 'http';
+
+        return $http({
+          method: 'POST',
+          url: protocol + '://' + provider.baseUrl + provider.loginUrl,
+          // http://stackoverflow.com/questions/24710503/how-do-i-post-urlencoded-form-data-with-http-in-angularjs
+          headers: {
+            'Content-Type' : 'application/x-www-form-urlencoded'
+          },
+          transformRequest: function(obj) {
+            var str = [];
+
+            for(var p in obj) {
+              str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+            }
+            
+            return str.join('&');
+          },
+          data: {
+            'grant_type': grantType,
+            'username': username,
+            'password': password
+          }
+        }).then(function success(response) {
+          if(angular.isDefined(response.data)) {
+            var data = response.data;
+
+            authenticated = true;
+
+            // $log.log('success', response);
+
+            return data;
+          } else {
+            return $q.reject('Field "data" missing in response.');
+          }
+        }, function failure(error) {
+          authenticated = false;
+
+          return error;
+        });
+      }
+
+      /*
+       * Public method: logout()
+       */
+      function logout() {
+        $log.log('Cloud.logout');
+      }
+
+      /*
+       * Public method: isAuthenticated()
+       */
+      function isAuthenticated() {
+        return authenticated;
+      }
+
+      /*
+       * Public method: getTunnelId()
+       */
+      function getTunnelId() {
+        // $log.log('getTunnelId', tunnelId);
+        return tunnelId;
+      }
+
+      /*
+       * Public method: setTunnelId(id)
+       */
+      function setTunnelId(id) {
+        tunnelId = id;
+        // $log.log('setTunnelId', tunnelId);
+      }
+    }
+
+  }
+
+}());
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.api', [])
+    .config(config);
+
+  config.$inject = [];
+
+  function config() {}
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.api')
+    .provider('apiService', apiService);
+
+  // apiService.$inject = ['$log', '$rootScope', '$q', 'cloudService', 'localWebsocketService', 'cloudWebsocketService', 'DS'];
+  apiService.$inject = [];
+
+  // function apiService($log, $rootScope, $q, cloudService, localWebsocketService, cloudWebsocketService, DS) {
+  function apiService() {
+
+    var apiServiceProvider = {
+      connectionType: 'localWebsocketService',
+      $get: $get
+    };
+
+    return apiServiceProvider;
+
+
+    $get.$inject = ['$log', '$rootScope', '$q', 'cloudService', 'localWebsocketService', 'cloudWebsocketService', 'websocketService', 'DS'];
+
+    function $get($log, $rootScope, $q, cloudService, localWebsocketService, cloudWebsocketService, websocketService, DS) {
+      var currentRequestId = 0;
+      var callbacks = {};
+      var apiService = {
+        send: send
+      };
+
+      // Set callbacks
+      if(apiServiceProvider.connectionType === 'cloudWebsocket') {
+        cloudWebsocketService.onmessage = _onmessage;
+        websocketService.onmessage = cloudWebsocketService.getOnMessageCallback();
+      } else {
+        localWebsocketService.onmessage = _onmessage;
+      }
+
+      return apiService;
+
+
+      function _getRequestId() {
+        currentRequestId = currentRequestId + 1;
+
+        if(currentRequestId > 10000) {
+          currentRequestId = 0;
+        }
+
+        return currentRequestId;
+      }
+
+      function _onmessage(response) {
+        // $log.log('%capiService:_onmessage', 'color: #4f98da', response, callbacks);
+
+        if(angular.isDefined(response.notification)) {
+          _notificationHandler(response);
+        } else if(angular.isDefined(response.server) &&
+                  angular.isDefined(response.version)) {
+          $rootScope.$apply(function() {
+            $rootScope.$broadcast('InitialHandshake', response);
+          });
+        } else if(angular.isDefined(response.id)) {
+          _responseHandler(response);
+        }
+      }
+
+      function _notificationHandler(response) {
+        var notification = response.notification;
+
+        switch(notification) {
+          // TODO: Cloud.ConnectionStatusChanged
+
+          
+          // TODO: Configuration.BasicConfigurationChanged
+
+          
+          // TODO: Configuration.TcpServerConfigurationChanged
+
+          
+          // TODO: Configuration.WebServerConfigurationChanged
+
+          
+          // TODO: Configuration.WebSocketServerConfigurationChanged
+
+
+          // Devices.DeviceAdded
+          case 'Devices.DeviceAdded':
+            var deviceId = response.params.device.id;
+            var device = DS.get('device', deviceId);
+
+            if(angular.isUndefined(device)) {
+              var injectedItem = DS.inject('device', response.params.device);
+
+              if(DS.is('device', injectedItem)) {
+                $rootScope.$broadcast('ReloadView', injectedItem.deviceClass.name + ' was added.');
+              }          
+            }
+            break;
+
+
+          // TODO: Devices.DeviceChanged
+
+
+          // Devices.DeviceRemoved
+          case 'Devices.DeviceRemoved':
+            var deviceId = response.params.deviceId;
+            var ejectedItem = DS.eject('device', deviceId);
+
+            if(angular.isDefined(ejectedItem)) {
+              $rootScope.$broadcast('ReloadView', 'Device was removed.', ejectedItem);
+            }
+            break;
+
+
+          // Devices.StateChanged
+          case 'Devices.StateChanged':
+            var deviceId = response.params.deviceId;
+            var stateTypeId = response.params.stateTypeId;
+            var value = response.params.value;
+
+            DS.inject('state', {
+              id: '' + deviceId + '_' + stateTypeId,
+              deviceId: deviceId,
+              stateTypeId: stateTypeId,
+              value: value
+            });
+            break;
+
+
+          // TODO: Events.EventTriggered
+
+
+          // TODO: Logging.LogDatabaseUpdated
+
+
+          // TODO: Logging.LogEntryAdded
+
+
+          // TODO: Rules.RuleActiveChanged
+
+
+          // Rules.RuleAdded
+          case 'Rules.RuleAdded':
+            var ruleId = response.params.rule.id;
+            var rule = DS.get('rule', ruleId);
+
+            if(angular.isUndefined(rule)) {
+              var injectedItem = DS.inject('rule', response.params.rule);
+
+              if(DS.is('rule', injectedItem)) {
+                $rootScope.$broadcast('ReloadView', injectedItem.name + ' was added.');
+              }
+            }
+            break;
+
+
+          // Rules.ConfigurationChanged
+          case 'Rules.ConfigurationChanged':
+            var rule = response.params.rule;
+            var injectedItem = DS.inject('rule', rule);
+
+            if(DS.is('rule', injectedItem)) {
+              $rootScope.$broadcast('ReloadView', injectedItem.name + ' was updated.');
+            }
+            break;
+
+          // Rules.RuleRemoved
+          case 'Rules.RuleRemoved':
+            var ruleId = response.params.ruleId;
+            var ejectedItem = DS.eject('rule', ruleId);
+
+            if(angular.isDefined(ejectedItem)) {
+              $rootScope.$broadcast('ReloadView', 'Rule was removed.');
+            }
+            break;
+
+          default:
+            $log.warn('apiService:notification', 'Notification "' + notification + '" not handled.', response);
+        }
+      }
+
+      function _responseHandler(response) {      
+        if(response.status === 'success') {
+          if(angular.isDefined(response.params.deviceError) && response.params.deviceError !== 'DeviceErrorNoError') {
+            $rootScope.$apply(callbacks[response.id].callback.reject(response.params));
+          } else if(angular.isDefined(response.params.loggingError) && response.params.loggingError !== 'LoggingErrorNoError') {
+            $rootScope.$apply(callbacks[response.id].callback.reject(response.params));
+          } else if(angular.isDefined(response.params.ruleError) && response.params.ruleError !== 'RuleErrorNoError') {
+            $rootScope.$apply(callbacks[response.id].callback.reject(response.params));
+          } else if(angular.isDefined(response.params.connectionError) && response.params.connectionError !== 'ConnectionErrorNoError') {
+            $rootScope.$apply(callbacks[response.id].callback.reject(response.params));
+          } else {
+            $rootScope.$apply(callbacks[response.id].callback.resolve(response.params));
+          }
+        } else {
+          $rootScope.$apply(callbacks[response.id].callback.reject(response));
+        }
+
+        delete callbacks[response.id];
+      }
+
+
+      function send(request) {
+        var defer = $q.defer();
+        var requestId = _getRequestId();
+        var tunnelId = cloudService.getTunnelId();
+
+        request.id = requestId;
+
+        callbacks[requestId] = {
+          time: new Date(),
+          callback: defer,
+          request: request
+        };
+
+        // var callbackString = '';
+        // angular.forEach(callbacks, function(value, key) {
+        //   callbackString = callbackString + key + '-' + value.request.method + ':';
+        // });
+        // $log.log('%capiService:send', 'color: #4f98da', requestId, request, callbackString);
+
+        if(angular.isDefined(tunnelId)) {
+          cloudWebsocketService.send(request);
+        } else {
+          localWebsocketService.send(request);
+        }
+
+        return defer.promise;
+      }
     }
 
   }

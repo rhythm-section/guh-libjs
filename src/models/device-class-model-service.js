@@ -30,9 +30,9 @@
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', '_', 'websocketService', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
+  DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', '_', 'apiService', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
 
-  function DSDeviceClassFactory($log, $q, DS, _, websocketService, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
+  function DSDeviceClassFactory($log, $q, DS, _, apiService, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
     
     var staticMethods = {};
     var deviceClassActionTypesId = 0;
@@ -164,7 +164,7 @@
 
 
     function load() {
-      return websocketService
+      return apiService
         .send({
           method: 'Devices.GetSupportedDevices'
         })
@@ -320,7 +320,7 @@
       /* jshint validthis: true */
       var self = this;
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Devices.GetDiscoveredDevices',
         params: {
           deviceClassId: self.id,

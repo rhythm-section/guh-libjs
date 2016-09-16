@@ -30,9 +30,9 @@
     .factory('DSVendor', DSVendorFactory)
     .run(function(DSVendor) {});
 
-  DSVendorFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  DSVendorFactory.$inject = ['$log', '$q', 'DS', 'apiService'];
 
-  function DSVendorFactory($log, $q, DS, websocketService) {
+  function DSVendorFactory($log, $q, DS, apiService) {
     
     var staticMethods = {};
 
@@ -72,7 +72,7 @@
 
 
     function load() {
-      return websocketService
+      return apiService
         .send({
           method: 'Devices.GetSupportedVendors'
         })

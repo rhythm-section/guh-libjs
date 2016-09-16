@@ -30,9 +30,9 @@
     .factory('DSDevice', DSDeviceFactory)
     .run(function(DSDevice) {});
 
-  DSDeviceFactory.$inject = ['$log', '$q', 'DS', 'websocketService'];
+  DSDeviceFactory.$inject = ['$log', '$q', 'DS', 'apiService'];
 
-  function DSDeviceFactory($log, $q, DS, websocketService) {
+  function DSDeviceFactory($log, $q, DS, apiService) {
     
     var staticMethods = {};
 
@@ -147,7 +147,7 @@
 
 
     function load() {
-      return websocketService
+      return apiService
         .send({
           method: 'Devices.GetConfiguredDevices'
         })
@@ -189,7 +189,7 @@
         params.name = name;
       }
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Devices.PairDevice',
         params: params
       });
@@ -207,7 +207,7 @@
         params.secret = secret;
       }
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Devices.ConfirmPairing',
         params: params
       }); 
@@ -237,7 +237,7 @@
       }
 
       // Device gets inserted when notification "Devices.DeviceAdded" was received
-      return websocketService.send({
+      return apiService.send({
         method: 'Devices.AddConfiguredDevice',
         params: params
       });
@@ -280,7 +280,7 @@
         jsonRpcParams.params = params;
       }
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Actions.ExecuteAction',
         params: jsonRpcParams
       });
@@ -302,7 +302,7 @@
         });
       }
 
-      return websocketService.send({
+      return apiService.send({
         method: 'Devices.RemoveConfiguredDevice',
         params: jsonRpcParams
       });

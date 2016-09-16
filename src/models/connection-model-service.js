@@ -31,13 +31,15 @@
     .run(function(DSConnection) {});
 
 
-  DSConnectionFactory.$inject = ['$log', 'LocalForage'];
+  DSConnectionFactory.$inject = ['$log', 'LocalForage', 'cloudWebsocketService'];
 
-  function DSConnectionFactory($log, LocalForage) {
+  function DSConnectionFactory($log, LocalForage, cloudWebsocketService) {
 
     LocalForage.localForageStore.registerAdapter('localForage', LocalForage.localForageAdapter, { default: true });
 
-    var Connection = LocalForage.localForageStore.defineResource({
+    var tunnelCreated = false;
+
+    var DSConnection = LocalForage.localForageStore.defineResource({
       name: 'connection',
       relations: {
         belongsTo: {
@@ -50,7 +52,76 @@
       }
     });
 
-    return Connection;
+    angular.extend(DSConnection, {
+      getConnections: getConnections,
+      createTunnel: createTunnel,
+      isTunnelCreated: isTunnelCreated
+    });
+
+    return DSConnection;
+
+
+    /*
+     * Static method: createTunnel(connectionId)
+     */
+
+    function createTunnel(connectionId) {
+      if(connectionId) {
+        return cloudWebsocketService
+          .send({
+            method: 'Connection.CreateTunnel',
+            params: {
+              connectionId: connectionId
+            }
+          })
+          .then(function(tunnelData) {
+            tunnelCreated = true;
+
+            return DSConnection
+              .create({
+                id: tunnelData.tunnel.id,
+                activationTimeStamp: tunnelData.tunnel.activationTimeStamp,
+                clientConnection: tunnelData.tunnel.clientConnection,
+                // tunnelId: tunnelData.tunnel.id,
+                serverConnection: tunnelData.tunnel.serverConnection
+              })
+              .then(function(connection) {
+                return tunnelData.tunnel;
+              })
+              .catch(function(error) {
+                return error;
+              });
+          })
+          .catch(function(error) {
+            tunnelCreated = false;
+            return error;
+          });
+      } else {
+        $log.error('Parameter "connectionId" missing.');
+        tunnelCreated = false;
+      }
+    }
+
+    /*
+     * Static method: isTunnelCreated()
+     */
+
+    function isTunnelCreated() {
+      return tunnelCreated;
+    }
+
+    /*
+     * Static method: getConnections()
+     */
+
+    function getConnections() {
+      // $log.log('getConnections');
+
+      return cloudWebsocketService
+        .send({
+          method: 'Connection.GetConnections'
+        });
+    }
 
   }
 
