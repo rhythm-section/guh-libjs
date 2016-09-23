@@ -396,6 +396,166 @@
   'use strict';
 
   angular
+    .module('guh.utils', [])
+    .config(config);
+
+  config.$inject = [];
+
+  function config() {}
+
+  // module.exports = angular.module('guh.utils');
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+
+  angular
+    .module('guh.utils')
+    .factory('LocalForage', LocalForage);
+
+
+  LocalForage.$inject = ['$log'];
+
+  function LocalForage($log) {
+
+    // jshint unused:false 
+    var LocalForage = {
+      localForageAdapter: new DSLocalForageAdapter(),
+      localForageStore: new JSData.DS()
+    };
+
+    return LocalForage;
+
+  }
+
+}());
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.utils')
+    .factory('File', FileFactory);
+
+  FileFactory.$inject = ['$log', '$templateCache'];
+
+  function FileFactory($log, $templateCache) {
+    
+    var File = {
+      checkFile: checkFile
+    };
+
+    return File;
+
+
+    /*
+     * Public method: checkFile(path, file)
+     */
+    function checkFile(path, file) {
+      // if(app.environment === 'production') {
+        // Production: One $templateCache entry per template
+        var cacheObject = $templateCache.get(path + file);
+
+        if(cacheObject !== undefined) {
+          return true;
+        } else {
+          return false;
+        }
+      /*} else if(app.environment === 'development') {
+        // Development: One HTML file per template
+        var request = new XMLHttpRequest();
+
+        request.open('HEAD', path + file, false);
+        request.send();
+
+        if(request.status === 200) {
+          return true;
+        } else {
+          return false;
+        }
+      }*/
+    }
+  }
+
+}());
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
     .module('guh.models', [
       // Datastore
       'js-data'
@@ -1012,6 +1172,71 @@
 
   angular
     .module('guh.models')
+    .factory('DSPluginParamType', DSPluginParamTypeFactory)
+    .run(function(DSPluginParamType) {});
+
+  DSPluginParamTypeFactory.$inject = ['$log', 'DS'];
+
+  function DSPluginParamTypeFactory($log, DS) {
+    
+    var staticMethods = {};
+
+    /*
+     * DataStore configuration
+     */
+    var DSPluginParamType = DS.defineResource({
+
+      // Model configuration
+      name: 'pluginParamType',
+      relations: {
+        belongsTo: {
+          plugin: {
+            localField: 'plugin',
+            localKey: 'pluginId'
+          },
+          paramType: {
+            localField: 'paramType',
+            localKey: 'paramTypeId'
+          }
+        }
+      }
+
+    });
+
+    return DSPluginParamType;
+
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.models')
     .factory('DSPlugin', DSPluginFactory)
     .run(function(DSPlugin) {});
 
@@ -1020,6 +1245,7 @@
   function DSPluginFactory($log, $q, DS, websocketService) {
     
     var staticMethods = {};
+    var pluginParamTypesId = 0;
 
     /*
      * DataStore configuration
@@ -1032,13 +1258,32 @@
       // Model configuration
       idAttribute: 'id',
       name: 'plugin',
-      relations: {},
+      relations: {
+        hasMany: {
+          pluginParamType: {
+            localField: 'pluginParamTypes',
+            foreignKey: 'pluginId'
+          }
+        }
+      },
 
       // Computed properties
       computed: {},
 
       // Instance methods
-      methods: {}
+      methods: {},
+
+      // Lifecycle hooks
+      afterInject: function(resource, attrs) {
+        if(angular.isArray(attrs)) {
+          var arrayOfAttrs = attrs;
+          angular.forEach(arrayOfAttrs, function(attrs) {
+            _createPluginParamTypes(resource, attrs);
+          });
+        } else {
+          _createPluginParamTypes(resource, attrs);
+        }
+      }
 
     });
 
@@ -1047,6 +1292,41 @@
     });
 
     return DSPlugin;
+
+
+    /*
+     * Private method: _createPluginParamTypes()
+     */
+    function _createPluginParamTypes(resource, attrs) {
+      var pluginParamTypes = DS.getAll('pluginParamType');
+      var paramTypes = attrs.paramTypes;
+      var pluginId = attrs.id;
+
+
+      // ParamTypes
+      angular.forEach(paramTypes, function(paramType) {
+        // Create paramType
+        var paramTypeInstance = DS.createInstance('paramType', paramType);
+        DS.inject('paramType', paramTypeInstance);
+
+        // Filtered actionTypeParamTypes
+        var pluginParamTypesFiltered = pluginParamTypes.filter(function(pluginParamType) {
+          return pluginParamType.pluginId === pluginId && pluginParamType.paramTypeId === paramType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(pluginParamTypesFiltered) && pluginParamTypesFiltered.length === 0) {
+          // Create membership (plugin <-> paramType)
+          pluginParamTypesId = pluginParamTypesId + 1;
+          var pluginParamTypeInstance = DS.createInstance('pluginParamType', {
+            id: pluginParamTypesId,
+            pluginId: pluginId,
+            paramTypeId: paramType.id
+          });
+          DS.inject('pluginParamType', pluginParamTypeInstance);
+        }
+      });
+    }
 
 
     function load() {
@@ -1109,10 +1389,26 @@
       // Model configuration
       name: 'paramType',
       relations: {
-        belongsTo: {
-          deviceClass: {
-            localField: 'deviceClass',
-            localKey: 'deviceClassId'
+        hasMany: {
+          deviceClassDiscoveryParamType: {
+            localField: 'deviceClassDiscoveryParamTypes',
+            foreignKey: 'paramTypeId'
+          },
+          deviceClassParamType: {
+            localField: 'deviceClassParamTypes',
+            foreignKey: 'paramTypeId'
+          },
+          actionTypeParamType: {
+            localField: 'actionTypeParamTypes',
+            foreignKey: 'paramTypeId'
+          },
+          eventTypeParamType: {
+            localField: 'eventTypeParamTypes',
+            foreignKey: 'paramTypeId'
+          },
+          pluginParamType: {
+            localField: 'pluginParamTypes',
+            foreignKey: 'paramTypeId'
           }
         }
       },
@@ -1273,6 +1569,71 @@
 
   angular
     .module('guh.models')
+    .factory('DSEventTypeParamType', DSEventTypeParamTypeFactory)
+    .run(function(DSEventTypeParamType) {});
+
+  DSEventTypeParamTypeFactory.$inject = ['$log', 'DS'];
+
+  function DSEventTypeParamTypeFactory($log, DS) {
+    
+    var staticMethods = {};
+
+    /*
+     * DataStore configuration
+     */
+    var DSEventTypeParamType = DS.defineResource({
+
+      // Model configuration
+      name: 'eventTypeParamType',
+      relations: {
+        belongsTo: {
+          eventType: {
+            localField: 'eventType',
+            localKey: 'eventTypeId'
+          },
+          paramType: {
+            localField: 'paramType',
+            localKey: 'paramTypeId'
+          }
+        }
+      }
+
+    });
+
+    return DSEventTypeParamType;
+
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.models')
     .factory('DSEventType', DSEventTypeFactory)
     .run(function(DSEventType) {});
 
@@ -1281,6 +1642,7 @@
   function DSEventTypeFactory($log, DS) {
     
     var staticMethods = {};
+    var eventTypeParamTypesId = 0;
 
     /*
      * DataStore configuration
@@ -1300,6 +1662,12 @@
             localKey: 'deviceClassId',
             parent: true
           }
+        },
+        hasMany: {
+          eventTypeParamType: {
+            localField: 'eventTypeParamTypes',
+            foreignKey: 'eventTypeId'
+          }
         }
       },
 
@@ -1317,9 +1685,11 @@
           var arrayOfAttrs = attrs;
           angular.forEach(arrayOfAttrs, function(attrs) {
             _addUiData(resource, attrs);
+            _createEventTypeParamTypes(resource, attrs);
           });
         } else {
           _addUiData(resource, attrs);
+          _createEventTypeParamTypes(resource, attrs);
         }
       }
 
@@ -1341,6 +1711,40 @@
       } else {
         attrs.phrase = phrase + ' is detected and parameters are';
       }
+    }
+
+    /*
+     * Private method:_createEventTypeParamTypes()
+     */
+    function _createEventTypeParamTypes(resource, attrs) {
+      var eventTypeParamTypes = DS.getAll('eventTypeParamType');
+      var paramTypes = attrs.paramTypes;
+      var eventTypeId = attrs.id;
+
+
+      // ParamTypes
+      angular.forEach(paramTypes, function(paramType) {
+        // Create paramType
+        var paramTypeInstance = DS.createInstance('paramType', paramType);
+        DS.inject('paramType', paramTypeInstance);
+
+        // Filtered eventTypeParamTypes
+        var eventTypeParamTypesFiltered = eventTypeParamTypes.filter(function(eventTypeParamType) {
+          return eventTypeParamType.eventTypeId === eventTypeId && eventTypeParamType.paramTypeId === paramType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(eventTypeParamTypesFiltered) && eventTypeParamTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> paramType)
+          eventTypeParamTypesId = eventTypeParamTypesId + 1;
+          var eventTypeParamTypeInstance = DS.createInstance('eventTypeParamType', {
+            id: eventTypeParamTypesId,
+            eventTypeId: eventTypeId,
+            paramTypeId: paramType.id
+          });
+          DS.inject('eventTypeParamType', eventTypeParamTypeInstance);
+        }
+      });
     }
 
 
@@ -1824,14 +2228,81 @@
 
   angular
     .module('guh.models')
+    .factory('DSDeviceClassParamType', DSDeviceClassParamTypeFactory)
+    .run(function(DSDeviceClassParamType) {});
+
+  DSDeviceClassParamTypeFactory.$inject = ['$log', 'DS'];
+
+  function DSDeviceClassParamTypeFactory($log, DS) {
+    
+    var staticMethods = {};
+
+    /*
+     * DataStore configuration
+     */
+    var DSDeviceClassParamType = DS.defineResource({
+
+      // Model configuration
+      name: 'deviceClassParamType',
+      relations: {
+        belongsTo: {
+          deviceClass: {
+            localField: 'deviceClass',
+            localKey: 'deviceClassId'
+          },
+          paramType: {
+            localField: 'paramType',
+            localKey: 'paramTypeId'
+          }
+        }
+      }
+
+    });
+
+    return DSDeviceClassParamType;
+
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.models')
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-  DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', '_', 'websocketService', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
+  DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', '_', 'websocketService', 'modelsHelper', 'DSDeviceClassParamType', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
 
-  function DSDeviceClassFactory($log, $q, DS, _, websocketService, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
+  function DSDeviceClassFactory($log, $q, DS, _, websocketService, modelsHelper, DSDeviceClassParamType, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
     
     var staticMethods = {};
+    var deviceClassDiscoveryParamTypesId = 0;
+    var deviceClassParamTypesId = 0;
     var deviceClassActionTypesId = 0;
     var deviceClassEventTypesId = 0;
     var deviceClassStateTypesId = 0;
@@ -1856,6 +2327,14 @@
           }
         },
         hasMany: {
+          deviceClassDiscoveryParamType: {
+            localField: 'deviceClassDiscoveryParamTypes',
+            foreignKey: 'deviceClassId'
+          },
+          deviceClassParamType: {
+            localField: 'deviceClassParamTypes',
+            foreignKey: 'deviceClassId'
+          },
           deviceClassActionType: {
             localField: 'deviceClassActionTypes',
             foreignKey: 'deviceClassId'
@@ -1889,11 +2368,11 @@
           var arrayOfAttrs = attrs;
           angular.forEach(arrayOfAttrs, function(attrs) {
             _mapStates(resource, attrs);
-            _createDeviceClassActionsTypes(resource, attrs);
+            _createDeviceClassParamTypes(resource, attrs);
           });
         } else {
           _mapStates(resource, attrs);
-          _createDeviceClassActionsTypes(resource, attrs);
+          _createDeviceClassParamTypes(resource, attrs);
         }
       }
 
@@ -1994,16 +2473,69 @@
     }
 
     /*
-     * Private method:_createDeviceClassActionsTypes()
+     * Private method:_createDeviceClassParamTypes()
      */
-    function _createDeviceClassActionsTypes(resource, attrs) {
+    function _createDeviceClassParamTypes(resource, attrs) {
+      var deviceClassDiscoveryParamTypes = DS.getAll('deviceClassDiscoveryParamType');
+      var deviceClassParamTypes = DS.getAll('deviceClassParamType');
       var deviceClassActionTypes = DS.getAll('deviceClassActionType');
       var deviceClassEventTypes = DS.getAll('deviceClassEventType');
       var deviceClassStateTypes = DS.getAll('deviceClassStateType');
+      var discoveryParamTypes = attrs.discoveryParamTypes;
+      var paramTypes = attrs.paramTypes;
       var actionTypes = attrs.actionTypes;
       var eventTypes = attrs.eventTypes;
       var stateTypes = attrs.stateTypes;
       var deviceClassId = attrs.id;
+
+
+      // DiscoveryParamTypes
+      angular.forEach(discoveryParamTypes, function(discoveryParamType) {
+        // Create discoveryParamType
+        var discoveryParamTypeInstance = DS.createInstance('paramType', discoveryParamType);
+        DS.inject('paramType', discoveryParamTypeInstance);
+
+        // Filtered deviceClassDiscoveryParamTypes
+        var deviceClassDiscoveryParamTypesFiltered = deviceClassDiscoveryParamTypes.filter(function(deviceClassDiscoveryParamType) {
+          return deviceClassDiscoveryParamType.deviceClassId === deviceClassId && deviceClassDiscoveryParamType.paramTypeId === discoveryParamType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(deviceClassDiscoveryParamTypesFiltered) && deviceClassDiscoveryParamTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> discoveryParamType)
+          deviceClassDiscoveryParamTypesId = deviceClassDiscoveryParamTypesId + 1;
+          var deviceClassDiscoveryParamTypeInstance = DS.createInstance('deviceClassDiscoveryParamType', {
+            id: deviceClassDiscoveryParamTypesId,
+            deviceClassId: deviceClassId,
+            paramTypeId: discoveryParamType.id
+          });
+          DS.inject('deviceClassDiscoveryParamType', deviceClassDiscoveryParamTypeInstance);
+        }
+      });
+
+      // ParamTypes
+      angular.forEach(paramTypes, function(paramType) {
+        // Create paramType
+        var paramTypeInstance = DS.createInstance('paramType', paramType);
+        DS.inject('paramType', paramTypeInstance);
+
+        // Filtered deviceClassParamTypes
+        var deviceClassParamTypesFiltered = deviceClassParamTypes.filter(function(deviceClassParamType) {
+          return deviceClassParamType.deviceClassId === deviceClassId && deviceClassParamType.paramTypeId === paramType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(deviceClassParamTypesFiltered) && deviceClassParamTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> paramType)
+          deviceClassParamTypesId = deviceClassParamTypesId + 1;
+          var deviceClassParamTypeInstance = DS.createInstance('deviceClassParamType', {
+            id: deviceClassParamTypesId,
+            deviceClassId: deviceClassId,
+            paramTypeId: paramType.id
+          });
+          DS.inject('deviceClassParamType', deviceClassParamTypeInstance);
+        }
+      });
 
       // ActionTypes
       angular.forEach(actionTypes, function(actionType) {
@@ -2294,6 +2826,71 @@
 
   angular
     .module('guh.models')
+    .factory('DSDeviceClassDiscoveryParamType', DSDeviceClassDiscoveryParamTypeFactory)
+    .run(function(DSDeviceClassDiscoveryParamType) {});
+
+  DSDeviceClassDiscoveryParamTypeFactory.$inject = ['$log', 'DS'];
+
+  function DSDeviceClassDiscoveryParamTypeFactory($log, DS) {
+    
+    var staticMethods = {};
+
+    /*
+     * DataStore configuration
+     */
+    var DSDeviceClassDiscoveryParamType = DS.defineResource({
+
+      // Model configuration
+      name: 'deviceClassDiscoveryParamType',
+      relations: {
+        belongsTo: {
+          deviceClass: {
+            localField: 'deviceClass',
+            localKey: 'deviceClassId'
+          },
+          paramType: {
+            localField: 'discoveryParamType',
+            localKey: 'paramTypeId'
+          }
+        }
+      }
+
+    });
+
+    return DSDeviceClassDiscoveryParamType;
+
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.models')
     .factory('DSDeviceClassActionType', DSDeviceClassActionTypeFactory)
     .run(function(DSDeviceClassActionType) {});
 
@@ -2417,6 +3014,71 @@
 
   angular
     .module('guh.models')
+    .factory('DSActionTypeParamType', DSActionTypeParamTypeFactory)
+    .run(function(DSActionTypeParamType) {});
+
+  DSActionTypeParamTypeFactory.$inject = ['$log', 'DS'];
+
+  function DSActionTypeParamTypeFactory($log, DS) {
+    
+    var staticMethods = {};
+
+    /*
+     * DataStore configuration
+     */
+    var DSActionTypeParamType = DS.defineResource({
+
+      // Model configuration
+      name: 'actionTypeParamType',
+      relations: {
+        belongsTo: {
+          actionType: {
+            localField: 'actionType',
+            localKey: 'actionTypeId'
+          },
+          paramType: {
+            localField: 'paramType',
+            localKey: 'paramTypeId'
+          }
+        }
+      }
+
+    });
+
+    return DSActionTypeParamType;
+
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.models')
     .factory('DSActionType', DSActionTypeFactory)
     .run(function(DSActionType) {});
 
@@ -2425,6 +3087,7 @@
   function DSActionTypeFactory($log, DS) {
     
     var staticMethods = {};
+    var actionTypeParamTypesId = 0;
 
     /*
      * DataStore configuration
@@ -2443,6 +3106,10 @@
             localField: 'deviceClassActionTypes',
             foreignKey: 'actionTypeId'
           },
+          actionTypeParamType: {
+            localField: 'actionTypeParamTypes',
+            foreignKey: 'actionTypeId'
+          }
         }
       },
 
@@ -2461,9 +3128,11 @@
           var arrayOfAttrs = attrs;
           angular.forEach(arrayOfAttrs, function(attrs) {
             _addUiData(resource, attrs);
+            _createActionTypeParamTypes(resource, attrs);
           });
         } else {
           _addUiData(resource, attrs);
+          _createActionTypeParamTypes(resource, attrs);
         }
       }
 
@@ -2486,6 +3155,40 @@
       }
     }
 
+    /*
+     * Private method:_createActionTypeParamTypes()
+     */
+    function _createActionTypeParamTypes(resource, attrs) {
+      var actionTypeParamTypes = DS.getAll('actionTypeParamType');
+      var paramTypes = attrs.paramTypes;
+      var actionTypeId = attrs.id;
+
+
+      // ParamTypes
+      angular.forEach(paramTypes, function(paramType) {
+        // Create paramType
+        var paramTypeInstance = DS.createInstance('paramType', paramType);
+        DS.inject('paramType', paramTypeInstance);
+
+        // Filtered actionTypeParamTypes
+        var actionTypeParamTypesFiltered = actionTypeParamTypes.filter(function(actionTypeParamType) {
+          return actionTypeParamType.actionTypeId === actionTypeId && actionTypeParamType.paramTypeId === paramType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(actionTypeParamTypesFiltered) && actionTypeParamTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> paramType)
+          actionTypeParamTypesId = actionTypeParamTypesId + 1;
+          var actionTypeParamTypeInstance = DS.createInstance('actionTypeParamType', {
+            id: actionTypeParamTypesId,
+            actionTypeId: actionTypeId,
+            paramTypeId: paramType.id
+          });
+          DS.inject('actionTypeParamType', actionTypeParamTypeInstance);
+        }
+      });
+    }
+
 
     /*
      * Public method: getParams()
@@ -2498,7 +3201,7 @@
 
       angular.forEach(paramTypes, function(paramType) {
         params.push({
-          name: paramType.name,
+          id: paramType.id,
           value: paramType.value
         });
       });
@@ -2516,21 +3219,21 @@
 
       angular.forEach(params, function(param) {
         if(actionParamType !== undefined && eventParamType !== undefined) {
-          if(param.name === actionParamType.name) {
+          if(param.paramTypeId === actionParamType.id) {
             ruleActionParams.push({
-              name: param.name,
+              paramTypeId: param.paramTypeId,
               eventParamName: eventParamType.name,
               eventTypeId: eventParamType.eventDescriptor.eventTypeId
             });
           } else {
             ruleActionParams.push({
-              name: param.name,
+              paramTypeId: param.paramTypeId,
               value: param.value
             });
           }
         } else {
           ruleActionParams.push({
-            name: param.name,
+            paramTypeId: param.paramTypeId,
             value: param.value
           });
         }
@@ -2542,166 +3245,6 @@
   }
 
 }());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
-    .module('guh.utils', [])
-    .config(config);
-
-  config.$inject = [];
-
-  function config() {}
-
-  // module.exports = angular.module('guh.utils');
-
-}());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-
-  angular
-    .module('guh.utils')
-    .factory('LocalForage', LocalForage);
-
-
-  LocalForage.$inject = ['$log'];
-
-  function LocalForage($log) {
-
-    // jshint unused:false 
-    var LocalForage = {
-      localForageAdapter: new DSLocalForageAdapter(),
-      localForageStore: new JSData.DS()
-    };
-
-    return LocalForage;
-
-  }
-
-}());
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
-    .module('guh.utils')
-    .factory('File', FileFactory);
-
-  FileFactory.$inject = ['$log', '$templateCache'];
-
-  function FileFactory($log, $templateCache) {
-    
-    var File = {
-      checkFile: checkFile
-    };
-
-    return File;
-
-
-    /*
-     * Public method: checkFile(path, file)
-     */
-    function checkFile(path, file) {
-      // if(app.environment === 'production') {
-        // Production: One $templateCache entry per template
-        var cacheObject = $templateCache.get(path + file);
-
-        if(cacheObject !== undefined) {
-          return true;
-        } else {
-          return false;
-        }
-      /*} else if(app.environment === 'development') {
-        // Development: One HTML file per template
-        var request = new XMLHttpRequest();
-
-        request.open('HEAD', path + file, false);
-        request.send();
-
-        if(request.status === 200) {
-          return true;
-        } else {
-          return false;
-        }
-      }*/
-    }
-  }
-
-}());
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                                     *
  * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
