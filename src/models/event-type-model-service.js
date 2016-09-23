@@ -35,6 +35,7 @@
   function DSEventTypeFactory($log, DS) {
     
     var staticMethods = {};
+    var eventTypeParamTypesId = 0;
 
     /*
      * DataStore configuration
@@ -54,6 +55,12 @@
             localKey: 'deviceClassId',
             parent: true
           }
+        },
+        hasMany: {
+          eventTypeParamType: {
+            localField: 'eventTypeParamTypes',
+            foreignKey: 'eventTypeId'
+          }
         }
       },
 
@@ -71,9 +78,11 @@
           var arrayOfAttrs = attrs;
           angular.forEach(arrayOfAttrs, function(attrs) {
             _addUiData(resource, attrs);
+            _createEventTypeParamTypes(resource, attrs);
           });
         } else {
           _addUiData(resource, attrs);
+          _createEventTypeParamTypes(resource, attrs);
         }
       }
 
@@ -95,6 +104,40 @@
       } else {
         attrs.phrase = phrase + ' is detected and parameters are';
       }
+    }
+
+    /*
+     * Private method:_createEventTypeParamTypes()
+     */
+    function _createEventTypeParamTypes(resource, attrs) {
+      var eventTypeParamTypes = DS.getAll('eventTypeParamType');
+      var paramTypes = attrs.paramTypes;
+      var eventTypeId = attrs.id;
+
+
+      // ParamTypes
+      angular.forEach(paramTypes, function(paramType) {
+        // Create paramType
+        var paramTypeInstance = DS.createInstance('paramType', paramType);
+        DS.inject('paramType', paramTypeInstance);
+
+        // Filtered eventTypeParamTypes
+        var eventTypeParamTypesFiltered = eventTypeParamTypes.filter(function(eventTypeParamType) {
+          return eventTypeParamType.eventTypeId === eventTypeId && eventTypeParamType.paramTypeId === paramType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(eventTypeParamTypesFiltered) && eventTypeParamTypesFiltered.length === 0) {
+          // Create membership (deviceClass <-> paramType)
+          eventTypeParamTypesId = eventTypeParamTypesId + 1;
+          var eventTypeParamTypeInstance = DS.createInstance('eventTypeParamType', {
+            id: eventTypeParamTypesId,
+            eventTypeId: eventTypeId,
+            paramTypeId: paramType.id
+          });
+          DS.inject('eventTypeParamType', eventTypeParamTypeInstance);
+        }
+      });
     }
 
 

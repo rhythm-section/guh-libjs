@@ -35,6 +35,7 @@
   function DSPluginFactory($log, $q, DS, apiService) {
     
     var staticMethods = {};
+    var pluginParamTypesId = 0;
 
     /*
      * DataStore configuration
@@ -47,13 +48,32 @@
       // Model configuration
       idAttribute: 'id',
       name: 'plugin',
-      relations: {},
+      relations: {
+        hasMany: {
+          pluginParamType: {
+            localField: 'pluginParamTypes',
+            foreignKey: 'pluginId'
+          }
+        }
+      },
 
       // Computed properties
       computed: {},
 
       // Instance methods
-      methods: {}
+      methods: {},
+
+      // Lifecycle hooks
+      afterInject: function(resource, attrs) {
+        if(angular.isArray(attrs)) {
+          var arrayOfAttrs = attrs;
+          angular.forEach(arrayOfAttrs, function(attrs) {
+            _createPluginParamTypes(resource, attrs);
+          });
+        } else {
+          _createPluginParamTypes(resource, attrs);
+        }
+      }
 
     });
 
@@ -62,6 +82,41 @@
     });
 
     return DSPlugin;
+
+
+    /*
+     * Private method: _createPluginParamTypes()
+     */
+    function _createPluginParamTypes(resource, attrs) {
+      var pluginParamTypes = DS.getAll('pluginParamType');
+      var paramTypes = attrs.paramTypes;
+      var pluginId = attrs.id;
+
+
+      // ParamTypes
+      angular.forEach(paramTypes, function(paramType) {
+        // Create paramType
+        var paramTypeInstance = DS.createInstance('paramType', paramType);
+        DS.inject('paramType', paramTypeInstance);
+
+        // Filtered actionTypeParamTypes
+        var pluginParamTypesFiltered = pluginParamTypes.filter(function(pluginParamType) {
+          return pluginParamType.pluginId === pluginId && pluginParamType.paramTypeId === paramType.id;
+        });
+
+        // Only inject if not already there
+        if(angular.isArray(pluginParamTypesFiltered) && pluginParamTypesFiltered.length === 0) {
+          // Create membership (plugin <-> paramType)
+          pluginParamTypesId = pluginParamTypesId + 1;
+          var pluginParamTypeInstance = DS.createInstance('pluginParamType', {
+            id: pluginParamTypesId,
+            pluginId: pluginId,
+            paramTypeId: paramType.id
+          });
+          DS.inject('pluginParamType', pluginParamTypeInstance);
+        }
+      });
+    }
 
 
     function load() {

@@ -27,56 +27,38 @@
 
   angular
     .module('guh.models')
-    .factory('DSParamType', DSParamTypeFactory)
-    .run(function(DSParamType) {});
+    .factory('DSDeviceClassDiscoveryParamType', DSDeviceClassDiscoveryParamTypeFactory)
+    .run(function(DSDeviceClassDiscoveryParamType) {});
 
-  DSParamTypeFactory.$inject = ['$log', 'DS'];
+  DSDeviceClassDiscoveryParamTypeFactory.$inject = ['$log', 'DS'];
 
-  function DSParamTypeFactory($log, DS) {
+  function DSDeviceClassDiscoveryParamTypeFactory($log, DS) {
     
     var staticMethods = {};
 
     /*
      * DataStore configuration
      */
-    var DSParamType = DS.defineResource({
+    var DSDeviceClassDiscoveryParamType = DS.defineResource({
 
       // Model configuration
-      name: 'paramType',
+      name: 'deviceClassDiscoveryParamType',
       relations: {
-        hasMany: {
-          deviceClassDiscoveryParamType: {
-            localField: 'deviceClassDiscoveryParamTypes',
-            foreignKey: 'paramTypeId'
+        belongsTo: {
+          deviceClass: {
+            localField: 'deviceClass',
+            localKey: 'deviceClassId'
           },
-          deviceClassParamType: {
-            localField: 'deviceClassParamTypes',
-            foreignKey: 'paramTypeId'
-          },
-          actionTypeParamType: {
-            localField: 'actionTypeParamTypes',
-            foreignKey: 'paramTypeId'
-          },
-          eventTypeParamType: {
-            localField: 'eventTypeParamTypes',
-            foreignKey: 'paramTypeId'
-          },
-          pluginParamType: {
-            localField: 'pluginParamTypes',
-            foreignKey: 'paramTypeId'
+          paramType: {
+            localField: 'discoveryParamType',
+            localKey: 'paramTypeId'
           }
         }
-      },
-
-      // Computed properties
-      computed: {},
-
-      // Instance methods
-      methods: {}
+      }
 
     });
 
-    return DSParamType;
+    return DSDeviceClassDiscoveryParamType;
 
   }
 
