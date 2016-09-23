@@ -30,12 +30,6 @@
     .factory('DSDeviceClass', DSDeviceClassFactory)
     .run(function(DSDeviceClass) {});
 
-// <<<<<<< HEAD
-//   DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', '_', 'apiService', 'modelsHelper', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
-
-//   function DSDeviceClassFactory($log, $q, DS, _, apiService, modelsHelper, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
-// =======
-  DSDeviceClassFactory.$inject = ['$log', '$q', 'DS', '_', 'apiService', 'modelsHelper', 'DSDeviceClassParamType', 'DSDeviceClassActionType', 'DSDeviceClassEventType', 'DSDeviceClassStateType'];
 
   function DSDeviceClassFactory($log, $q, DS, _, apiService, modelsHelper, DSDeviceClassParamType, DSDeviceClassActionType, DSDeviceClassEventType, DSDeviceClassStateType) {
     
