@@ -79,7 +79,8 @@
 
             return DSConnection
               .create({
-                id: tunnelData.tunnel.id,
+                id: 'tunnel',
+                tunnelId: tunnelData.tunnel.id,
                 activationTimeStamp: tunnelData.tunnel.activationTimeStamp,
                 clientConnection: tunnelData.tunnel.clientConnection,
                 // tunnelId: tunnelData.tunnel.id,

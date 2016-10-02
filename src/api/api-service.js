@@ -30,10 +30,9 @@
     .module('guh.api')
     .provider('apiService', apiService);
 
-  // apiService.$inject = ['$log', '$rootScope', '$q', 'cloudService', 'localWebsocketService', 'cloudWebsocketService', 'DS'];
+
   apiService.$inject = [];
 
-  // function apiService($log, $rootScope, $q, cloudService, localWebsocketService, cloudWebsocketService, DS) {
   function apiService() {
 
     var apiServiceProvider = {

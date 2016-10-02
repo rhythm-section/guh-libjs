@@ -32,10 +32,8 @@
 
 
   DSAuthenticationFactory.$inject = ['$log', '$q', 'LocalForage', 'cloudWebsocketService'];
-  // DSAuthenticationFactory.$inject = ['$log', '$q', 'cloudService', 'LocalForage', 'apiService'];
 
   function DSAuthenticationFactory($log, $q, LocalForage, cloudWebsocketService) {
-  // function DSAuthenticationFactory($log, $q, cloudService, LocalForage, apiService) {
 
     LocalForage.localForageStore.registerAdapter('localForage', LocalForage.localForageAdapter, { default: true });
 
@@ -102,7 +100,6 @@
      */
 
     function authenticateConnection(id, name, token, type) {
-      // $log.log('DSAuthentication:factory.authenticateConnection', id, name, token, type);
       return cloudWebsocketService.send({
         method: 'Authentication.Authenticate',
         params: {
@@ -114,25 +111,6 @@
       })
       .then(function(response) {
         return response;
-
-        // if(angular.isDefined(response.connectionId)) {
-        //   connectionAuthenticated = true;
-
-        //   return DSAuthentication.create({
-        //     id: 'connection',
-        //     connectionId: id,
-        //     name: name,
-        //     token: token
-        //   })
-        //   .then(function(response) {
-        //     return response;
-        //   })
-        //   .catch(function(error) {
-        //     return error;
-        //   });
-        // } else {
-        //   return $q.reject('Field "connectionId" missing in response.');
-        // }
       })
       .catch(function(error) {
         connectionAuthenticated = false;
@@ -146,8 +124,6 @@
      */
 
     function isAuthenticated() {
-      // $log.log('isAuthenticated', this);
-
       if(this.id === 'cloudUser') {
         return cloudUserAuthenticated;  
       }/* else if(this.id === 'connection') {

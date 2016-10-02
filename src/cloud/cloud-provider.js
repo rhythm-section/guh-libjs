@@ -62,6 +62,14 @@
         isAuthenticated: isAuthenticated,
         getTunnelId: getTunnelId,
         setTunnelId: setTunnelId,
+
+        // Authentication.Authenticate
+        // Connection.CreateTunnel
+        // Connection.DestroyTunnel
+        // Connection.GetConnections
+        // Connection.GetTunnels
+        // Connection.SendData
+        // Interface.Introspect
       };
 
       return service;

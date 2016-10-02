@@ -3007,7 +3007,8 @@
 
             return DSConnection
               .create({
-                id: tunnelData.tunnel.id,
+                id: 'tunnel',
+                tunnelId: tunnelData.tunnel.id,
                 activationTimeStamp: tunnelData.tunnel.activationTimeStamp,
                 clientConnection: tunnelData.tunnel.clientConnection,
                 // tunnelId: tunnelData.tunnel.id,
@@ -3250,10 +3251,8 @@
 
 
   DSAuthenticationFactory.$inject = ['$log', '$q', 'LocalForage', 'cloudWebsocketService'];
-  // DSAuthenticationFactory.$inject = ['$log', '$q', 'cloudService', 'LocalForage', 'apiService'];
 
   function DSAuthenticationFactory($log, $q, LocalForage, cloudWebsocketService) {
-  // function DSAuthenticationFactory($log, $q, cloudService, LocalForage, apiService) {
 
     LocalForage.localForageStore.registerAdapter('localForage', LocalForage.localForageAdapter, { default: true });
 
@@ -3320,7 +3319,6 @@
      */
 
     function authenticateConnection(id, name, token, type) {
-      // $log.log('DSAuthentication:factory.authenticateConnection', id, name, token, type);
       return cloudWebsocketService.send({
         method: 'Authentication.Authenticate',
         params: {
@@ -3332,25 +3330,6 @@
       })
       .then(function(response) {
         return response;
-
-        // if(angular.isDefined(response.connectionId)) {
-        //   connectionAuthenticated = true;
-
-        //   return DSAuthentication.create({
-        //     id: 'connection',
-        //     connectionId: id,
-        //     name: name,
-        //     token: token
-        //   })
-        //   .then(function(response) {
-        //     return response;
-        //   })
-        //   .catch(function(error) {
-        //     return error;
-        //   });
-        // } else {
-        //   return $q.reject('Field "connectionId" missing in response.');
-        // }
       })
       .catch(function(error) {
         connectionAuthenticated = false;
@@ -3364,8 +3343,6 @@
      */
 
     function isAuthenticated() {
-      // $log.log('isAuthenticated', this);
-
       if(this.id === 'cloudUser') {
         return cloudUserAuthenticated;  
       }/* else if(this.id === 'connection') {
@@ -3664,6 +3641,200 @@
   }
 
 }());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.cloud', [])
+    .config(config);
+
+  config.$inject = [];
+
+  function config() {}
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.cloud')
+    .provider('cloudService', Cloud);
+
+  Cloud.$inject = [];
+
+  function Cloud() {
+    
+    var grantType = 'password';
+
+    var provider = {
+      ssl: true,
+      baseUrl: '',
+      loginUrl: '/auth/login',
+      signupUrl: '/auth/signup',
+      $get: $get
+    };
+
+    return provider;
+
+
+    /*
+     * Provider method: $get()
+     */
+
+    $get.$inject = ['$log', '$q', '$http'];
+
+    function $get($log, $q, $http) {
+      var authenticated = false;
+      var tunnelId;
+      var service = {
+        login: login,
+        logout: logout,
+        isAuthenticated: isAuthenticated,
+        getTunnelId: getTunnelId,
+        setTunnelId: setTunnelId,
+
+        // Authentication.Authenticate
+        // Connection.CreateTunnel
+        // Connection.DestroyTunnel
+        // Connection.GetConnections
+        // Connection.GetTunnels
+        // Connection.SendData
+        // Interface.Introspect
+      };
+
+      return service;
+
+
+      /*
+       * Public method: login(username, password)
+       */
+      function login(username, password) {
+        var protocol = provider.ssl ? 'https' : 'http';
+
+        return $http({
+          method: 'POST',
+          url: protocol + '://' + provider.baseUrl + provider.loginUrl,
+          // http://stackoverflow.com/questions/24710503/how-do-i-post-urlencoded-form-data-with-http-in-angularjs
+          headers: {
+            'Content-Type' : 'application/x-www-form-urlencoded'
+          },
+          transformRequest: function(obj) {
+            var str = [];
+
+            for(var p in obj) {
+              str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+            }
+            
+            return str.join('&');
+          },
+          data: {
+            'grant_type': grantType,
+            'username': username,
+            'password': password
+          }
+        }).then(function success(response) {
+          if(angular.isDefined(response.data)) {
+            var data = response.data;
+
+            authenticated = true;
+
+            // $log.log('success', response);
+
+            return data;
+          } else {
+            return $q.reject('Field "data" missing in response.');
+          }
+        }, function failure(error) {
+          authenticated = false;
+
+          return error;
+        });
+      }
+
+      /*
+       * Public method: logout()
+       */
+      function logout() {
+        $log.log('Cloud.logout');
+      }
+
+      /*
+       * Public method: isAuthenticated()
+       */
+      function isAuthenticated() {
+        return authenticated;
+      }
+
+      /*
+       * Public method: getTunnelId()
+       */
+      function getTunnelId() {
+        // $log.log('getTunnelId', tunnelId);
+        return tunnelId;
+      }
+
+      /*
+       * Public method: setTunnelId(id)
+       */
+      function setTunnelId(id) {
+        tunnelId = id;
+        // $log.log('setTunnelId', tunnelId);
+      }
+    }
+
+  }
+
+}());
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                                                                     *
  * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
@@ -4411,192 +4582,6 @@
   'use strict';
 
   angular
-    .module('guh.cloud', [])
-    .config(config);
-
-  config.$inject = [];
-
-  function config() {}
-
-}());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-
-(function() {
-  'use strict';
-
-  angular
-    .module('guh.cloud')
-    .provider('cloudService', Cloud);
-
-  Cloud.$inject = [];
-
-  function Cloud() {
-    
-    var grantType = 'password';
-
-    var provider = {
-      ssl: true,
-      baseUrl: '',
-      loginUrl: '/auth/login',
-      signupUrl: '/auth/signup',
-      $get: $get
-    };
-
-    return provider;
-
-
-    /*
-     * Provider method: $get()
-     */
-
-    $get.$inject = ['$log', '$q', '$http'];
-
-    function $get($log, $q, $http) {
-      var authenticated = false;
-      var tunnelId;
-      var service = {
-        login: login,
-        logout: logout,
-        isAuthenticated: isAuthenticated,
-        getTunnelId: getTunnelId,
-        setTunnelId: setTunnelId,
-      };
-
-      return service;
-
-
-      /*
-       * Public method: login(username, password)
-       */
-      function login(username, password) {
-        var protocol = provider.ssl ? 'https' : 'http';
-
-        return $http({
-          method: 'POST',
-          url: protocol + '://' + provider.baseUrl + provider.loginUrl,
-          // http://stackoverflow.com/questions/24710503/how-do-i-post-urlencoded-form-data-with-http-in-angularjs
-          headers: {
-            'Content-Type' : 'application/x-www-form-urlencoded'
-          },
-          transformRequest: function(obj) {
-            var str = [];
-
-            for(var p in obj) {
-              str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
-            }
-            
-            return str.join('&');
-          },
-          data: {
-            'grant_type': grantType,
-            'username': username,
-            'password': password
-          }
-        }).then(function success(response) {
-          if(angular.isDefined(response.data)) {
-            var data = response.data;
-
-            authenticated = true;
-
-            // $log.log('success', response);
-
-            return data;
-          } else {
-            return $q.reject('Field "data" missing in response.');
-          }
-        }, function failure(error) {
-          authenticated = false;
-
-          return error;
-        });
-      }
-
-      /*
-       * Public method: logout()
-       */
-      function logout() {
-        $log.log('Cloud.logout');
-      }
-
-      /*
-       * Public method: isAuthenticated()
-       */
-      function isAuthenticated() {
-        return authenticated;
-      }
-
-      /*
-       * Public method: getTunnelId()
-       */
-      function getTunnelId() {
-        // $log.log('getTunnelId', tunnelId);
-        return tunnelId;
-      }
-
-      /*
-       * Public method: setTunnelId(id)
-       */
-      function setTunnelId(id) {
-        tunnelId = id;
-        // $log.log('setTunnelId', tunnelId);
-      }
-    }
-
-  }
-
-}());
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
     .module('guh.api', [])
     .config(config);
 
@@ -4637,10 +4622,9 @@
     .module('guh.api')
     .provider('apiService', apiService);
 
-  // apiService.$inject = ['$log', '$rootScope', '$q', 'cloudService', 'localWebsocketService', 'cloudWebsocketService', 'DS'];
+
   apiService.$inject = [];
 
-  // function apiService($log, $rootScope, $q, cloudService, localWebsocketService, cloudWebsocketService, DS) {
   function apiService() {
 
     var apiServiceProvider = {
