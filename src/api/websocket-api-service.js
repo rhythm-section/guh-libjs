@@ -122,6 +122,7 @@
 
       ws.onmessage = function(message) {
         var data = angular.fromJson(message.data);
+        var injectedItem;
 
         if(angular.isDefined(data.notification)) {
           switch(data.notification) {
@@ -131,7 +132,7 @@
               var device = DS.get('device', deviceId);
 
               if(angular.isUndefined(device)) {
-                var injectedItem = DS.inject('device', data.params.device);
+                injectedItem = DS.inject('device', data.params.device);
 
                 // Send broadcast event
                 if(DS.is('device', injectedItem)) {
@@ -142,8 +143,21 @@
               break;
 
 
-            // TODO: Devices.DeviceChanged
+            // Devices.DeviceChanged
+            case 'Devices.DeviceChanged':
+              var deviceId = data.params.device.id;
+              var device = DS.get('device', deviceId);
 
+              if(angular.isDefined(device)) {
+                injectedItem = DS.inject('device', data.params.device);
+
+                // Send broadcast event
+                if(DS.is('device', injectedItem)) {
+                  $rootScope.$broadcast('ReloadView', injectedItem.deviceClass.name + ' was changed.');
+                }
+              }
+
+              break;
 
             // Devices.DeviceRemoved
             case 'Devices.DeviceRemoved':
@@ -190,7 +204,7 @@
               var rule = DS.get('rule', ruleId);
 
               if(angular.isUndefined(rule)) {
-                var injectedItem = DS.inject('rule', data.params.rule);
+                injectedItem = DS.inject('rule', data.params.rule);
 
                 // Send broadcast event
                 if(DS.is('rule', injectedItem)) {
@@ -204,7 +218,7 @@
             // Rules.ConfigurationChanged
             case 'Rules.ConfigurationChanged':
               var rule = data.params.rule;
-              var injectedItem = DS.inject('rule', rule);
+              injectedItem = DS.inject('rule', rule);
 
               // Send broadcast event
               if(DS.is('rule', injectedItem)) {
