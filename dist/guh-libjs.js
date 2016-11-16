@@ -396,166 +396,6 @@
   'use strict';
 
   angular
-    .module('guh.utils', [])
-    .config(config);
-
-  config.$inject = [];
-
-  function config() {}
-
-  // module.exports = angular.module('guh.utils');
-
-}());
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-
-  angular
-    .module('guh.utils')
-    .factory('LocalForage', LocalForage);
-
-
-  LocalForage.$inject = ['$log'];
-
-  function LocalForage($log) {
-
-    // jshint unused:false 
-    var LocalForage = {
-      localForageAdapter: new DSLocalForageAdapter(),
-      localForageStore: new JSData.DS()
-    };
-
-    return LocalForage;
-
-  }
-
-}());
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
-    .module('guh.utils')
-    .factory('File', FileFactory);
-
-  FileFactory.$inject = ['$log', '$templateCache'];
-
-  function FileFactory($log, $templateCache) {
-    
-    var File = {
-      checkFile: checkFile
-    };
-
-    return File;
-
-
-    /*
-     * Public method: checkFile(path, file)
-     */
-    function checkFile(path, file) {
-      // if(app.environment === 'production') {
-        // Production: One $templateCache entry per template
-        var cacheObject = $templateCache.get(path + file);
-
-        if(cacheObject !== undefined) {
-          return true;
-        } else {
-          return false;
-        }
-      /*} else if(app.environment === 'development') {
-        // Development: One HTML file per template
-        var request = new XMLHttpRequest();
-
-        request.open('HEAD', path + file, false);
-        request.send();
-
-        if(request.status === 200) {
-          return true;
-        } else {
-          return false;
-        }
-      }*/
-    }
-  }
-
-}());
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                                                                     *
- * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
- *                                                                                     *
- * Permission is hereby granted, free of charge, to any person obtaining a copy        *
- * of this software and associated documentation files (the "Software"), to deal       *
- * in the Software without restriction, including without limitation the rights        *
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
- * copies of the Software, and to permit persons to whom the Software is               *
- * furnished to do so, subject to the following conditions:                            *
- *                                                                                     *
- * The above copyright notice and this permission notice shall be included in all      *
- * copies or substantial portions of the Software.                                     *
- *                                                                                     *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
- * SOFTWARE.                                                                           *
- *                                                                                     *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-(function() {
-  'use strict';
-
-  angular
     .module('guh.models', [
       // Datastore
       'js-data'
@@ -1837,6 +1677,7 @@
 
       // Instance methods
       methods: {
+        edit: edit,
         executeAction: executeAction,
         remove: remove,
         getDescription: getDescription,
@@ -1873,7 +1714,7 @@
     angular.extend(DSDevice, {
       load: load,
       add: add,
-      edit: edit,
+      reconfigure: reconfigure,
       pair: pair,
       confirmPairing: confirmPairing
     });
@@ -2012,25 +1853,42 @@
     }
 
     /*
-     * Public method: edit(deviceId, deviceData)
+     * Public method: edit(deviceId, name)
      */
-    function edit(deviceId, deviceData) {
-      var device = {};
-      deviceData = deviceData || {};
+    function edit(deviceId, name) {
+      /* jshint validthis: true */
+      var self = this;
+      var jsonRpcParams = {
+        deviceId: self.id,
+        name: name
+      };
 
-      device.deviceDescriptorId = deviceData.id || '';
-
-      device.deviceParams = [];
-      angular.forEach(deviceData.deviceParamTypes, function(deviceParamType) {
-        var deviceParam = {};
-
-        deviceParam.name = deviceParamType.name;
-        deviceParam.value = deviceParamType.value;
-
-        device.deviceParams.push(deviceParam);
+      return websocketService.send({
+        method: 'Devices.EditDevice',
+        params: jsonRpcParams
       });
+    }
 
-      return DSDevice.update(deviceId, {device: device});
+    /*
+     * Public method: reconfigure(deviceId, deviceData)
+     */
+    function reconfigure(deviceId, deviceData) {
+      // var device = {};
+      // deviceData = deviceData || {};
+
+      // device.deviceDescriptorId = deviceData.id || '';
+
+      // device.deviceParams = [];
+      // angular.forEach(deviceData.deviceParamTypes, function(deviceParamType) {
+      //   var deviceParam = {};
+
+      //   deviceParam.name = deviceParamType.name;
+      //   deviceParam.value = deviceParamType.value;
+
+      //   device.deviceParams.push(deviceParam);
+      // });
+
+      // return DSDevice.update(deviceId, {device: device});
     }
 
     /*
@@ -3273,87 +3131,61 @@
   'use strict';
 
   angular
-    .module('guh.logging', [
-      'guh.logging.hooks'
-    ])
+    .module('guh.utils', [])
     .config(config);
 
-  config.$inject = ['$provide'];
+  config.$inject = [];
 
-  function config($provide) {
-    // Exceptions
-    // $provide.decorator('$exceptionHandler', ['$injector', '$delegate', 'Logging', function($injector, $delegate, Logging) {
-    //   if(!Logging.angularServiceEnhanced.$exceptionHandler) {
-    //     return $delegate;
-    //   }
+  function config() {}
 
-    //   return function(exception, cause) {
-    //     $delegate(exception, cause);
-    //   }
-    // }]);
+  // module.exports = angular.module('guh.utils');
 
-    // Logs
-    $provide.decorator('$log', ['$injector', '$delegate', 'guhLogging', function($injector, $delegate, guhLogging) {
-      var decorator = {
-        log: log,
-        info: info,
-        warn: warn,
-        error: error
-      };
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-      return decorator;
+(function() {
+  'use strict';
 
 
-      function _applyCallbacks(logType, args) {
-        var logTypeData = guhLogging.getLogType(logType);
+  angular
+    .module('guh.utils')
+    .factory('LocalForage', LocalForage);
 
-        // Pre callbacks
-        angular.forEach(logTypeData.preCallbacks, function(preCallbackProvider) {
-          var preCallback = $injector.get(preCallbackProvider);
-          preCallback.call(preCallback, {
-            type: logType,
-            args: args
-          });
-        });
 
-        // Console
-        if(guhLogging.isEnhanced(logType)) {
-          $delegate[logType].apply($delegate, args);
-          guhLogging[logType].apply(null, args);
-        } else {
-          $delegate[logType].apply($delegate, args);
-        }
+  LocalForage.$inject = ['$log'];
 
-        // Post callbacks
-        angular.forEach(logTypeData.postCallbacks, function(postCallbackProvider) {
-          var postCallback = $injector.get(postCallbackProvider);
-          postCallback.call(postCallback, {
-            type: logType,
-            args: args
-          });
-        });
-      }
+  function LocalForage($log) {
 
-      function log() {
-        var args = arguments;
-        _applyCallbacks('log', args);
-      }
+    // jshint unused:false 
+    var LocalForage = {
+      localForageAdapter: new DSLocalForageAdapter(),
+      localForageStore: new JSData.DS()
+    };
 
-      function info() {
-        var args = arguments;
-        _applyCallbacks('info', args);
-      }
+    return LocalForage;
 
-      function warn() {
-        var args = arguments;
-        _applyCallbacks('warn', args);
-      }
-
-      function error() {
-        var args = arguments;
-        _applyCallbacks('error', args);
-      }
-    }]);
   }
 
 }());
@@ -3386,185 +3218,46 @@
   'use strict';
 
   angular
-    .module('guh.logging')
-    .provider('guhLogging', Logging);
+    .module('guh.utils')
+    .factory('File', FileFactory);
 
-  Logging.$inject = ['$injector'];
+  FileFactory.$inject = ['$log', '$templateCache'];
 
-  function Logging($injector) {
-    var _logTypes = {
-      log: {},
-      info: {},
-      warn: {},
-      error: {}
+  function FileFactory($log, $templateCache) {
+    
+    var File = {
+      checkFile: checkFile
     };
 
-    var _hooks = {
-      http: 'guhLoggingHttpHook',
-      broadcast: 'guhLoggingBroadcastHook',
-      websocket: null
-    };
-
-    var provider = {
-      $get: $get,
-      enhance: enhance,
-      before: before,
-      after: after,
-      decorate: decorate
-    };
-
-    return provider;
+    return File;
 
 
-    // function _getArrayFromString(string) {
-    //   if(!angular.isString(string)) {
-    //     return;
-    //   }
-    // }
+    /*
+     * Public method: checkFile(path, file)
+     */
+    function checkFile(path, file) {
+      // if(app.environment === 'production') {
+        // Production: One $templateCache entry per template
+        var cacheObject = $templateCache.get(path + file);
 
-    function _addHooks(prePost, logTypes, hooks) {
-      try {
-        if(angular.isUndefined(logTypes) || logTypes === null || !angular.isString(logTypes)) {
-          throw 'Wrong argument type. The argument "logTypes" should be a comma seperated String.';
+        if(cacheObject !== undefined) {
+          return true;
+        } else {
+          return false;
         }
-        if(angular.isDefined(hooks) && hooks !== null && !angular.isString(hooks)) {
-          throw 'Wrong argument type. The argument "hooks" should be a comma seperated String.';
+      /*} else if(app.environment === 'development') {
+        // Development: One HTML file per template
+        var request = new XMLHttpRequest();
+
+        request.open('HEAD', path + file, false);
+        request.send();
+
+        if(request.status === 200) {
+          return true;
+        } else {
+          return false;
         }
-      } catch(error) {
-        return error;
-      }
-
-      var logTypesArray = logTypes.replace(/\s+/g, '').split(',');
-      var hooksArray = hooks.replace(/\s+/g, '').split(',');
-      var logTypeCallbacks = [];
-
-      // Check hooks
-      var callback;
-      angular.forEach(hooksArray, function(hook) {
-        if(angular.isDefined(_hooks[hook]) && _hooks[hook] !== null) {
-          logTypeCallbacks.push(_hooks[hook]);
-        }
-      });
-
-      // Initialize all log types with preCallbacks = [] / postCallbacks = []
-      angular.forEach(_logTypes, function(_logType) {
-        _logType[prePost + 'Callbacks'] = [];
-      });
-
-      // Set defined callbacks for log types
-      angular.forEach(logTypesArray, function(logType) {
-        if(angular.isDefined(_logTypes[logType])) {
-          _logTypes[logType][prePost + 'Callbacks'] = logTypeCallbacks;
-        }
-      });
-    }
-
-    function _getEnhancedArguments(args) {
-      // console.log('args', args, angular.isObject(args), angular.isArray(args));
-
-      var argsArray = args ? [].slice.call(args) : args;
-
-      // console.log('argsArray', argsArray, argsArray.length, angular.isArray(argsArray), argsArray[0]);
-
-      if(argsArray.length === 1) {
-        return argsArray[0];
-      } else {
-        return args;
-      }
-    }
-
-    function _addTimestamp() {
-
-    }
-
-
-    function $get() {
-      var service = {
-        isEnhanced: isEnhanced,
-        log: log,
-        info: info,
-        warn: warn,
-        error: error,
-        getLogType: getLogType
-      };
-
-      return service;
-
-
-      function isEnhanced(logType) {
-        return (angular.isDefined(_logTypes[logType]) && angular.isDefined(_logTypes[logType].enhanced)) ? _logTypes[logType].enhanced : false;
-      }
-
-      function log() {
-        // var args = _getEnhancedArguments(arguments);
-        // console.log(arguments);
-      }
-
-      function info() {
-        // var args = _getEnhancedArguments(arguments);
-        // console.info(arguments);
-      }
-
-      function warn() {
-        // var args = _getEnhancedArguments(arguments);
-        // console.warn(arguments);
-      }
-
-      function error() {
-        // var args = _getEnhancedArguments(arguments);
-        // console.error(arguments);
-      }
-
-      function getLogType(logType) {
-        return _logTypes[logType];
-      }
-    }
-
-    function enhance(logTypes) {
-      try {
-        if(angular.isDefined(logTypes) && logTypes !== null && !angular.isString(logTypes)) {
-          throw 'Wrong argument type. The argument "logTypes" should be a comma seperated String.';
-        }
-      } catch(error) {
-        return error;
-      }
-
-      var logTypesArray = [];
-
-      // Set enhanced
-      if(angular.isString(logTypes)) {
-        logTypesArray = logTypes.replace(/\s+/g, '').split(',');
-
-        // Initialize all log types with enhanced = false
-        angular.forEach(_logTypes, function(_logType) {
-          _logType.enhanced = false;
-        });
-
-        // Set defined enhanced values for log types
-        angular.forEach(logTypesArray, function(logType) {
-          if(angular.isDefined(_logTypes[logType])) {
-            _logTypes[logType].enhanced = true;
-          }
-        });
-      } else {
-        // If logTypes is undefined or null
-        // Initialize all log types with enhanced = true
-        angular.forEach(_logTypes, function(_logType) {
-          _logType.enhanced = true;
-        });
-      }
-    }
-
-    function before(logTypes, hooks) {
-      _addHooks('pre', logTypes, hooks);
-    }
-
-    function after(logTypes, hooks) {
-      _addHooks('post', logTypes, hooks);
-    }
-
-    function decorate(message) {
-
+      }*/
     }
   }
 
@@ -3891,6 +3584,330 @@
       return defer.promise;
     }
 
+  }
+
+}());
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.logging', [
+      'guh.logging.hooks'
+    ])
+    .config(config);
+
+  config.$inject = ['$provide'];
+
+  function config($provide) {
+    // Exceptions
+    // $provide.decorator('$exceptionHandler', ['$injector', '$delegate', 'Logging', function($injector, $delegate, Logging) {
+    //   if(!Logging.angularServiceEnhanced.$exceptionHandler) {
+    //     return $delegate;
+    //   }
+
+    //   return function(exception, cause) {
+    //     $delegate(exception, cause);
+    //   }
+    // }]);
+
+    // Logs
+    $provide.decorator('$log', ['$injector', '$delegate', 'guhLogging', function($injector, $delegate, guhLogging) {
+      var decorator = {
+        log: log,
+        info: info,
+        warn: warn,
+        error: error
+      };
+
+      return decorator;
+
+
+      function _applyCallbacks(logType, args) {
+        var logTypeData = guhLogging.getLogType(logType);
+
+        // Pre callbacks
+        angular.forEach(logTypeData.preCallbacks, function(preCallbackProvider) {
+          var preCallback = $injector.get(preCallbackProvider);
+          preCallback.call(preCallback, {
+            type: logType,
+            args: args
+          });
+        });
+
+        // Console
+        if(guhLogging.isEnhanced(logType)) {
+          $delegate[logType].apply($delegate, args);
+          guhLogging[logType].apply(null, args);
+        } else {
+          $delegate[logType].apply($delegate, args);
+        }
+
+        // Post callbacks
+        angular.forEach(logTypeData.postCallbacks, function(postCallbackProvider) {
+          var postCallback = $injector.get(postCallbackProvider);
+          postCallback.call(postCallback, {
+            type: logType,
+            args: args
+          });
+        });
+      }
+
+      function log() {
+        var args = arguments;
+        _applyCallbacks('log', args);
+      }
+
+      function info() {
+        var args = arguments;
+        _applyCallbacks('info', args);
+      }
+
+      function warn() {
+        var args = arguments;
+        _applyCallbacks('warn', args);
+      }
+
+      function error() {
+        var args = arguments;
+        _applyCallbacks('error', args);
+      }
+    }]);
+  }
+
+}());
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                                                                     *
+ * Copyright (C) 2015 Lukas Mayerhofer <lukas.mayerhofer@guh.guru>                     *
+ *                                                                                     *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy        *
+ * of this software and associated documentation files (the "Software"), to deal       *
+ * in the Software without restriction, including without limitation the rights        *
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell           *
+ * copies of the Software, and to permit persons to whom the Software is               *
+ * furnished to do so, subject to the following conditions:                            *
+ *                                                                                     *
+ * The above copyright notice and this permission notice shall be included in all      *
+ * copies or substantial portions of the Software.                                     *
+ *                                                                                     *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR          *
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,            *
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE         *
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER              *
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,       *
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE       *
+ * SOFTWARE.                                                                           *
+ *                                                                                     *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+(function() {
+  'use strict';
+
+  angular
+    .module('guh.logging')
+    .provider('guhLogging', Logging);
+
+  Logging.$inject = ['$injector'];
+
+  function Logging($injector) {
+    var _logTypes = {
+      log: {},
+      info: {},
+      warn: {},
+      error: {}
+    };
+
+    var _hooks = {
+      http: 'guhLoggingHttpHook',
+      broadcast: 'guhLoggingBroadcastHook',
+      websocket: null
+    };
+
+    var provider = {
+      $get: $get,
+      enhance: enhance,
+      before: before,
+      after: after,
+      decorate: decorate
+    };
+
+    return provider;
+
+
+    // function _getArrayFromString(string) {
+    //   if(!angular.isString(string)) {
+    //     return;
+    //   }
+    // }
+
+    function _addHooks(prePost, logTypes, hooks) {
+      try {
+        if(angular.isUndefined(logTypes) || logTypes === null || !angular.isString(logTypes)) {
+          throw 'Wrong argument type. The argument "logTypes" should be a comma seperated String.';
+        }
+        if(angular.isDefined(hooks) && hooks !== null && !angular.isString(hooks)) {
+          throw 'Wrong argument type. The argument "hooks" should be a comma seperated String.';
+        }
+      } catch(error) {
+        return error;
+      }
+
+      var logTypesArray = logTypes.replace(/\s+/g, '').split(',');
+      var hooksArray = hooks.replace(/\s+/g, '').split(',');
+      var logTypeCallbacks = [];
+
+      // Check hooks
+      var callback;
+      angular.forEach(hooksArray, function(hook) {
+        if(angular.isDefined(_hooks[hook]) && _hooks[hook] !== null) {
+          logTypeCallbacks.push(_hooks[hook]);
+        }
+      });
+
+      // Initialize all log types with preCallbacks = [] / postCallbacks = []
+      angular.forEach(_logTypes, function(_logType) {
+        _logType[prePost + 'Callbacks'] = [];
+      });
+
+      // Set defined callbacks for log types
+      angular.forEach(logTypesArray, function(logType) {
+        if(angular.isDefined(_logTypes[logType])) {
+          _logTypes[logType][prePost + 'Callbacks'] = logTypeCallbacks;
+        }
+      });
+    }
+
+    function _getEnhancedArguments(args) {
+      // console.log('args', args, angular.isObject(args), angular.isArray(args));
+
+      var argsArray = args ? [].slice.call(args) : args;
+
+      // console.log('argsArray', argsArray, argsArray.length, angular.isArray(argsArray), argsArray[0]);
+
+      if(argsArray.length === 1) {
+        return argsArray[0];
+      } else {
+        return args;
+      }
+    }
+
+    function _addTimestamp() {
+
+    }
+
+
+    function $get() {
+      var service = {
+        isEnhanced: isEnhanced,
+        log: log,
+        info: info,
+        warn: warn,
+        error: error,
+        getLogType: getLogType
+      };
+
+      return service;
+
+
+      function isEnhanced(logType) {
+        return (angular.isDefined(_logTypes[logType]) && angular.isDefined(_logTypes[logType].enhanced)) ? _logTypes[logType].enhanced : false;
+      }
+
+      function log() {
+        // var args = _getEnhancedArguments(arguments);
+        // console.log(arguments);
+      }
+
+      function info() {
+        // var args = _getEnhancedArguments(arguments);
+        // console.info(arguments);
+      }
+
+      function warn() {
+        // var args = _getEnhancedArguments(arguments);
+        // console.warn(arguments);
+      }
+
+      function error() {
+        // var args = _getEnhancedArguments(arguments);
+        // console.error(arguments);
+      }
+
+      function getLogType(logType) {
+        return _logTypes[logType];
+      }
+    }
+
+    function enhance(logTypes) {
+      try {
+        if(angular.isDefined(logTypes) && logTypes !== null && !angular.isString(logTypes)) {
+          throw 'Wrong argument type. The argument "logTypes" should be a comma seperated String.';
+        }
+      } catch(error) {
+        return error;
+      }
+
+      var logTypesArray = [];
+
+      // Set enhanced
+      if(angular.isString(logTypes)) {
+        logTypesArray = logTypes.replace(/\s+/g, '').split(',');
+
+        // Initialize all log types with enhanced = false
+        angular.forEach(_logTypes, function(_logType) {
+          _logType.enhanced = false;
+        });
+
+        // Set defined enhanced values for log types
+        angular.forEach(logTypesArray, function(logType) {
+          if(angular.isDefined(_logTypes[logType])) {
+            _logTypes[logType].enhanced = true;
+          }
+        });
+      } else {
+        // If logTypes is undefined or null
+        // Initialize all log types with enhanced = true
+        angular.forEach(_logTypes, function(_logType) {
+          _logType.enhanced = true;
+        });
+      }
+    }
+
+    function before(logTypes, hooks) {
+      _addHooks('pre', logTypes, hooks);
+    }
+
+    function after(logTypes, hooks) {
+      _addHooks('post', logTypes, hooks);
+    }
+
+    function decorate(message) {
+
+    }
   }
 
 }());

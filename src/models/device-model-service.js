@@ -69,6 +69,7 @@
 
       // Instance methods
       methods: {
+        edit: edit,
         executeAction: executeAction,
         remove: remove,
         getDescription: getDescription,
@@ -105,7 +106,7 @@
     angular.extend(DSDevice, {
       load: load,
       add: add,
-      edit: edit,
+      reconfigure: reconfigure,
       pair: pair,
       confirmPairing: confirmPairing
     });
@@ -244,25 +245,42 @@
     }
 
     /*
-     * Public method: edit(deviceId, deviceData)
+     * Public method: edit(deviceId, name)
      */
-    function edit(deviceId, deviceData) {
-      var device = {};
-      deviceData = deviceData || {};
+    function edit(deviceId, name) {
+      /* jshint validthis: true */
+      var self = this;
+      var jsonRpcParams = {
+        deviceId: self.id,
+        name: name
+      };
 
-      device.deviceDescriptorId = deviceData.id || '';
-
-      device.deviceParams = [];
-      angular.forEach(deviceData.deviceParamTypes, function(deviceParamType) {
-        var deviceParam = {};
-
-        deviceParam.name = deviceParamType.name;
-        deviceParam.value = deviceParamType.value;
-
-        device.deviceParams.push(deviceParam);
+      return websocketService.send({
+        method: 'Devices.EditDevice',
+        params: jsonRpcParams
       });
+    }
 
-      return DSDevice.update(deviceId, {device: device});
+    /*
+     * Public method: reconfigure(deviceId, deviceData)
+     */
+    function reconfigure(deviceId, deviceData) {
+      // var device = {};
+      // deviceData = deviceData || {};
+
+      // device.deviceDescriptorId = deviceData.id || '';
+
+      // device.deviceParams = [];
+      // angular.forEach(deviceData.deviceParamTypes, function(deviceParamType) {
+      //   var deviceParam = {};
+
+      //   deviceParam.name = deviceParamType.name;
+      //   deviceParam.value = deviceParamType.value;
+
+      //   device.deviceParams.push(deviceParam);
+      // });
+
+      // return DSDevice.update(deviceId, {device: device});
     }
 
     /*
