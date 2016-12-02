@@ -292,6 +292,8 @@
 
       request.id = requestId;
 
+      console.log('SEND', request, angular.toJson(request));
+
       ws.send(angular.toJson(request));
 
       return defer.promise;

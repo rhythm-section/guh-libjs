@@ -245,9 +245,11 @@
     }
 
     /*
-     * Public method: edit(deviceId, name)
+     * Public method: edit(name)
      */
-    function edit(deviceId, name) {
+    function edit(name) {
+      $log.log('edit', name);
+
       /* jshint validthis: true */
       var self = this;
       var jsonRpcParams = {
@@ -262,9 +264,37 @@
     }
 
     /*
-     * Public method: reconfigure(deviceId, deviceData)
+     * Public method: reconfigure(deviceId, deviceDescriptorId, deviceParams, name)
      */
-    function reconfigure(deviceId, deviceData) {
+    function reconfigure(deviceId, deviceDescriptorId, deviceParams, name) {
+      var jsonRpcParams = {};
+
+      $log.log(deviceId, deviceDescriptorId, deviceParams, name);
+
+      // deviceClassId
+      if(angular.isDefined(deviceId) && deviceId  !== '') {
+        jsonRpcParams.deviceId = deviceId;
+      }
+
+      // deviceDescriptorId or deviceParams
+      if(angular.isDefined(deviceDescriptorId) && deviceDescriptorId !== '') {
+        jsonRpcParams.deviceDescriptorId = deviceDescriptorId;
+      } else if(angular.isDefined(deviceParams) && deviceParams !== []) {
+        jsonRpcParams.deviceParams = deviceParams;
+      }
+
+      // TODO: This should not be needed. Can be removed when bug () is fixed.
+      // name
+      // if(angular.isDefined(name)) {
+      //   jsonRpcParams.name = name;
+      // }
+
+      // Device gets inserted when notification "Devices.DeviceChanged" was received
+      return websocketService.send({
+        method: 'Devices.ReconfigureDevice',
+        params: jsonRpcParams
+      });
+
       // var device = {};
       // deviceData = deviceData || {};
 
