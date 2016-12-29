@@ -244,6 +244,8 @@
               $rootScope.$apply(callbacks[data.id].callback.reject(data.params));
             } else if(angular.isDefined(data.params.ruleError) && data.params.ruleError !== 'RuleErrorNoError') {
               $rootScope.$apply(callbacks[data.id].callback.reject(data.params));
+            } else if(angular.isDefined(data.params.loggingError) && data.params.loggingError !== 'LoggingErrorNoError') {
+              $rootScope.$apply(callbacks[data.id].callback.reject(data.params));
             } else {
               $rootScope.$apply(callbacks[data.id].callback.resolve(data.params));
             }
